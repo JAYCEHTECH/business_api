@@ -627,7 +627,7 @@ def initiate_ishare_transaction(request):
                             doc_ref = history_collection.document(date_and_time)
                             doc_ref.update({'done': 'Successful'})
                             mail_doc_ref = mail_collection.document(f"{batch_id}-Mail")
-                            file_path = 'wallet_api_app/mail.txt'  # Replace with your file path
+                            file_path = 'business_api/mail.txt'  # Replace with your file path
 
                             name = first_name
                             volume = data_volume
