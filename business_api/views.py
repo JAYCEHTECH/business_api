@@ -436,9 +436,6 @@ def initiate_mtn_transaction(request):
 
                     history_collection.document(date_and_time).set(data)
                     history_web.collection(email).document(date_and_time).set(data)
-                    user = history_collection.document(date_and_time)
-                    loko = history_web.collection(email).document(date_and_time)
-                    print(loko.get().to_dict())
                     doc = user.get()
                     print(doc.to_dict())
                     tranx_id = doc.to_dict()['tranxId']
@@ -468,9 +465,6 @@ def initiate_mtn_transaction(request):
                         'type': "MTN Master Bundle"
                     }
                     mtn_other.document(date_and_time).set(second_data)
-                    user22 = mtn_other.document(date_and_time)
-                    pu = user22.get()
-                    print(pu.to_dict())
                     print("pu")
                     mail_doc_ref = mail_collection.document()
                     file_path = 'business_api/mtn_maill.txt'  # Replace with your file path
@@ -504,9 +498,9 @@ def initiate_mtn_transaction(request):
                         }
                     })
                     print("got to redirect")
-                    return Response(data={"code": "200", "message": "Transaction saved"}, status=status.HTTP_200_OK)
+                    return Response(data={"status": "200", "message": "Transaction received successfully"}, status=status.HTTP_200_OK)
                 else:
-                    return Response({"code": '400', 'message': 'Not enough balance to perform transaction'},
+                    return Response({"status": '400', 'message': 'Not enough balance to perform transaction'},
                                     status=status.HTTP_400_BAD_REQUEST)
             except Token.DoesNotExist:
                 return Response({'error': 'Token does not exist.'}, status=status.HTTP_401_UNAUTHORIZED)
