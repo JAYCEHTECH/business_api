@@ -63,7 +63,6 @@ oauthlib==3.2.2
 odfpy==1.4.1
 openpyxl==3.1.2
 packaging==23.2
-pandas==1.5.2
 parso==0.8.3
 prompt-toolkit==3.0.41
 proto-plus==1.22.3

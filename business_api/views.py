@@ -1,15 +1,9 @@
-import json
-import random
+
 import string
 
-import jwt
-import requests
 from django.db import IntegrityError
-from rest_framework import status
 
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
-from rest_framework.exceptions import PermissionDenied
-from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.models import Token
 
@@ -18,36 +12,20 @@ from business_api import models
 from rest_framework.authentication import TokenAuthentication
 
 import datetime
-import hashlib
-import hmac
 import json
 import random
-import secrets
-from io import BytesIO
 from time import sleep
 
-import pandas as pd
 import requests
-from decouple import config
-from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render, redirect
-from django.views.decorators.csrf import csrf_exempt
-from requests.adapters import HTTPAdapter
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from urllib3 import Retry
 from django.conf import settings
 
-# from. import models, serializers
-# from .other_tests import tranx_id_generator
-# Create your views here.
 
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db, firestore
-from secrets import compare_digest
 
 if not firebase_admin._apps:
     cred = credentials.Certificate(settings.FIREBASE_ADMIN_CERT)
