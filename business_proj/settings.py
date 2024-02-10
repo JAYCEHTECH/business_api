@@ -27,14 +27,9 @@ SECRET_KEY = 'django-insecure-#-$h%!)-414g8w=xrgkcopw*rrcq7o#)vb!4zs%gzk__bboj^6
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "*"
+    "plankton-app-s46li.ondigitalocean.app"
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
-
-CSRF_TRUSTED_ORIGINS = [
-    'https://uyyh8ft.localto.net'
-]
 
 
 # Application definition
