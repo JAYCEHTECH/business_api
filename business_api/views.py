@@ -436,6 +436,7 @@ def initiate_mtn_transaction(request):
 
                     history_collection.document(date_and_time).set(data)
                     history_web.collection(email).document(date_and_time).set(data)
+                    user = history_collection.document(date_and_time)
                     doc = user.get()
                     print(doc.to_dict())
                     tranx_id = doc.to_dict()['tranxId']
