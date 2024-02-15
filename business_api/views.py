@@ -111,6 +111,7 @@ def send_ishare_bundle(first_name: str, last_name: str, buyer, receiver: str, em
     token_doc = token.get()
     token_doc_dict = token_doc.to_dict()
     tokennn = token_doc_dict['ishare_bearer']
+    print(tokennn)
 
     headers = {
         'Authorization': tokennn,
