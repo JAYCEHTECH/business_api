@@ -1,4 +1,3 @@
-
 import string
 
 from django.db import IntegrityError
@@ -22,7 +21,6 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.conf import settings
 
-
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db, firestore
@@ -44,6 +42,8 @@ mtn_other = mtn_tranx.collection('mtnOther')
 bearer_token_collection = database.collection("_KeysAndBearer")
 history_web = database.collection(u'History Web').document('all_users')
 
+totals_collection = database.collection('Totals')
+admin_collection = database.collection('Admin')
 
 class BearerTokenAuthentication(TokenAuthentication):
     keyword = 'Bearer'
@@ -81,6 +81,7 @@ def get_user_details(user_id):
     doc = user.get()
     if doc.exists:
         doc_dict = doc.to_dict()
+        print(doc_dict)
         first_name = doc_dict['first name']
         last_name = doc_dict['last name']
         email = doc_dict['email']
@@ -237,6 +238,118 @@ def send_and_save_to_history(user_id, txn_type: str, txn_status: str, paid_at: s
     return ishare_response.status_code, batch_id if batch_id else "No batchId", email, first_name
 
 
+def big_time_transaction(receiver, date, time, date_and_time, phone, amount, data_volume, details: dict, ref,
+                         channel, txn_status, user_id):
+    print("==========")
+    print(amount)
+    data = {
+        'batch_id': "unknown",
+        'buyer': phone,
+        'color_code': "Green",
+        'amount': amount,
+        'data_break_down': str(data_volume),
+        'data_volume': data_volume,
+        'date': date,
+        'date_and_time': date_and_time,
+        'done': "unknown",
+        'email': details['email'],
+        'image': details['user_id'],
+        'ishareBalance': 0,
+        'name': f"{details['first_name']} {details['last_name']}",
+        'number': receiver,
+        'paid_at': str(date_and_time),
+        'reference': ref,
+        'responseCode': 200,
+        'status': txn_status,
+        'time': time,
+        'tranxId': str(tranx_id_generator()),
+        'type': "AT Big Time",
+        'uid': details['user_id']
+    }
+    history_collection.document(date_and_time).set(data)
+    history_web.collection(details['email']).document(date_and_time).set(data)
+    big_time.document(date_and_time).set(data)
+    user = history_collection.document(date_and_time)
+    doc = user.get()
+    print(doc.to_dict())
+    tranx_id = doc.to_dict()['tranxId']
+    mail_doc_ref = mail_collection.document()
+    file_path = 'business_api/mtn_maill.txt'  # Replace with your file path
+
+    name = details['first_name']
+    volume = data_volume
+    date = date_and_time
+    reference_t = ref
+    receiver_t = receiver
+
+    tot = user_collection.document(user_id)
+    print(tot.get().to_dict())
+    try:
+        print(tot.get().to_dict()['bt_total_sales'])
+        previous_sale = tot.get().to_dict()['bt_total_sales']
+        print(f"Previous Sale: {previous_sale}")
+        new_sale = float(previous_sale) + float(amount)
+        print(new_sale)
+        user_collection.document(user_id).update({'bt_total_sales': new_sale})
+    except:
+        user_collection.document(user_id).update({'bt_total_sales': amount})
+
+    # previous_big_time_totals = totals_collection.document('BIGTIME TOTALS')
+    # all_totals = totals_collection.document('ALL TOTALS')
+    # doc = previous_big_time_totals.get()
+    # doc_dict = doc.to_dict()
+    #
+    # previous_total_trans = doc_dict['total_trans']
+    # previous_total_amount = doc_dict['total_amount']
+    #
+    # all_total_doc = all_totals.get()
+    # all_total_doc_dict = all_total_doc.to_dict()
+    #
+    # previous_all_total_amount = all_total_doc_dict['total_amount']
+    #
+    # try:
+    #     new_total_amount = previous_total_amount + amount
+    # except:
+    #     new_total_amount = amount
+    #
+    # try:
+    #     new_total_trans = previous_total_trans + 1
+    # except:
+    #     new_total_trans = 1
+    #
+    # data = {
+    #     'total_trans': new_total_trans,
+    #     'total_amount': new_total_amount
+    # }
+    #
+    # totals_collection.document('BIGTIME TOTALS').update(data)
+    # totals_collection.document('ALL TOTALS').update({'total_amount': previous_all_total_amount + amount})
+
+    with open(file_path, 'r') as file:
+        html_content = file.read()
+
+    placeholders = {
+        '{name}': name,
+        '{volume}': volume,
+        '{date}': date,
+        '{reference}': reference_t,
+        '{receiver}': receiver_t
+    }
+
+    for placeholder, value in placeholders.items():
+        html_content = html_content.replace(placeholder, str(value))
+
+    mail_doc_ref.set({
+        'to': details['email'],
+        'message': {
+            'subject': 'Big Time Data',
+            'html': html_content,
+            'messageId': 'Bestpay'
+        }
+    })
+    return Response(data={'code': '0000', 'message': "Transaction Saved"}, status=status.HTTP_200_OK)
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 @authentication_classes([BearerTokenAuthentication])
@@ -347,6 +460,7 @@ def initiate_mtn_transaction(request):
                     50000: 155,
                     100000: 290
                 }
+
                 amount_to_be_deducted = prices_dict[data_volume]
                 print(str(amount_to_be_deducted) + "================")
                 channel = phone_number
@@ -468,6 +582,19 @@ def initiate_mtn_transaction(request):
                     }
                     mtn_other.document(date_and_time).set(second_data)
                     print("pu")
+
+                    tot = user_collection.document(user_id)
+                    print(tot.get().to_dict())
+                    try:
+                        print(tot.get().to_dict()['mtn_total_sales'])
+                        previous_sale = tot.get().to_dict()['mtn_total_sales']
+                        print(f"Previous Sale: {previous_sale}")
+                        new_sale = float(previous_sale) + float(amount)
+                        print(new_sale)
+                        user_collection.document(user_id).update({'mtn_total_sales': new_sale})
+                    except:
+                        user_collection.document(user_id).update({'mtn_total_sales': amount})
+
                     mail_doc_ref = mail_collection.document()
                     file_path = 'business_api/mtn_maill.txt'  # Replace with your file path
 
@@ -500,7 +627,8 @@ def initiate_mtn_transaction(request):
                         }
                     })
                     print("got to redirect")
-                    return Response(data={"status": "200", "message": "Transaction received successfully"}, status=status.HTTP_200_OK)
+                    return Response(data={"status": "200", "message": "Transaction received successfully"},
+                                    status=status.HTTP_200_OK)
                 else:
                     return Response({"status": '400', 'message': 'Not enough balance to perform transaction'},
                                     status=status.HTTP_400_BAD_REQUEST)
@@ -549,7 +677,12 @@ def initiate_ishare_transaction(request):
                 date_and_time = datetime.datetime.now().isoformat()
 
                 if channel.lower() == "wallet":
-                    enough_balance = check_user_balance_against_price(user_id, amount)
+                    try:
+                        enough_balance = check_user_balance_against_price(user_id, amount)
+                    except:
+                        return Response(
+                            {'code': '0001', 'message': f'User ID does not exist: User ID provided: {user_id}.'},
+                            status=status.HTTP_400_BAD_REQUEST)
                 else:
                     enough_balance = True
                     print("not wallet")
@@ -659,6 +792,19 @@ def initiate_ishare_transaction(request):
                                     'messageId': 'Bestpay'
                                 }
                             })
+
+                            tot = user_collection.document(user_id)
+                            print(tot.get().to_dict())
+                            try:
+                                print(tot.get().to_dict()['at_total_sales'])
+                                previous_sale = tot.get().to_dict()['at_total_sales']
+                                print(f"Previous Sale: {previous_sale}")
+                                new_sale = float(previous_sale) + float(amount)
+                                print(new_sale)
+                                user_collection.document(user_id).update({'at_total_sales': new_sale})
+                            except:
+                                user_collection.document(user_id).update({'at_total_sales': amount})
+
                             return Response(data={'status_code': status_code, 'batch_id': batch_id},
                                             status=status.HTTP_200_OK)
                         else:
@@ -694,3 +840,228 @@ def get_user_token(request):
             return Response({'message': 'Token does not exist for the user.'}, status=status.HTTP_404_NOT_FOUND)
     else:
         return Response({'message': 'User ID parameter is missing.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([BearerTokenAuthentication])
+def initiate_big_time(request):
+    authorization_header = request.headers.get('Authorization')
+    if authorization_header:
+        auth_type, token = authorization_header.split(' ')
+        if auth_type == 'Bearer':
+            try:
+                token_obj = Token.objects.get(key=token)
+                user = token_obj.user
+                user_id = user.user_id
+                print(user_id)
+
+                print("hiiiii")
+
+                receiver = request.data.get('receiver')
+                data_volume = request.data.get('data_volume')
+                reference = request.data.get('reference')
+                amount = request.data.get('amount')
+                print(amount)
+                phone_number = request.data.get('phone_number')
+
+                print("yo")
+
+                if not receiver or not data_volume or not reference or not amount or not phone_number:
+                    return Response({'message': 'Body parameters not valid. Check and try again.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
+                print("got here")
+                user_details = get_user_details(user_id)
+                print(user_details['first name'])
+
+                date = datetime.datetime.now().strftime("%a, %b %d, %Y")
+                time = datetime.datetime.now().strftime("%I:%M:%S %p")
+                date_and_time = datetime.datetime.now().isoformat()
+
+                if user_details is not None:
+                    print("yes")
+                    first_name = user_details['first name']
+                    print(first_name)
+                    last_name = user_details['last name']
+                    print(last_name)
+                    email = user_details['email']
+                    phone = user_details['phone']
+                else:
+                    first_name = ""
+                    last_name = ""
+                    email = ""
+                    phone = ""
+                details = {
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'email': email,
+                    'user_id': user_id
+                }
+                big_time_response = big_time_transaction(receiver=receiver, date_and_time=date_and_time, date=date,
+                                                         time=time, amount=amount, data_volume=data_volume,
+                                                         channel="MoMo", phone=phone, ref=reference,
+                                                         details=details, txn_status="Undelivered", user_id=user_id)
+                if big_time_response.status_code == 200 or big_time_response.data["code"] == "0000":
+                    return Response(data={"status": "200", "message": "Transaction received successfully"},
+                                    status=status.HTTP_200_OK)
+                else:
+                    return Response({"status": '400', 'message': 'Something went wrong'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                print(e)
+                return Response({"status": '400', 'message': f'Something went wrong: {e}'},
+                                status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+    else:
+        return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([BearerTokenAuthentication])
+def wallet_topup(request):
+    authorization_header = request.headers.get('Authorization')
+    if authorization_header:
+        auth_type, token = authorization_header.split(' ')
+        if auth_type == 'Bearer':
+            try:
+                token_obj = Token.objects.get(key=token)
+                user = token_obj.user
+                user_id = user.user_id
+
+                amount = request.data.get('topup_amount')
+                reference = request.data.get('reference')
+
+                if not amount or not reference:
+                    return Response({'message': 'Body parameters not valid. Check and try again.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
+                date = datetime.datetime.now().strftime("%a, %b %d, %Y")
+                time = datetime.datetime.now().strftime("%I:%M:%S %p")
+                date_and_time = datetime.datetime.now().isoformat()
+
+                user_details = get_user_details(user_id)
+                if user_details is not None:
+                    print(user_details)
+                    first_name = user_details['first name']
+                    last_name = user_details['last name']
+                    email = user_details['email']
+                    phone = user_details['phone']
+                    try:
+                        previous_wallet = user_details['wallet']
+                    except KeyError:
+                        previous_wallet = 0
+                else:
+                    first_name = ""
+                    last_name = ""
+                    email = ""
+                    phone = ""
+                    previous_wallet = 0
+                all_data = {
+                    'batch_id': "unknown",
+                    'buyer': phone,
+                    'color_code': "Green",
+                    'amount': amount,
+                    'data_break_down': amount,
+                    'data_volume': amount,
+                    'date': date,
+                    'date_and_time': date_and_time,
+                    'done': "Success",
+                    'email': email,
+                    'image': user_id,
+                    'ishareBalance': 0,
+                    'name': f"{first_name} {last_name}",
+                    'number': phone,
+                    'paid_at': date_and_time,
+                    'reference': reference,
+                    'responseCode': 200,
+                    'status': "Credited",
+                    'time': time,
+                    'tranxId': str(tranx_id_generator()),
+                    'type': "WALLETTOPUP",
+                    'uid': user_id
+                }
+                history_web.collection(email).document(date_and_time).set(all_data)
+                print("f saved")
+                history_collection.document(date_and_time).set(all_data)
+                print(f"ya{history_collection.document(date_and_time).get().to_dict()}")
+                print("f saved")
+                print(f"yo{history_web.collection(email).document(date_and_time).get().to_dict()}")
+                to_be_added = float(amount)
+                print(f"amount to be added: {to_be_added}")
+                new_balance = previous_wallet + to_be_added
+                print(f" new balance: {new_balance}")
+                doc_ref = user_collection.document(user_id)
+                doc_ref.update(
+                    {'wallet': new_balance, 'wallet_last_update': date_and_time,
+                     'recent_wallet_reference': reference})
+                print(doc_ref.get().to_dict())
+                print("before all data")
+                all_data = {
+                    'batch_id': "unknown",
+                    'buyer': phone,
+                    'color_code': "Green",
+                    'amount': amount,
+                    'data_break_down': amount,
+                    'data_volume': amount,
+                    'date': date,
+                    'date_and_time': date_and_time,
+                    'done': "Success",
+                    'email': email,
+                    'image': user_id,
+                    'ishareBalance': 0,
+                    'name': f"{first_name} {last_name}",
+                    'number': phone,
+                    'paid_at': date_and_time,
+                    'reference': reference,
+                    'responseCode': 200,
+                    'status': "Credited",
+                    'time': time,
+                    'tranxId': str(tranx_id_generator()),
+                    'type': "WALLETTOPUP",
+                    'uid': user_id
+                }
+                history_web.collection(email).document(date_and_time).set(all_data)
+                print("saved")
+                history_collection.document(date_and_time).set(all_data)
+                print(f"ya{history_collection.document(date_and_time).get().to_dict()}")
+                print("saved")
+                print(f"yo{history_web.collection(email).document(date_and_time).get().to_dict()}")
+
+                name = f"{first_name} {last_name}"
+                amount = to_be_added
+                file_path = 'business_api/wallet_mail.txt'
+                mail_doc_ref = mail_collection.document()
+
+                with open(file_path, 'r') as file:
+                    html_content = file.read()
+
+                placeholders = {
+                    '{name}': name,
+                    '{amount}': amount
+                }
+
+                for placeholder, value in placeholders.items():
+                    html_content = html_content.replace(placeholder, str(value))
+
+                mail_doc_ref.set({
+                    'to': email,
+                    'message': {
+                        'subject': 'Wallet Topup',
+                        'html': html_content,
+                        'messageId': 'Bestpay'
+                    }
+                })
+
+                sms_message = f"GHS {to_be_added} was deposited in your wallet. Available balance is now GHS {new_balance}"
+                sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to=0{user_details['phone']}&from=Bestpay&sms={sms_message}"
+                response = requests.request("GET", url=sms_url)
+                print(response.status_code)
+                return Response(data={"status": "200", "message": "Wallet Topup Successful"},
+                                status=status.HTTP_200_OK)
+            except Token.DoesNotExist or models.CustomUser.DoesNotExist:
+                return Response({'error': 'Token does not exist.'}, status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
