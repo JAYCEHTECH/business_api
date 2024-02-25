@@ -1,6 +1,8 @@
+from django.conf.urls.static import static
 from django.urls import path
 
 from business_api import views
+from django.conf import settings as conf_settings
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -12,5 +14,5 @@ urlpatterns = [
     path('api/initiate_ishare', views.initiate_ishare_transaction, name='ishare_transaction'),
     path('api/initiate_big_time', views.initiate_big_time, name='big_time'),
     path('api/initiate_wallet_topup', views.wallet_topup, name='wallet_topup')
-]
+] + static(conf_settings.STATIC_URL, document_root=conf_settings.STATIC_ROOT)
 
