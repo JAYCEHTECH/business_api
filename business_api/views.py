@@ -204,7 +204,7 @@ def send_and_save_to_history(user_id, txn_type: str, txn_status: str, paid_at: s
     try:
         batch_id = json_response["batchId"]
     except KeyError:
-        return ishare_response.status_code, None, email, first_name
+        batch_id = None
     print(batch_id)
 
     doc_ref = history_collection.document(date_and_time)
@@ -239,7 +239,7 @@ def send_and_save_to_history(user_id, txn_type: str, txn_status: str, paid_at: s
     # history_web.collection(email).document(date_and_time).set(data)
 
     print("firebase saved")
-    return Response({'data':ishare_response.json(), 'status':ishare_response.status_code}, status=status.HTTP_200_OK)
+    return ishare_response
 
 
 def big_time_transaction(receiver, date, time, date_and_time, phone, amount, data_volume, details: dict, ref,
@@ -738,20 +738,14 @@ def initiate_ishare_transaction(request):
                                                                                         float(amount), receiver,
                                                                                         date, image, time,
                                                                                         date_and_time)
-                    print(ishare_response)
-                    print(f"in the main thing: {ishare_response["data"]}")
-                    try:
-                        error_message = ishare_response["data"]["error"]
-                        if error_message == "Unauthorized":
-                            return Response(data={'status_code': ishare_response.status_code, "message": "Authorization Failed"},
-                                            status=status.HTTP_400_BAD_REQUEST)
-                    except Exception as e:
-                        print(e)
-                        pass
-                    data = ishare_response
-                    batch_id = data["data"]["batchId"]
+                    print(ishare_response.status_code)
+                    if ishare_response.status_code == 400:
+                        return Response(data={'status_code': ishare_response.status_code, "message": "Authorization Failed"},
+                                        status=status.HTTP_400_BAD_REQUEST)
+                    data = ishare_response.json()
+                    batch_id = data["batchId"]
                     print(data["batchId"])
-                    status_code = ishare_response["status"]
+                    status_code = ishare_response.status_code
                     if batch_id is None:
                         return Response(data={'status_code': status_code, "message": "Transaction Failed"},
                                         status=status.HTTP_400_BAD_REQUEST)
