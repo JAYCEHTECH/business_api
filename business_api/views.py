@@ -1634,13 +1634,13 @@ def hubtel_webhook_send_and_save_to_history(saved_data, user_id, reference, rece
     if history_collection.document(reference).get().exists:
         print("first save")
 
-    ishare_response, status_code = send_ishare_bundle(first_name=first_name, last_name=last_name, receiver=receiver,
+    ishare_response = send_ishare_bundle(first_name=first_name, last_name=last_name, receiver=receiver,
                                                       buyer=phone,
                                                       bundle=data_volume,
                                                       email=email)
     json_response = ishare_response.json()
     print(f"hello:{json_response}")
-    status_code = status_code
+    status_code = ishare_response.status_code
     print(status_code)
     try:
         batch_id = json_response["batch_id"]
@@ -2049,6 +2049,80 @@ def hubtel_webhook(request):
                     })
 
                     sms_message = f"GHS {to_be_added} was deposited in your wallet. Available balance is now GHS {new_balance}"
+                    sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to=0{user_details['phone']}&from=Bestpay&sms={sms_message}"
+                    response = requests.request("GET", url=sms_url)
+                    print(response.status_code)
+                    return JsonResponse({'message': "Success"}, status=200)
+                elif txn_type == "ISHARE_TOPUP":
+                    doc_ref.update(
+                        {'ishareBalance': "Paid", 'status': "Credited", "tranxId": str(tranx_id_generator())})
+                    user_details = get_user_details(user_id)
+                    collection_saved = history_collection.document(reference).get().to_dict()
+                    if user_details is not None:
+                        print(user_details)
+                        first_name = user_details['first name']
+                        last_name = user_details['last name']
+                        email = user_details['email']
+                        phone = user_details['phone']
+                        try:
+                            previous_wallet = user_details['at_balance']
+                        except KeyError:
+                            previous_wallet = 0
+                    else:
+                        first_name = ""
+                        last_name = ""
+                        email = ""
+                        phone = ""
+                        previous_wallet = 0
+                    all_data = collection_saved
+                    history_web.collection(email).document(date_and_time).set(all_data)
+                    print("f saved")
+                    history_collection.document(date_and_time).set(all_data)
+                    print(f"ya{history_collection.document(date_and_time).get().to_dict()}")
+                    print("f saved")
+                    print(f"yo{history_web.collection(email).document(date_and_time).get().to_dict()}")
+                    to_be_added = float(amount)
+                    print(f"amount to be added: {to_be_added}")
+                    new_balance = previous_wallet + to_be_added
+                    print(f" new balance: {new_balance}")
+                    doc_ref = user_collection.document(user_id)
+                    doc_ref.update(
+                        {'at_balance': new_balance})
+                    print(doc_ref.get().to_dict())
+                    print("before all data")
+                    all_data = collection_saved
+                    history_web.collection(email).document(date_and_time).set(all_data)
+                    print("saved")
+                    print(f"ya{history_collection.document(date_and_time).get().to_dict()}")
+                    print("saved")
+                    print(f"yo{history_web.collection(email).document(date_and_time).get().to_dict()}")
+
+                    name = f"{first_name} {last_name}"
+                    amount = to_be_added
+                    file_path = 'wallet_api_app/wallet_mail.txt'
+                    mail_doc_ref = mail_collection.document()
+
+                    with open(file_path, 'r') as file:
+                        html_content = file.read()
+
+                    placeholders = {
+                        '{name}': name,
+                        '{amount}': amount
+                    }
+
+                    for placeholder, value in placeholders.items():
+                        html_content = html_content.replace(placeholder, str(value))
+
+                    mail_doc_ref.set({
+                        'to': email,
+                        'message': {
+                            'subject': 'Wallet Topup',
+                            'html': html_content,
+                            'messageId': 'Bestpay'
+                        }
+                    })
+
+                    sms_message = f"GHS {to_be_added} was deposited in your AT Wallet. Available AT Wallet balance is now GHS {new_balance}"
                     sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to=0{user_details['phone']}&from=Bestpay&sms={sms_message}"
                     response = requests.request("GET", url=sms_url)
                     print(response.status_code)
