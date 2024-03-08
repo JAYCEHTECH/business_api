@@ -239,7 +239,7 @@ def send_and_save_to_history(user_id, txn_type: str, txn_status: str, paid_at: s
     # history_web.collection(email).document(date_and_time).set(data)
 
     print("firebase saved")
-    return ishare_response
+    return ishare_response, ishare_response.status_code
 
 
 def big_time_transaction(receiver, date, time, date_and_time, phone, amount, data_volume, details: dict, ref,
@@ -729,7 +729,7 @@ def initiate_ishare_transaction(request):
                             print(f"new_user_wallet: {new_user_wallet}")
                         else:
                             print("it's fine")
-                    ishare_response = send_and_save_to_history(user_id, txn_type, txn_status,
+                    ishare_response, status_code = send_and_save_to_history(user_id, txn_type, txn_status,
                                                                                         paid_at,
                                                                                         float(ishare_balance),
                                                                                         color_code, float(data_volume),
@@ -738,14 +738,15 @@ def initiate_ishare_transaction(request):
                                                                                         float(amount), receiver,
                                                                                         date, image, time,
                                                                                         date_and_time)
-                    print(ishare_response.status_code)
-                    if ishare_response.status_code == 400:
-                        return Response(data={'status_code': ishare_response.status_code, "message": "Authorization Failed"},
+                    print(f"in the main thing: {ishare_response}")
+                    print(status_code)
+                    if status_code == 400:
+                        return Response(data={'status_code': status_code, "message": "Authorization Failed"},
                                         status=status.HTTP_400_BAD_REQUEST)
                     data = ishare_response.json()
                     batch_id = data["batchId"]
                     print(data["batchId"])
-                    status_code = ishare_response.status_code
+                    status_code = status_code
                     if batch_id is None:
                         return Response(data={'status_code': status_code, "message": "Transaction Failed"},
                                         status=status.HTTP_400_BAD_REQUEST)
