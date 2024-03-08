@@ -738,8 +738,7 @@ def initiate_ishare_transaction(request):
                                                                                         float(amount), receiver,
                                                                                         date, image, time,
                                                                                         date_and_time)
-                    print(f"in the main thing: {ishare_response}")
-                    print(ishare_response.status_code)
+                    print(f"in the main thing: {ishare_response.json()}")
                     try:
                         error_message = ishare_response.json()["error"]
                         if error_message == "Unauthorized":
