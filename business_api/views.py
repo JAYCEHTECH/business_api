@@ -739,11 +739,15 @@ def initiate_ishare_transaction(request):
                                                                                         date, image, time,
                                                                                         date_and_time)
                     print(ishare_response.status_code)
-                    if ishare_response.status_code == 400:
+                    if ishare_response.status_code == 401:
                         return Response(data={'status_code': ishare_response.status_code, "message": "Authorization Failed"},
                                         status=status.HTTP_400_BAD_REQUEST)
                     data = ishare_response.json()
-                    batch_id = data["batchId"]
+                    try:
+                        batch_id = data["batchId"]
+                    except KeyError:
+                        return Response(data={'status_code': ishare_response.status_code, "message": "Transaction Failed"},
+                                        status=status.HTTP_400_BAD_REQUEST)
                     print(data["batchId"])
                     status_code = ishare_response.status_code
                     if batch_id is None:
