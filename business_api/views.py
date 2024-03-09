@@ -80,11 +80,11 @@ def check_user_balance_against_price(user_id, price):
         return None
 
 
-def check_user_at_balance_against_price(user_id, price):
+def check_user_at_balance_against_price(user_id, data_volume):
     details = get_user_details(user_id)
-    wallet_balance = details['at_balance']
-    if wallet_balance is not None:
-        return wallet_balance >= float(price)
+    at_balance = details['at_balance']
+    if at_balance is not None:
+        return at_balance >= float(data_volume)
     else:
         return None
 
@@ -690,7 +690,7 @@ def initiate_ishare_transaction(request):
 
                 if "wallet" == "wallet":
                     try:
-                        enough_balance = check_user_at_balance_against_price(user_id, amount)
+                        enough_balance = check_user_at_balance_against_price(user_id, data_volume)
                     except:
                         return Response(
                             {'code': '0001', 'message': f'User ID does not exist: User ID provided: {user_id}.'},
