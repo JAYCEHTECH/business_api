@@ -80,6 +80,15 @@ def check_user_balance_against_price(user_id, price):
         return None
 
 
+def check_user_at_balance_against_price(user_id, price):
+    details = get_user_details(user_id)
+    wallet_balance = details['at_balance']
+    if wallet_balance is not None:
+        return wallet_balance >= float(price)
+    else:
+        return None
+
+
 def get_user_details(user_id):
     user = user_collection.document(user_id)
     doc = user.get()
@@ -153,10 +162,9 @@ def ishare_verification(batch_id):
         return False
 
 
-def send_and_save_to_history(user_id, txn_type: str, txn_status: str, paid_at: str, ishare_balance: float,
-                             color_code: str,
-                             data_volume: float, reference: str, data_break_down: str, amount: float, receiver: str,
-                             date: str, image, time: str, date_and_time: str):
+def send_and_save_to_history(user_id, txn_type: str,
+                             data_volume: float, reference: str, amount: float, receiver: str,
+                             date: str, time: str, date_and_time: str):
     user_details = get_user_details(user_id)
     first_name = user_details['first name']
     last_name = user_details['last name']
@@ -167,22 +175,22 @@ def send_and_save_to_history(user_id, txn_type: str, txn_status: str, paid_at: s
     data = {
         'batch_id': "unknown",
         'buyer': phone,
-        'color_code': color_code,
+        'color_code': "Green",
         'amount': amount,
-        'data_break_down': data_break_down,
+        'data_break_down': data_volume,
         'data_volume': data_volume,
         'date': date,
         'date_and_time': date_and_time,
         'done': "unknown",
         'email': email,
         'image': user_id,
-        'ishareBalance': ishare_balance,
+        'ishareBalance': 0,
         'name': f"{first_name} {last_name}",
         'number': receiver,
-        'paid_at': paid_at,
+        'paid_at': date_and_time,
         'reference': reference,
         'responseCode': "0",
-        'status': txn_status,
+        'status': "Delivered",
         'time': time,
         'tranxId': str(tranx_id_generator()),
         'type': txn_type,
@@ -440,9 +448,9 @@ def initiate_mtn_transaction(request):
                 print(data_volume)
                 reference = request.data.get('reference')
                 amount = request.data.get('amount')
-                phone_number = request.data.get('phone_number')
+                # phone_number = request.data.get('phone_number')
 
-                if not receiver or not data_volume or not reference or not amount or not phone_number:
+                if not receiver or not data_volume or not reference or not amount:
                     return Response({'message': 'Body parameters not valid. Check and try again.'},
                                     status=status.HTTP_400_BAD_REQUEST)
 
@@ -467,7 +475,7 @@ def initiate_mtn_transaction(request):
 
                 amount_to_be_deducted = prices_dict[data_volume]
                 print(str(amount_to_be_deducted) + "================")
-                channel = phone_number
+                # channel = phone_number
                 date = datetime.datetime.now().strftime("%a, %b %d, %Y")
                 time = datetime.datetime.now().strftime("%I:%M:%S %p")
                 date_and_time = datetime.datetime.now().isoformat()
@@ -529,7 +537,7 @@ def initiate_mtn_transaction(request):
 
                     data = {
                         'batch_id': "unknown",
-                        'buyer': channel,
+                        'buyer': phone,
                         'color_code': "Green",
                         'amount': amount_to_be_deducted,
                         'data_break_down': data_volume,
@@ -574,7 +582,7 @@ def initiate_mtn_transaction(request):
                         'ishareBalance': 0,
                         'name': f"{first_name} {last_name}",
                         'number': receiver,
-                        'buyer': channel,
+                        'buyer': phone,
                         'paid_at': date_and_time,
                         'payment_status': "success",
                         'reference': reference,
@@ -658,17 +666,17 @@ def initiate_ishare_transaction(request):
                 print(data_volume)
                 reference = request.data.get('reference')
                 amount = request.data.get('amount')
-                phone_number = request.data.get('phone_number')
-                channel = request.data.get('channel')
-                txn_type = request.data.get('txn_type')
-                txn_status = request.data.get('txn_status')
-                paid_at = request.data.get('paid_at')
-                ishare_balance = request.data.get('ishare_balance')
-                color_code = request.data.get('color_code')
-                data_break_down = request.data.get('data_break_down')
-                image = request.data.get('image')
+                # phone_number = request.data.get('phone_number')
+                # channel = request.data.get('channel')
+                # txn_type = request.data.get('txn_type')
+                # txn_status = request.data.get('txn_status')
+                # paid_at = request.data.get('paid_at')
+                # ishare_balance = request.data.get('ishare_balance')
+                # color_code = request.data.get('color_code')
+                # data_break_down = request.data.get('data_break_down')
+                # image = request.data.get('image')
 
-                if not receiver or not data_volume or not reference or not amount or not phone_number or not channel or not txn_type or not txn_status or not paid_at or not ishare_balance or not color_code or not data_break_down or not image:
+                if not receiver or not data_volume or not reference or not amount:
                     return Response({'message': 'Body parameters not valid. Check and try again.'},
                                     status=status.HTTP_400_BAD_REQUEST)
 
@@ -680,9 +688,9 @@ def initiate_ishare_transaction(request):
                 time = datetime.datetime.now().strftime("%I:%M:%S %p")
                 date_and_time = datetime.datetime.now().isoformat()
 
-                if channel.lower() == "wallet":
+                if "wallet" == "wallet":
                     try:
-                        enough_balance = check_user_balance_against_price(user_id, amount)
+                        enough_balance = check_user_at_balance_against_price(user_id, amount)
                     except:
                         return Response(
                             {'code': '0001', 'message': f'User ID does not exist: User ID provided: {user_id}.'},
@@ -701,42 +709,37 @@ def initiate_ishare_transaction(request):
                     #     return redirect(f"https://{callback_url}")
                     # else:
                     #     print("no record found")
-                    if channel.lower() == "wallet":
+                    if "wallet" == "wallet":
                         user = get_user_details(user_id)
                         if user is None:
                             return None
-                        previous_user_wallet = user['wallet']
+                        previous_user_wallet = user['at_balance']
                         print(f"previous wallet: {previous_user_wallet}")
-                        new_balance = float(previous_user_wallet) - float(amount)
+                        new_balance = float(previous_user_wallet) - float(data_volume)
                         print(f"new_balance:{new_balance}")
                         doc_ref = user_collection.document(user_id)
-                        doc_ref.update({'wallet': new_balance})
+                        doc_ref.update({'at_balance': new_balance})
                         user = get_user_details(user_id)
-                        new_user_wallet = user['wallet']
+                        new_user_wallet = user['at_balance']
                         print(f"new_user_wallet: {new_user_wallet}")
                         if new_user_wallet == previous_user_wallet:
                             user = get_user_details(user_id)
                             if user is None:
                                 return None
-                            previous_user_wallet = user['wallet']
+                            previous_user_wallet = user['at_balance']
                             print(f"previous wallet: {previous_user_wallet}")
-                            new_balance = float(previous_user_wallet) - float(amount)
+                            new_balance = float(previous_user_wallet) - float(data_volume)
                             print(f"new_balance:{new_balance}")
                             doc_ref = user_collection.document(user_id)
-                            doc_ref.update({'wallet': new_balance})
+                            doc_ref.update({'at_balance': new_balance})
                             user = get_user_details(user_id)
-                            new_user_wallet = user['wallet']
+                            new_user_wallet = user['at_balance']
                             print(f"new_user_wallet: {new_user_wallet}")
                         else:
                             print("it's fine")
-                    ishare_response = send_and_save_to_history(user_id, txn_type, txn_status,
-                                                                                        paid_at,
-                                                                                        float(ishare_balance),
-                                                                                        color_code, float(data_volume),
-                                                                                        reference,
-                                                                                        data_break_down,
+                    ishare_response = send_and_save_to_history(user_id,float(data_volume),reference,
                                                                                         float(amount), receiver,
-                                                                                        date, image, time,
+                                                                                        date,time,
                                                                                         date_and_time)
                     print(ishare_response.status_code)
                     if ishare_response.status_code == 401:
@@ -872,16 +875,29 @@ def initiate_big_time(request):
 
                 print("hiiiii")
 
+                prices_dict = {
+                    3000: 70,
+                    4000: 80,
+                    5000: 85,
+                    8000: 150,
+                    10000: 160,
+                    20000: 300,
+                }
+
                 receiver = request.data.get('receiver')
                 data_volume = request.data.get('data_volume')
                 reference = request.data.get('reference')
-                amount = request.data.get('amount')
+                try:
+                    amount = prices_dict[data_volume]
+                except KeyError:
+                    return Response({'message': 'Check data volume parameter and try again.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
                 print(amount)
-                phone_number = request.data.get('phone_number')
+                # phone_number = request.data.get('phone_number')
 
                 print("yo")
 
-                if not receiver or not data_volume or not reference or not amount or not phone_number:
+                if not receiver or not data_volume or not reference or not amount:
                     return Response({'message': 'Body parameters not valid. Check and try again.'},
                                     status=status.HTTP_400_BAD_REQUEST)
 
@@ -2140,3 +2156,266 @@ def hubtel_webhook(request):
     else:
         print("not post")
         return JsonResponse({'message': 'Not Found'}, status=404)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([BearerTokenAuthentication])
+def initiate_at_airtime(request):
+    authorization_header = request.headers.get('Authorization')
+    if authorization_header:
+        auth_type, token = authorization_header.split(' ')
+        if auth_type == 'Bearer':
+            try:
+                token_obj = Token.objects.get(key=token)
+                user = token_obj.user
+                user_id = user.user_id
+                print(user_id)
+
+                print("hiiiii")
+
+                receiver = request.data.get('receiver')
+                reference = request.data.get('reference')
+                amount = request.data.get('amount')
+                print(amount)
+                phone_number = request.data.get('phone_number')
+
+                print("yo")
+
+                if not receiver or not reference or not amount or not phone_number:
+                    return Response({'message': 'Body parameters not valid. Check and try again.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
+                print("got here")
+                user_details = get_user_details(user_id)
+                print(user_details['first name'])
+
+                date = datetime.datetime.now().strftime("%a, %b %d, %Y")
+                time = datetime.datetime.now().strftime("%I:%M:%S %p")
+                date_and_time = datetime.datetime.now().isoformat()
+
+                if user_details is not None:
+                    print("yes")
+                    first_name = user_details['first name']
+                    print(first_name)
+                    last_name = user_details['last name']
+                    print(last_name)
+                    email = user_details['email']
+                    phone = user_details['phone']
+                else:
+                    first_name = ""
+                    last_name = ""
+                    email = ""
+                    phone = ""
+                details = {
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'email': email,
+                    'user_id': user_id
+                }
+
+                payload = "{\r\n    \"Destination\": " + str(receiver) + ",\r\n    \"Amount\": " + str(
+                    amount) + ",\r\n    \"CallbackUrl\": \"https://webhook.site/9125cb31-9481-47ad-972f-d1d7765a5957\",\r\n    \"ClientReference\": " + str(
+                    reference) + "\r\n}"
+
+
+                url = "https://cs.hubtel.com/commissionservices/2016884/dae2142eb5a14c298eace60240c09e4b"
+
+                airtime_headers = {
+                    'Authorization': config("HUBTEL_API_KEY"),
+                    'Content-Type': 'text/plain'
+                }
+
+                response = requests.request("POST", url, headers=airtime_headers, data=payload)
+                airtime_data = response.json()
+                print(airtime_data)
+                print(response.status_code)
+
+                if response.status_code == 200:
+                    print("worked well")
+                else:
+                    print("not 200 error")
+            except Exception as e:
+                print(e)
+                return Response({"status": '400', 'message': f'Something went wrong: {e}'},
+                                status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+    else:
+        return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([BearerTokenAuthentication])
+def initiate_mtn_airtime(request):
+    authorization_header = request.headers.get('Authorization')
+    if authorization_header:
+        auth_type, token = authorization_header.split(' ')
+        if auth_type == 'Bearer':
+            try:
+                token_obj = Token.objects.get(key=token)
+                user = token_obj.user
+                user_id = user.user_id
+                print(user_id)
+
+                print("hiiiii")
+
+                receiver = request.data.get('receiver')
+                reference = request.data.get('reference')
+                amount = request.data.get('amount')
+                print(amount)
+                phone_number = request.data.get('phone_number')
+
+                print("yo")
+
+                if not receiver or not reference or not amount or not phone_number:
+                    return Response({'message': 'Body parameters not valid. Check and try again.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
+                print("got here")
+                user_details = get_user_details(user_id)
+                print(user_details['first name'])
+
+                date = datetime.datetime.now().strftime("%a, %b %d, %Y")
+                time = datetime.datetime.now().strftime("%I:%M:%S %p")
+                date_and_time = datetime.datetime.now().isoformat()
+
+                if user_details is not None:
+                    print("yes")
+                    first_name = user_details['first name']
+                    print(first_name)
+                    last_name = user_details['last name']
+                    print(last_name)
+                    email = user_details['email']
+                    phone = user_details['phone']
+                else:
+                    first_name = ""
+                    last_name = ""
+                    email = ""
+                    phone = ""
+                details = {
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'email': email,
+                    'user_id': user_id
+                }
+
+                payload = "{\r\n    \"Destination\": " + str(receiver) + ",\r\n    \"Amount\": " + str(
+                    amount) + ",\r\n    \"CallbackUrl\": \"https://webhook.site/9125cb31-9481-47ad-972f-d1d7765a5957\",\r\n    \"ClientReference\": " + str(
+                    reference) + "\r\n}"
+
+
+                url = "https://cs.hubtel.com/commissionservices/2016884/fdd76c884e614b1c8f669a3207b09a98"
+
+                airtime_headers = {
+                    'Authorization': config("HUBTEL_API_KEY"),
+                    'Content-Type': 'text/plain'
+                }
+
+                response = requests.request("POST", url, headers=airtime_headers, data=payload)
+                airtime_data = response.json()
+                print(airtime_data)
+                print(response.status_code)
+
+                if response.status_code == 200:
+                    print("worked well")
+                else:
+                    print("not 200 error")
+            except Exception as e:
+                print(e)
+                return Response({"status": '400', 'message': f'Something went wrong: {e}'},
+                                status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+    else:
+        return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([BearerTokenAuthentication])
+def initiate_voda_airtime(request):
+    authorization_header = request.headers.get('Authorization')
+    if authorization_header:
+        auth_type, token = authorization_header.split(' ')
+        if auth_type == 'Bearer':
+            try:
+                token_obj = Token.objects.get(key=token)
+                user = token_obj.user
+                user_id = user.user_id
+                print(user_id)
+
+                print("hiiiii")
+
+                receiver = request.data.get('receiver')
+                reference = request.data.get('reference')
+                amount = request.data.get('amount')
+                print(amount)
+                phone_number = request.data.get('phone_number')
+
+                print("yo")
+
+                if not receiver or not reference or not amount or not phone_number:
+                    return Response({'message': 'Body parameters not valid. Check and try again.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
+                print("got here")
+                user_details = get_user_details(user_id)
+                print(user_details['first name'])
+
+                date = datetime.datetime.now().strftime("%a, %b %d, %Y")
+                time = datetime.datetime.now().strftime("%I:%M:%S %p")
+                date_and_time = datetime.datetime.now().isoformat()
+
+                if user_details is not None:
+                    print("yes")
+                    first_name = user_details['first name']
+                    print(first_name)
+                    last_name = user_details['last name']
+                    print(last_name)
+                    email = user_details['email']
+                    phone = user_details['phone']
+                else:
+                    first_name = ""
+                    last_name = ""
+                    email = ""
+                    phone = ""
+                details = {
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'email': email,
+                    'user_id': user_id
+                }
+
+                payload = "{\r\n    \"Destination\": " + str(receiver) + ",\r\n    \"Amount\": " + str(
+                    amount) + ",\r\n    \"CallbackUrl\": \"https://webhook.site/9125cb31-9481-47ad-972f-d1d7765a5957\",\r\n    \"ClientReference\": " + str(
+                    reference) + "\r\n}"
+
+
+                url = "https://cs.hubtel.com/commissionservices/2016884/f4be83ad74c742e185224fdae1304800"
+
+                airtime_headers = {
+                    'Authorization': config("HUBTEL_API_KEY"),
+                    'Content-Type': 'text/plain'
+                }
+
+                response = requests.request("POST", url, headers=airtime_headers, data=payload)
+                airtime_data = response.json()
+                print(airtime_data)
+                print(response.status_code)
+
+                if response.status_code == 200:
+                    print("worked well")
+                else:
+                    print("not 200 error")
+            except Exception as e:
+                print(e)
+                return Response({"status": '400', 'message': f'Something went wrong: {e}'},
+                                status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+    else:
+        return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
