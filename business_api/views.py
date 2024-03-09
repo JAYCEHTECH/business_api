@@ -162,7 +162,7 @@ def ishare_verification(batch_id):
         return False
 
 
-def send_and_save_to_history(user_id, txn_type: str,
+def send_and_save_to_history(user_id,
                              data_volume: float, reference: str, amount: float, receiver: str,
                              date: str, time: str, date_and_time: str):
     user_details = get_user_details(user_id)
@@ -193,7 +193,7 @@ def send_and_save_to_history(user_id, txn_type: str,
         'status': "Delivered",
         'time': time,
         'tranxId': str(tranx_id_generator()),
-        'type': txn_type,
+        'type': "AT PREMIUM BUNDLE",
         'uid': user_id,
         'bal': wallet
     }
