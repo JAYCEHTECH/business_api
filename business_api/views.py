@@ -933,6 +933,35 @@ def initiate_big_time(request):
                                                          channel="MoMo", phone=phone, ref=reference,
                                                          details=details, txn_status="Undelivered", user_id=user_id)
                 if big_time_response.status_code == 200 or big_time_response.data["code"] == "0000":
+                    if "wallet" == "wallet":
+                        print("updated")
+                        user = get_user_details(user_id)
+                        if user is None:
+                            return None
+                        previous_user_wallet = user['wallet']
+                        print(f"previous wallet: {previous_user_wallet}")
+                        new_balance = float(previous_user_wallet) - float(amount)
+                        print(f"new_balance:{new_balance}")
+                        doc_ref = user_collection.document(user_id)
+                        doc_ref.update({'wallet': new_balance})
+                        user = get_user_details(user_id)
+                        new_user_wallet = user['wallet']
+                        print(f"new_user_wallet: {new_user_wallet}")
+                        if new_user_wallet == previous_user_wallet:
+                            user = get_user_details(user_id)
+                            if user is None:
+                                return None
+                            previous_user_wallet = user['wallet']
+                            print(f"previous wallet: {previous_user_wallet}")
+                            new_balance = float(previous_user_wallet) - float(amount)
+                            print(f"new_balance:{new_balance}")
+                            doc_ref = user_collection.document(user_id)
+                            doc_ref.update({'wallet': new_balance})
+                            user = get_user_details(user_id)
+                            new_user_wallet = user['wallet']
+                            print(f"new_user_wallet: {new_user_wallet}")
+                        else:
+                            print("it's fine")
                     return Response(data={"status": "200", "message": "Transaction received successfully"},
                                     status=status.HTTP_200_OK)
                 else:
