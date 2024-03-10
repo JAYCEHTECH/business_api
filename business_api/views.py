@@ -2495,7 +2495,7 @@ def export_unknown_transactions(request):
             cell.value = None
 
     # Query your Django model for the first 200 records with batch_id 'Unknown' and ordered by status and date
-    queryset = MTNTransaction.objects.filter(batch_id='Unknown', status="Undelivered")[:200]
+    queryset = MTNTransaction.objects.filter(batch_id='Unknown', status="Undelivered")[:100]
 
     # Process transactions with batch_id 'Unknown'
     counter = 0
