@@ -399,7 +399,7 @@ def generate_token(request):
         try:
             user = models.CustomUser.objects.create_user(username=username, user_id=user_id,
                                                          full_name=full_name, email=email)
-            token_key = generate_tokenn(150)
+            token_key = generate_tokenn(35)
             token = Token.objects.create(user=user, key=token_key)
             return Response({'token': token.key, 'message': 'Token Generation Successful'}, status=status.HTTP_200_OK)
         except IntegrityError:
@@ -421,7 +421,7 @@ def regenerate_token(request):
         except Token.DoesNotExist:
             pass
 
-        token_key = generate_tokenn(150)
+        token_key = generate_tokenn(35)
         token = Token.objects.create(user=user, key=token_key)
         return Response({'user_id': user_id, 'token': token.key, 'message': 'Token Generation Successful'},
                         status=status.HTTP_200_OK)
