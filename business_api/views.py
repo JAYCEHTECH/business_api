@@ -876,20 +876,24 @@ def initiate_big_time(request):
                 print("hiiiii")
 
                 prices_dict = {
-                    3000: 70,
-                    4000: 80,
-                    5000: 85,
-                    8000: 150,
-                    10000: 160,
-                    20000: 300,
+                    30000: 70,
+                    40000: 80,
+                    50000: 85,
+                    80000: 150,
+                    100000: 160,
+                    200000: 300,
                 }
 
                 receiver = request.data.get('receiver')
+                print(receiver)
                 data_volume = request.data.get('data_volume')
                 reference = request.data.get('reference')
+                print(data_volume, reference)
                 try:
                     amount = prices_dict[data_volume]
+                    print(amount)
                 except KeyError:
+                    print("key error")
                     return Response({'message': 'Check data volume parameter and try again.'},
                                     status=status.HTTP_400_BAD_REQUEST)
                 print(amount)
@@ -2446,5 +2450,7 @@ def initiate_voda_airtime(request):
             return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
     else:
         return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
 
 
