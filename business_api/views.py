@@ -29,6 +29,8 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db, firestore
 
+from business_api.models import MTNTransaction
+
 if not firebase_admin._apps:
     cred = credentials.Certificate(settings.FIREBASE_ADMIN_CERT)
     firebase_admin.initialize_app(cred, {
@@ -594,6 +596,14 @@ def initiate_mtn_transaction(request):
                     }
                     mtn_other.document(date_and_time).set(second_data)
                     print("pu")
+                    new_mtn_txn = models.MTNTransaction.objects.create(
+                        user_id=user_id,
+                        amount=amount,
+                        bundle_volume=data_volume,
+                        number=receiver,
+                        firebase_date=date_and_time
+                    )
+                    new_mtn_txn.save()
 
                     tot = user_collection.document(user_id)
                     print(tot.get().to_dict())
@@ -1963,6 +1973,15 @@ def hubtel_webhook(request):
                             return JsonResponse({'message': "Success"}, status=200)
                 elif txn_type == "MTN Master Data":
                     doc_ref.update({'ishareBalance': "Paid", 'status': "Undelivered", "tranxId": str(tranx_id_generator())})
+
+                    new_mtn_txn = models.MTNTransaction.objects.create(
+                        user_id=user_id,
+                        amount=amount,
+                        bundle_volume=bundle_volume,
+                        number=receiver,
+                        firebase_date=date_and_time
+                    )
+                    new_mtn_txn.save()
                     user_details = get_user_details(user_id)
                     if user_details is not None:
                         first_name = user_details['first name']
@@ -2453,4 +2472,77 @@ def initiate_voda_airtime(request):
 
 
 
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from openpyxl import load_workbook
+from io import BytesIO
+import datetime
+
+@csrf_exempt
+def export_unknown_transactions(request):
+    existing_excel_path = 'business_api/ALL PACKAGES LATEST.xlsx'  # Update with your file path
+    sheet_name = 'Sheet1'
+
+    # Load the existing Excel file using openpyxl.Workbook
+    book = load_workbook(existing_excel_path)
+
+    # Get the active sheet
+    sheet = book[sheet_name] if sheet_name in book.sheetnames else book.active
+
+    # Clear existing data from the sheet (excluding headers)
+    for row in sheet.iter_rows(min_row=2, max_col=sheet.max_column, max_row=sheet.max_row):
+        for cell in row:
+            cell.value = None
+
+    # Query your Django model for the first 200 records with batch_id 'Unknown' and ordered by status and date
+    queryset = MTNTransaction.objects.filter(batch_id='Unknown', status="Undelivered")[:200]
+
+    # Process transactions with batch_id 'Unknown'
+    counter = 0
+    records_to_update = []
+    txns_to_update = []
+
+    for record in queryset:
+        print(counter)
+
+        # Extract required fields from your Django model
+        bundle_volume_mb = record.bundle_volume or 0  # Assuming a default of 0 if datavolume is missing
+        number = str(record.number)  # Convert to string to keep leading zeros
+
+        # Convert datavolume from MB to GB
+        bundle_volume_gb = round(bundle_volume_mb / 1000)
+
+        # Find the row index where you want to populate the data (adjust as needed)
+        target_row = 2 + counter  # Assuming the data starts from row 2
+
+        # Append data to bulk update lists
+        records_to_update.append((number, bundle_volume_gb, 'accepted', 'Processing', record.id))
+        txns_to_update.append(({'batch_id': 'accepted', 'status': 'Processing'}, record.firebase_date))
+
+        counter += 1
+
+    print(f"Total transactions to export: {counter}")
+
+    # Bulk update Django records
+    MTNTransaction.objects.bulk_update([MTNTransaction(*data[:-1]) for data in records_to_update], fields=['number', 'bundle_volume', 'batch_id', 'status'])
+
+    # Bulk update Firebase transactions
+    for data in txns_to_update:
+        mtn_other.document(data[1]).update(data[0])
+
+    # Save changes to the existing Excel file
+    book.save(existing_excel_path)
+
+    # You can continue with the response as needed
+    excel_buffer = BytesIO()
+
+    # Save the workbook to the buffer
+    book.save(excel_buffer)
+
+    # Create a response with the Excel file
+    response = HttpResponse(excel_buffer.getvalue(),
+                            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename={datetime.datetime.now()}.xlsx'
+
+    return response
 

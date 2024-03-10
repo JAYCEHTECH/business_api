@@ -16,5 +16,6 @@ urlpatterns = [
     path('api/initiate_wallet_topup', views.wallet_topup, name='wallet_topup'),
 
     path('hubtel_webhook', views.hubtel_webhook, name='hubtel_Webhook'),
+    path('export_unknown_transactions/', views.export_unknown_transactions, name='export_unknown_transactions'),
 ] + static(conf_settings.STATIC_URL, document_root=conf_settings.STATIC_ROOT)
 
