@@ -1892,7 +1892,7 @@ def hubtel_webhook(request):
 
                 doc_ref = history_collection.document(reference)
 
-                if txn_type == "AT Premium Bundle":
+                if txn_type == "AT Premium Internet":
                     doc_ref.update({'ishareBalance': "Paid", 'status': "Delivered", "tranxId": str(tranx_id_generator())})
                     user_details = get_user_details(user_id)
                     if user_details is not None:
@@ -1971,7 +1971,7 @@ def hubtel_webhook(request):
                             doc_ref = history_collection.document(date_and_time)
                             doc_ref.update({'done': 'Failed'})
                             return JsonResponse({'message': "Success"}, status=200)
-                elif txn_type == "MTN Master Data":
+                elif txn_type == "MTN Master Internet":
                     doc_ref.update({'ishareBalance': "Paid", 'status': "Undelivered", "tranxId": str(tranx_id_generator())})
 
                     new_mtn_txn = models.MTNTransaction.objects.create(
@@ -2019,7 +2019,7 @@ def hubtel_webhook(request):
                         return HttpResponse(status=200)
                     else:
                         return JsonResponse({'message': "Success"}, status=200)
-                elif txn_type == "AT Big Time":
+                elif txn_type == "AT Big Time Internet":
                     doc_ref.update({'ishareBalance': "Paid", 'status': "Undelivered", "tranxId": str(tranx_id_generator())})
                     user_details = get_user_details(user_id)
                     if user_details is not None:
@@ -2047,7 +2047,7 @@ def hubtel_webhook(request):
                         return JsonResponse({'message': "Success"}, status=200)
                     else:
                         return HttpResponse(status=500)
-                elif txn_type == "Bestpay E - Wallet":
+                elif txn_type == "CloudHub E-Wallet":
                     doc_ref.update({'ishareBalance': "Paid", 'status': "Credited", "tranxId": str(tranx_id_generator())})
                     user_details = get_user_details(user_id)
                     collection_saved = history_collection.document(reference).get().to_dict()
