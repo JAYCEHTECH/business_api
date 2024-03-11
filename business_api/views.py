@@ -1317,7 +1317,7 @@ def mtn_flexi_transaction(receiver, date, time, date_and_time, phone, amount, da
     print(pu.to_dict())
     print("pu")
     mail_doc_ref = mail_collection.document()
-    file_path = 'wallet_api_app/mtn_maill.txt'  # Replace with your file path
+    file_path = 'business_api/mtn_maill.txt'  # Replace with your file path
 
     name = details['first_name']
     volume = data_volume
@@ -1439,7 +1439,7 @@ def paystack_webhook(request):
                             else:
                                 print("no entry")
                             mail_doc_ref = mail_collection.document(f"{batch_id}-Mail")
-                            file_path = 'wallet_api_app/mail.txt'  # Replace with your file path
+                            file_path = 'business_api/mail.txt'  # Replace with your file path
 
                             name = first_name
                             volume = bundle_package
@@ -1621,7 +1621,7 @@ def paystack_webhook(request):
 
                     name = f"{first_name} {last_name}"
                     amount = to_be_added
-                    file_path = 'wallet_api_app/wallet_mail.txt'
+                    file_path = 'business_api/wallet_mail.txt'
                     mail_doc_ref = mail_collection.document()
 
                     with open(file_path, 'r') as file:
@@ -1743,7 +1743,7 @@ def hubtel_mtn_flexi_transaction(saved_data, reference, email, data_volume, date
     print(pu.to_dict())
     print("pu")
     mail_doc_ref = mail_collection.document()
-    file_path = 'wallet_api_app/mtn_maill.txt'  # Replace with your file path
+    file_path = 'business_api/mtn_maill.txt'  # Replace with your file path
 
     tot = user_collection.document(user_id)
     print(tot.get().to_dict())
@@ -1800,7 +1800,7 @@ def hubtel_big_time_transaction(saved_data, reference, email, data_volume, date_
     print(doc.to_dict())
     tranx_id = doc.to_dict()['tranxId']
     mail_doc_ref = mail_collection.document()
-    file_path = 'wallet_api_app/mtn_mail.txt'  # Replace with your file path
+    file_path = 'business_api/mtn_mail.txt'  # Replace with your file path
 
     name = first_name
     volume = data_volume
@@ -1946,7 +1946,7 @@ def hubtel_webhook(request):
                             else:
                                 print("no entry")
                             mail_doc_ref = mail_collection.document(f"{batch_id}-Mail")
-                            file_path = 'wallet_api_app/mail.txt'  # Replace with your file path
+                            file_path = 'business_api/mail.txt'  # Replace with your file path
 
                             name = first_name
                             volume = bundle_volume
@@ -2108,7 +2108,7 @@ def hubtel_webhook(request):
 
                     name = f"{first_name} {last_name}"
                     amount = to_be_added
-                    file_path = 'wallet_api_app/wallet_mail.txt'
+                    file_path = 'business_api/wallet_mail.txt'
                     mail_doc_ref = mail_collection.document()
 
                     with open(file_path, 'r') as file:
@@ -2182,7 +2182,7 @@ def hubtel_webhook(request):
 
                     name = f"{first_name} {last_name}"
                     amount = to_be_added
-                    file_path = 'wallet_api_app/wallet_mail.txt'
+                    file_path = 'business_api/wallet_mail.txt'
                     mail_doc_ref = mail_collection.document()
 
                     with open(file_path, 'r') as file:
