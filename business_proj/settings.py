@@ -81,7 +81,7 @@ CORS_ALLOWED_ORIGINS = [  # Replace with your allowed domain(s)
     'https://www.dataforall.store',
     'https://www.bestpluggh.com',
     'https://www.ghdatahubs.com',
-    'webapp.cloudhubgh.com'
+    'https://webapp.cloudhubgh.com'
 ]
 
 CORS_ALLOW_METHODS = [

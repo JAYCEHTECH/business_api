@@ -17,5 +17,7 @@ urlpatterns = [
 
     path('hubtel_webhook', views.hubtel_webhook, name='hubtel_Webhook'),
     path('export_unknown_transactions/', views.export_unknown_transactions, name='export_unknown_transactions'),
+
+    path('initiate_mtn_airtime', views.initiate_at_airtime, name='initiate_mtn_airtime'),
 ] + static(conf_settings.STATIC_URL, document_root=conf_settings.STATIC_ROOT)
 
