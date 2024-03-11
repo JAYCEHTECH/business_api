@@ -2506,11 +2506,13 @@ def export_unknown_transactions(request):
         print(counter)
 
         # Extract required fields from your Django model
-        bundle_volume_mb = record.bundle_volume or 0  # Assuming a default of 0 if datavolume is missing
+        bundle_volume_mb = record.bundle_volume or 0
+        print(bundle_volume_mb)# Assuming a default of 0 if datavolume is missing
         number = str(record.number)  # Convert to string to keep leading zeros
 
         # Convert datavolume from MB to GB
         bundle_volume_gb = round(bundle_volume_mb / 1000)
+        print(bundle_volume_gb)
 
         # Find the row index where you want to populate the data (adjust as needed)
         target_row = 2 + counter  # Assuming the data starts from row 2
