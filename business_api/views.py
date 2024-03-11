@@ -672,7 +672,7 @@ def admin_initiate_mtn_transaction(request):
         if auth_type == 'Bearer':
             try:
                 token_obj = Token.objects.get(key=token)
-                token_key = token.key
+                token_key = token_obj.key
                 if token_key != config("TOKEN_KEY"):
                     return Response({'message': 'Authorisation Failed.'},
                                     status=status.HTTP_400_BAD_REQUEST)
@@ -1432,7 +1432,6 @@ def initiate_big_time(request):
             return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
     else:
         return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
-
 
 
 @api_view(['POST'])
