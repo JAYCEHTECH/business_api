@@ -759,7 +759,9 @@ def initiate_ishare_transaction(request):
                             status=status.HTTP_400_BAD_REQUEST)
                     data = ishare_response.json()
                     try:
+                        print("entered the try")
                         batch_id = data["batchId"]
+                        print("batch id")
                     except KeyError:
                         print("key error")
                         return Response(
