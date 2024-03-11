@@ -899,11 +899,13 @@ def admin_initiate_mtn_transaction(request):
                         previous_cashback = tat.get().to_dict()['cashback_wallet']
                         print(previous_cashback)
                         cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
+                        print(cashback_balance)
                         new_cashback = float(previous_cashback) + float(cashback_balance)
                         print(new_cashback)
                         cashback_collection.document(user_id).update({'cashback_wallet': new_cashback})
                     except:
                         cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
+                        print(cashback_balance)
                         user_collection.document(user_id).update({'cashback_wallet': cashback_balance})
 
                     mail_doc_ref = mail_collection.document()
