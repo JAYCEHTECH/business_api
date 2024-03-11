@@ -673,7 +673,7 @@ def admin_initiate_mtn_transaction(request):
             try:
                 token_obj = Token.objects.get(key=token)
                 token_key = token.key
-                if token_key != config("TOKEN KEY"):
+                if token_key != config("TOKEN_KEY"):
                     return Response({'message': 'Authorisation Failed.'},
                                     status=status.HTTP_400_BAD_REQUEST)
 
@@ -1126,7 +1126,7 @@ def admin_initiate_ishare_transaction(request):
                 token_obj = Token.objects.get(key=token)
                 token_key = token_obj.key
 
-                if token_key != config("TOKEN KEY"):
+                if token_key != config("TOKEN_KEY"):
                     return Response({'message': 'Authorisation Failed.'},
                                     status=status.HTTP_400_BAD_REQUEST)
 
@@ -1483,7 +1483,7 @@ def admin_initiate_big_time(request):
                 token_obj = Token.objects.get(key=token)
                 token_key = token_obj.key
 
-                if token_key != config("TOKEN KEY"):
+                if token_key != config("TOKEN_KEY"):
                     return Response({'message': 'Authorisation Failed.'},
                                     status=status.HTTP_400_BAD_REQUEST)
 
