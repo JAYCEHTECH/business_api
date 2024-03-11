@@ -2473,14 +2473,9 @@ def initiate_voda_airtime(request):
 
 
 from django.http import HttpResponse
-from openpyxl import Workbook
-from openpyxl.utils.dataframe import dataframe_to_rows
 from io import BytesIO
-import pandas as pd
 from .models import MTNTransaction  # Adjust the import based on your model's location
 
-from openpyxl import load_workbook
-from openpyxl.utils.dataframe import dataframe_to_rows
 
 
 from openpyxl import load_workbook
