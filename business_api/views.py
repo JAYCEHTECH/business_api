@@ -782,8 +782,8 @@ def initiate_ishare_transaction(request):
                         print(code)
                         print(ishare_response)
                         if code == '200' or ishare_response == 'Crediting Successful.':
-                            sms = f"Hey there\nYour account has been credited with {data_volume}MB.\nConfirm your new balance using the AT Mobile App"
-                            r_sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to={receiver}&from=Bestpay&sms={sms}"
+                            sms = f"Your account has been credited with {data_volume}MB."
+                            r_sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to={receiver}&from=CloudHub GH&sms={sms}"
                             response = requests.request("GET", url=r_sms_url)
                             print(response.text)
                             doc_ref = history_collection.document(date_and_time)
@@ -1926,8 +1926,8 @@ def hubtel_webhook(request):
                         print(batch_id)
 
                         if json_response["code"] == '0000':
-                            sms = f"Hey there\nYour account has been credited with {bundle_volume}MB.\nConfirm your new balance using the AT Mobile App"
-                            r_sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to={receiver}&from=Bestpay&sms={sms}"
+                            sms = f"Your account has been credited with {bundle_volume}MB."
+                            r_sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to={receiver}&from=CloudHub GH&sms={sms}"
                             response = requests.request("GET", url=r_sms_url)
                             doc_ref = history_collection.document(date_and_time)
                             if doc_ref.get().exists:
@@ -2246,6 +2246,56 @@ def initiate_at_airtime(request):
                 time = datetime.datetime.now().strftime("%I:%M:%S %p")
                 date_and_time = datetime.datetime.now().isoformat()
 
+                if "wallet" == "wallet":
+                    try:
+                        enough_balance = check_user_balance_against_price(user_id, amount)
+                    except:
+                        return Response(
+                            {'code': '0001', 'message': f'User ID does not exist: User ID provided: {user_id}.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    enough_balance = True
+                    print("not wallet")
+                print(enough_balance)
+                if enough_balance:
+                    user_details = get_user_details(user_id)
+                    email = user_details['email']
+                    print(enough_balance)
+                    # hist = history_web.collection(email).document(date_and_time)
+                    # doc = hist.get()
+                    # if doc.exists:
+                    #     return redirect(f"https://{callback_url}")
+                    # else:
+                    #     print("no record found")
+                    if "wallet" == "wallet":
+                        user = get_user_details(user_id)
+                        if user is None:
+                            return None
+                        previous_user_wallet = user['wallet']
+                        print(f"previous wallet: {previous_user_wallet}")
+                        new_balance = float(previous_user_wallet) - float(amount)
+                        print(f"new_balance:{new_balance}")
+                        doc_ref = user_collection.document(user_id)
+                        doc_ref.update({'wallet': new_balance})
+                        user = get_user_details(user_id)
+                        new_user_wallet = user['wallet']
+                        print(f"new_user_wallet: {new_user_wallet}")
+                        if new_user_wallet == previous_user_wallet:
+                            user = get_user_details(user_id)
+                            if user is None:
+                                return None
+                            previous_user_wallet = user['wallet']
+                            print(f"previous wallet: {previous_user_wallet}")
+                            new_balance = float(previous_user_wallet) - float(amount)
+                            print(f"new_balance:{new_balance}")
+                            doc_ref = user_collection.document(user_id)
+                            doc_ref.update({'wallet': new_balance})
+                            user = get_user_details(user_id)
+                            new_user_wallet = user['wallet']
+                            print(f"new_user_wallet: {new_user_wallet}")
+                        else:
+                            print("it's fine")
+
                 if user_details is not None:
                     print("yes")
                     first_name = user_details['first name']
@@ -2284,9 +2334,40 @@ def initiate_at_airtime(request):
                 print(response.status_code)
 
                 if response.status_code == 200:
+                    data = {
+                        'batch_id': "unknown",
+                        'buyer': phone,
+                        'color_code': "Green",
+                        'amount': amount,
+                        'data_break_down': "",
+                        'data_volume': "",
+                        'date': date,
+                        'date_and_time': date_and_time,
+                        'done': "unknown",
+                        'email': email,
+                        'image': user_id,
+                        'ishareBalance': 0,
+                        'name': f"{first_name} {last_name}",
+                        'number': receiver,
+                        'paid_at': date_and_time,
+                        'reference': reference,
+                        'responseCode': "0",
+                        'status': "Delivered",
+                        'time': time,
+                        'tranxId': str(tranx_id_generator()),
+                        'type': "AT PREMIUM BUNDLE",
+                        'uid': user_id,
+                        'bal': user["wallet"]
+                    }
+                    history_collection.document(date_and_time).set(data)
+                    history_web.collection(email).document(date_and_time).set(data)
                     print("worked well")
+                    return Response({"status": response.status_code, 'message': f'Something went wrong'},
+                                    )
                 else:
                     print("not 200 error")
+                    return Response({"status": '200', 'message': f'Transaction Completed Successfully'},
+                                    status=status.HTTP_200_OK)
             except Exception as e:
                 print(e)
                 return Response({"status": '400', 'message': f'Something went wrong: {e}'},
@@ -2333,6 +2414,57 @@ def initiate_mtn_airtime(request):
                 time = datetime.datetime.now().strftime("%I:%M:%S %p")
                 date_and_time = datetime.datetime.now().isoformat()
 
+
+                if "wallet" == "wallet":
+                    try:
+                        enough_balance = check_user_balance_against_price(user_id, amount)
+                    except:
+                        return Response(
+                            {'code': '0001', 'message': f'User ID does not exist: User ID provided: {user_id}.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    enough_balance = True
+                    print("not wallet")
+                print(enough_balance)
+                if enough_balance:
+                    user_details = get_user_details(user_id)
+                    email = user_details['email']
+                    print(enough_balance)
+                    # hist = history_web.collection(email).document(date_and_time)
+                    # doc = hist.get()
+                    # if doc.exists:
+                    #     return redirect(f"https://{callback_url}")
+                    # else:
+                    #     print("no record found")
+                    if "wallet" == "wallet":
+                        user = get_user_details(user_id)
+                        if user is None:
+                            return None
+                        previous_user_wallet = user['wallet']
+                        print(f"previous wallet: {previous_user_wallet}")
+                        new_balance = float(previous_user_wallet) - float(amount)
+                        print(f"new_balance:{new_balance}")
+                        doc_ref = user_collection.document(user_id)
+                        doc_ref.update({'wallet': new_balance})
+                        user = get_user_details(user_id)
+                        new_user_wallet = user['wallet']
+                        print(f"new_user_wallet: {new_user_wallet}")
+                        if new_user_wallet == previous_user_wallet:
+                            user = get_user_details(user_id)
+                            if user is None:
+                                return None
+                            previous_user_wallet = user['wallet']
+                            print(f"previous wallet: {previous_user_wallet}")
+                            new_balance = float(previous_user_wallet) - float(amount)
+                            print(f"new_balance:{new_balance}")
+                            doc_ref = user_collection.document(user_id)
+                            doc_ref.update({'wallet': new_balance})
+                            user = get_user_details(user_id)
+                            new_user_wallet = user['wallet']
+                            print(f"new_user_wallet: {new_user_wallet}")
+                        else:
+                            print("it's fine")
+
                 if user_details is not None:
                     print("yes")
                     first_name = user_details['first name']
@@ -2371,9 +2503,40 @@ def initiate_mtn_airtime(request):
                 print(response.status_code)
 
                 if response.status_code == 200:
+                    data = {
+                        'batch_id': "unknown",
+                        'buyer': phone,
+                        'color_code': "Green",
+                        'amount': amount,
+                        'data_break_down': "",
+                        'data_volume': "",
+                        'date': date,
+                        'date_and_time': date_and_time,
+                        'done': "unknown",
+                        'email': email,
+                        'image': user_id,
+                        'ishareBalance': 0,
+                        'name': f"{first_name} {last_name}",
+                        'number': receiver,
+                        'paid_at': date_and_time,
+                        'reference': reference,
+                        'responseCode': "0",
+                        'status': "Delivered",
+                        'time': time,
+                        'tranxId': str(tranx_id_generator()),
+                        'type': "AT PREMIUM BUNDLE",
+                        'uid': user_id,
+                        'bal': user["wallet"]
+                    }
+                    history_collection.document(date_and_time).set(data)
+                    history_web.collection(email).document(date_and_time).set(data)
                     print("worked well")
+                    return Response({"status": response.status_code, 'message': f'Something went wrong'},
+                                    )
                 else:
                     print("not 200 error")
+                    return Response({"status": '200', 'message': f'Transaction Completed Successfully'},
+                                    status=status.HTTP_200_OK)
             except Exception as e:
                 print(e)
                 return Response({"status": '400', 'message': f'Something went wrong: {e}'},
@@ -2420,6 +2583,57 @@ def initiate_voda_airtime(request):
                 time = datetime.datetime.now().strftime("%I:%M:%S %p")
                 date_and_time = datetime.datetime.now().isoformat()
 
+
+                if "wallet" == "wallet":
+                    try:
+                        enough_balance = check_user_balance_against_price(user_id, amount)
+                    except:
+                        return Response(
+                            {'code': '0001', 'message': f'User ID does not exist: User ID provided: {user_id}.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    enough_balance = True
+                    print("not wallet")
+                print(enough_balance)
+                if enough_balance:
+                    user_details = get_user_details(user_id)
+                    email = user_details['email']
+                    print(enough_balance)
+                    # hist = history_web.collection(email).document(date_and_time)
+                    # doc = hist.get()
+                    # if doc.exists:
+                    #     return redirect(f"https://{callback_url}")
+                    # else:
+                    #     print("no record found")
+                    if "wallet" == "wallet":
+                        user = get_user_details(user_id)
+                        if user is None:
+                            return None
+                        previous_user_wallet = user['wallet']
+                        print(f"previous wallet: {previous_user_wallet}")
+                        new_balance = float(previous_user_wallet) - float(amount)
+                        print(f"new_balance:{new_balance}")
+                        doc_ref = user_collection.document(user_id)
+                        doc_ref.update({'wallet': new_balance})
+                        user = get_user_details(user_id)
+                        new_user_wallet = user['wallet']
+                        print(f"new_user_wallet: {new_user_wallet}")
+                        if new_user_wallet == previous_user_wallet:
+                            user = get_user_details(user_id)
+                            if user is None:
+                                return None
+                            previous_user_wallet = user['wallet']
+                            print(f"previous wallet: {previous_user_wallet}")
+                            new_balance = float(previous_user_wallet) - float(amount)
+                            print(f"new_balance:{new_balance}")
+                            doc_ref = user_collection.document(user_id)
+                            doc_ref.update({'wallet': new_balance})
+                            user = get_user_details(user_id)
+                            new_user_wallet = user['wallet']
+                            print(f"new_user_wallet: {new_user_wallet}")
+                        else:
+                            print("it's fine")
+
                 if user_details is not None:
                     print("yes")
                     first_name = user_details['first name']
@@ -2458,9 +2672,40 @@ def initiate_voda_airtime(request):
                 print(response.status_code)
 
                 if response.status_code == 200:
+                    data = {
+                        'batch_id': "unknown",
+                        'buyer': phone,
+                        'color_code': "Green",
+                        'amount': amount,
+                        'data_break_down': "",
+                        'data_volume': "",
+                        'date': date,
+                        'date_and_time': date_and_time,
+                        'done': "unknown",
+                        'email': email,
+                        'image': user_id,
+                        'ishareBalance': 0,
+                        'name': f"{first_name} {last_name}",
+                        'number': receiver,
+                        'paid_at': date_and_time,
+                        'reference': reference,
+                        'responseCode': "0",
+                        'status': "Delivered",
+                        'time': time,
+                        'tranxId': str(tranx_id_generator()),
+                        'type': "AT PREMIUM BUNDLE",
+                        'uid': user_id,
+                        'bal': user["wallet"]
+                    }
+                    history_collection.document(date_and_time).set(data)
+                    history_web.collection(email).document(date_and_time).set(data)
                     print("worked well")
+                    return Response({"status": response.status_code, 'message': f'Something went wrong'},
+                                    )
                 else:
                     print("not 200 error")
+                    return Response({"status": '200', 'message': f'Transaction Completed Successfully'},
+                                    status=status.HTTP_200_OK)
             except Exception as e:
                 print(e)
                 return Response({"status": '400', 'message': f'Something went wrong: {e}'},

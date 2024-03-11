@@ -53,14 +53,65 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+
+CORS_ALLOWED_ORIGINS = [  # Replace with your allowed domain(s)
+    'https://test.bestpaygh.com',
+    'https://www.bestpaygh.com',
+    'https://www.bestpaygh.com',
+    'https://console.bestpaygh.com',
+    'https://posapi.bestpaygh.com',
+    'https://webhook-5n2u9.ondigitalocean.app',
+    'https://webhook.bestpaygh.com',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'https://www.nobledatagh.com',
+    'https://www.aunicetopupgh.com',
+    'https://www.gh-bay.com',
+    'https://www.dataforall.store',
+    'https://www.bestpluggh.com',
+    'https://www.ghdatahubs.com',
+    'webapp.cloudhubgh.com'
+]
+
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+
+CORS_ALLOW_HEADERS = [
+    'Accept',
+    'accept-encoding',
+    'Accept-Language',
+    'Content-Type',
+    'Authorization',
+    'authorization'
+    'Api-Key',
+    'Api-Secret',
+    'api-key',
+    'api-secret',
+    'x-api-key'
+    'x-api-secret'
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'cache-control',
+    'pragma',
 ]
 
 ROOT_URLCONF = 'business_proj.urls'
