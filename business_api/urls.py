@@ -22,8 +22,8 @@ urlpatterns = [
     path('api/initiate_voda_airtime', views.initiate_voda_airtime, name='initiate_voda_airtime'),
     path('api/initiate_at_airtime', views.initiate_at_airtime, name='initiate_at_airtime'),
 
-    path('admin/api/initiate_mtn', views.admin_initiate_mtn_transaction, name='initiate_mtn_transaction'),
-    path('admin/api/initiate_ishare', views.admin_initiate_ishare_transaction, name='ishare_transaction'),
-    path('admin/api/initiate_big_time', views.admin_initiate_big_time, name='big_time'),
+    path('elevated/api/initiate_mtn', views.admin_initiate_mtn_transaction, name='initiate_mtn_transaction'),
+    path('elevated/api/initiate_ishare', views.admin_initiate_ishare_transaction, name='ishare_transaction'),
+    path('elevated/api/initiate_big_time', views.admin_initiate_big_time, name='big_time'),
 ] + static(conf_settings.STATIC_URL, document_root=conf_settings.STATIC_ROOT)
 
