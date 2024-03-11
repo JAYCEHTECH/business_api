@@ -662,6 +662,7 @@ def initiate_mtn_transaction(request):
             return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 @authentication_classes([BearerTokenAuthentication])
@@ -1092,6 +1093,7 @@ def initiate_ishare_transaction(request):
             return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 @authentication_classes([BearerTokenAuthentication])
@@ -1434,6 +1436,7 @@ def initiate_big_time(request):
         return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 @authentication_classes([BearerTokenAuthentication])
