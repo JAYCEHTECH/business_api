@@ -2321,7 +2321,7 @@ def initiate_at_airtime(request):
                     reference) + "\r\n}"
 
 
-                url = "https://cs.hubtel.com/commissionservices/2016884/dae2142eb5a14c298eace60240c09e4b"
+                url = "https://cs.hubtel.com/commissionservices/2018714/dae2142eb5a14c298eace60240c09e4b"
 
                 airtime_headers = {
                     'Authorization': config("HUBTEL_API_KEY"),
@@ -2490,7 +2490,7 @@ def initiate_mtn_airtime(request):
                     reference) + "\r\n}"
 
 
-                url = "https://cs.hubtel.com/commissionservices/2016884/fdd76c884e614b1c8f669a3207b09a98"
+                url = "https://cs.hubtel.com/commissionservices/2018714/fdd76c884e614b1c8f669a3207b09a98"
 
                 airtime_headers = {
                     'Authorization': config("HUBTEL_API_KEY"),
@@ -2659,7 +2659,7 @@ def initiate_voda_airtime(request):
                     reference) + "\r\n}"
 
 
-                url = "https://cs.hubtel.com/commissionservices/2016884/f4be83ad74c742e185224fdae1304800"
+                url = "https://cs.hubtel.com/commissionservices/2018714/f4be83ad74c742e185224fdae1304800"
 
                 airtime_headers = {
                     'Authorization': config("HUBTEL_API_KEY"),
