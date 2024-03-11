@@ -2230,11 +2230,10 @@ def initiate_at_airtime(request):
                 reference = request.data.get('reference')
                 amount = request.data.get('amount')
                 print(amount)
-                phone_number = request.data.get('phone_number')
 
                 print("yo")
 
-                if not receiver or not reference or not amount or not phone_number:
+                if not receiver or not reference or not amount:
                     return Response({'message': 'Body parameters not valid. Check and try again.'},
                                     status=status.HTTP_400_BAD_REQUEST)
 
@@ -2355,7 +2354,7 @@ def initiate_at_airtime(request):
                         'status': "Delivered",
                         'time': time,
                         'tranxId': str(tranx_id_generator()),
-                        'type': "AT PREMIUM BUNDLE",
+                        'type': "AT Airtime",
                         'uid': user_id,
                         'bal': user["wallet"]
                     }
@@ -2398,11 +2397,10 @@ def initiate_mtn_airtime(request):
                 reference = request.data.get('reference')
                 amount = request.data.get('amount')
                 print(amount)
-                phone_number = request.data.get('phone_number')
 
                 print("yo")
 
-                if not receiver or not reference or not amount or not phone_number:
+                if not receiver or not reference or not amount:
                     return Response({'message': 'Body parameters not valid. Check and try again.'},
                                     status=status.HTTP_400_BAD_REQUEST)
 
@@ -2524,7 +2522,7 @@ def initiate_mtn_airtime(request):
                         'status': "Delivered",
                         'time': time,
                         'tranxId': str(tranx_id_generator()),
-                        'type': "AT PREMIUM BUNDLE",
+                        'type': "MTN Airtime",
                         'uid': user_id,
                         'bal': user["wallet"]
                     }
@@ -2567,11 +2565,11 @@ def initiate_voda_airtime(request):
                 reference = request.data.get('reference')
                 amount = request.data.get('amount')
                 print(amount)
-                phone_number = request.data.get('phone_number')
+                # phone_number = request.data.get('phone_number')
 
                 print("yo")
 
-                if not receiver or not reference or not amount or not phone_number:
+                if not receiver or not reference or not amount:
                     return Response({'message': 'Body parameters not valid. Check and try again.'},
                                     status=status.HTTP_400_BAD_REQUEST)
 
@@ -2693,7 +2691,7 @@ def initiate_voda_airtime(request):
                         'status': "Delivered",
                         'time': time,
                         'tranxId': str(tranx_id_generator()),
-                        'type': "AT PREMIUM BUNDLE",
+                        'type': "Vodafone Airtime",
                         'uid': user_id,
                         'bal': user["wallet"]
                     }
