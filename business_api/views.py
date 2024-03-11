@@ -640,7 +640,6 @@ def initiate_mtn_transaction(request):
                     except:
                         user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1').update({'mtn_total_sales': amount})
 
-
                     tat = cashback_collection.document(user_id)
                     print(tat.get().to_dict())
 
@@ -883,7 +882,6 @@ def admin_initiate_mtn_transaction(request):
                     except:
                         user_collection.document(user_id).update({'mtn_total_sales': amount_to_be_deducted})
 
-
                     try:
                         print(tot.get().to_dict()['mtn_total_sales'])
                         previous_sale = tot.get().to_dict()['mtn_total_sales']
@@ -897,12 +895,16 @@ def admin_initiate_mtn_transaction(request):
                     tat = cashback_collection.document(user_id)
                     print(tat.get().to_dict())
 
-                    previous_cashback = tat.get().to_dict()['cashback_wallet']
-                    print(previous_cashback)
-                    cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
-                    new_cashback = float(previous_cashback) + float(cashback_balance)
-                    print(new_cashback)
-                    cashback_collection.document(user_id).update({'cashback_wallet': new_cashback})
+                    try:
+                        previous_cashback = tat.get().to_dict()['cashback_wallet']
+                        print(previous_cashback)
+                        cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
+                        new_cashback = float(previous_cashback) + float(cashback_balance)
+                        print(new_cashback)
+                        cashback_collection.document(user_id).update({'cashback_wallet': new_cashback})
+                    except:
+                        cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
+                        user_collection.document(user_id).update({'mtn_total_sales': cashback_balance})
 
                     mail_doc_ref = mail_collection.document()
                     file_path = 'business_api/mtn_maill.txt'  # Replace with your file path
@@ -2416,7 +2418,6 @@ def hubtel_mtn_flexi_transaction(saved_data, reference, email, data_volume, date
         user_collection.document(user_id).update({'mtn_total_sales': new_sale})
     except:
         user_collection.document(user_id).update({'mtn_total_sales': amount})
-
 
     try:
         print(tot.get().to_dict()['mtn_total_sales'])
