@@ -2524,7 +2524,7 @@ def export_unknown_transactions(request):
         counter += 1
 
     print(f"Total transactions to export: {counter}")
-
+    print(records_to_update)
     # Bulk update Django records
     MTNTransaction.objects.bulk_update([MTNTransaction(*data[:-1]) for data in records_to_update], fields=['number', 'bundle_volume', 'batch_id', 'status'])
 
