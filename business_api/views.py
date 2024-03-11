@@ -2473,20 +2473,27 @@ def initiate_voda_airtime(request):
 
 
 from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-from openpyxl import load_workbook
+from openpyxl import Workbook
+from openpyxl.utils.dataframe import dataframe_to_rows
 from io import BytesIO
-import datetime
+import pandas as pd
+from .models import MTNTransaction  # Adjust the import based on your model's location
+
+from openpyxl import load_workbook
+from openpyxl.utils.dataframe import dataframe_to_rows
+
+
+from openpyxl import load_workbook
 
 @csrf_exempt
 def export_unknown_transactions(request):
     existing_excel_path = 'business_api/ALL PACKAGES LATEST.xlsx'  # Update with your file path
-    sheet_name = 'Sheet1'
 
     # Load the existing Excel file using openpyxl.Workbook
     book = load_workbook(existing_excel_path)
 
     # Get the active sheet
+    sheet_name = 'Sheet1'
     sheet = book[sheet_name] if sheet_name in book.sheetnames else book.active
 
     # Clear existing data from the sheet (excluding headers)
@@ -2499,48 +2506,34 @@ def export_unknown_transactions(request):
 
     # Process transactions with batch_id 'Unknown'
     counter = 0
-    records_to_update = []
-    txns_to_update = []
 
     for record in queryset:
         print(counter)
 
         # Extract required fields from your Django model
-        bundle_volume_mb = record.bundle_volume or 0
-        print(bundle_volume_mb)# Assuming a default of 0 if datavolume is missing
+        bundle_volume_mb = record.bundle_volume  # Assuming a default of 0 if datavolume is missing
         number = str(record.number)  # Convert to string to keep leading zeros
 
         # Convert datavolume from MB to GB
-        bundle_volume_gb = round(bundle_volume_mb / 1000)
-        print(bundle_volume_gb)
+        bundle_volume_gb = round(float(bundle_volume_mb) / 1000)
 
         # Find the row index where you want to populate the data (adjust as needed)
         target_row = 2 + counter  # Assuming the data starts from row 2
 
-        # Append data to bulk update lists
-        records_to_update.append((number, bundle_volume_gb, 'accepted', 'Processing', record.id))
-        txns_to_update.append(({'batch_id': 'accepted', 'status': 'Processing'}, record.firebase_date))
+        # Populate the specific cells with the new data
+        sheet.cell(row=target_row, column=1, value=number)  # Keep leading zeros
+        sheet.cell(row=target_row, column=2, value=float(bundle_volume_gb))  # Convert to float
+
+        # Update 'batch_id' to 'processing' in your Django model
+        record.batch_id = 'accepted'
+        record.status = 'Processing'
+        record.save()
 
         counter += 1
+        # txn = mtn_other.document(record.firebase_date)
+        # txn.update({'batch_id': 'accepted', 'status': 'Processing'})
 
     print(f"Total transactions to export: {counter}")
-    print(records_to_update)
-    # Bulk update Django records
-    instances_to_update = [MTNTransaction(
-        number=data[0],
-        bundle_volume=data[1],
-        batch_id=data[2],
-        status=data[3],
-        id=data[4]
-    ) for data in records_to_update]
-
-    # Perform bulk update
-    MTNTransaction.objects.bulk_update(instances_to_update, fields=['number', 'bundle_volume', 'batch_id', 'status'])
-    print("done")
-    # Bulk update Firebase transactions
-    # for data in txns_to_update:
-    #     print("got here")
-    #     mtn_other.document(data[1]).update(data[0])
 
     # Save changes to the existing Excel file
     book.save(existing_excel_path)
@@ -2557,4 +2550,5 @@ def export_unknown_transactions(request):
     response['Content-Disposition'] = f'attachment; filename={datetime.datetime.now()}.xlsx'
 
     return response
+
 
