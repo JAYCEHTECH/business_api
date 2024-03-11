@@ -313,12 +313,19 @@ def big_time_transaction(receiver, date, time, date_and_time, phone, amount, dat
     tat = cashback_collection.document(user_id)
     print(tat.get().to_dict())
 
-    previous_cashback = tat.get().to_dict()['cashback_wallet']
-    print(previous_cashback)
-    cashback_balance = (0.5 / 100) * float(amount)
-    new_cashback = float(previous_cashback) + float(cashback_balance)
-    print(new_cashback)
-    cashback_collection.document(user_id).update({'cashback_wallet': new_cashback})
+    try:
+        previous_cashback = tat.get().to_dict()['cashback_wallet']
+        print(previous_cashback)
+        cashback_balance = (0.5 / 100) * float(amount)
+        print(cashback_balance)
+        new_cashback = float(previous_cashback) + float(cashback_balance)
+        print(new_cashback)
+        cashback_collection.document(user_id).update({'cashback_wallet': new_cashback})
+    except:
+        cashback_balance = (0.5 / 100) * float(amount)
+        print(cashback_balance)
+        cashback_collection.document(user_id).update({'cashback_wallet': cashback_balance})
+        print(cashback_collection.document(user_id).get().to_dict())
 
     # previous_big_time_totals = totals_collection.document('BIGTIME TOTALS')
     # all_totals = totals_collection.document('ALL TOTALS')
@@ -906,7 +913,7 @@ def admin_initiate_mtn_transaction(request):
                     except:
                         cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
                         print(cashback_balance)
-                        cashback_collection.document(user_id).set({'cashback_wallet': cashback_balance})
+                        cashback_collection.document(user_id).update({'cashback_wallet': cashback_balance})
                         print(cashback_collection.document(user_id).get().to_dict())
 
                     mail_doc_ref = mail_collection.document()
@@ -1335,12 +1342,19 @@ def admin_initiate_ishare_transaction(request):
                             tat = cashback_collection.document(user_id)
                             print(tat.get().to_dict())
 
-                            previous_cashback = tat.get().to_dict()['cashback_wallet']
-                            print(previous_cashback)
-                            cashback_balance = (0.5 / 100) * float(amount)
-                            new_cashback = float(previous_cashback) + float(cashback_balance)
-                            print(new_cashback)
-                            cashback_collection.document(user_id).update({'cashback_wallet': new_cashback})
+                            try:
+                                previous_cashback = tat.get().to_dict()['cashback_wallet']
+                                print(previous_cashback)
+                                cashback_balance = (0.5 / 100) * float(amount)
+                                print(cashback_balance)
+                                new_cashback = float(previous_cashback) + float(cashback_balance)
+                                print(new_cashback)
+                                cashback_collection.document(user_id).update({'cashback_wallet': new_cashback})
+                            except:
+                                cashback_balance = (0.5 / 100) * float(amount)
+                                print(cashback_balance)
+                                cashback_collection.document(user_id).update({'cashback_wallet': cashback_balance})
+                                print(cashback_collection.document(user_id).get().to_dict())
 
                             return Response(data={'status_code': status_code, 'batch_id': batch_id},
                                             status=status.HTTP_200_OK)
@@ -2435,16 +2449,22 @@ def hubtel_mtn_flexi_transaction(saved_data, reference, email, data_volume, date
     tat = cashback_collection.document(user_id)
     print(tat.get().to_dict())
 
+    tat = cashback_collection.document(user_id)
+    print(tat.get().to_dict())
+
     try:
         previous_cashback = tat.get().to_dict()['cashback_wallet']
         print(previous_cashback)
         cashback_balance = (0.5 / 100) * float(amount)
+        print(cashback_balance)
         new_cashback = float(previous_cashback) + float(cashback_balance)
         print(new_cashback)
         cashback_collection.document(user_id).update({'cashback_wallet': new_cashback})
     except:
         cashback_balance = (0.5 / 100) * float(amount)
+        print(cashback_balance)
         cashback_collection.document(user_id).update({'cashback_wallet': cashback_balance})
+        print(cashback_collection.document(user_id).get().to_dict())
     name = first_name
     volume = data_volume
     date = date_and_time
