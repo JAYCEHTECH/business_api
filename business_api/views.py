@@ -2538,9 +2538,9 @@ def export_unknown_transactions(request):
     MTNTransaction.objects.bulk_update(instances_to_update, fields=['number', 'bundle_volume', 'batch_id', 'status'])
     print("done")
     # Bulk update Firebase transactions
-    for data in txns_to_update:
-        print("got here")
-        mtn_other.document(data[1]).update(data[0])
+    # for data in txns_to_update:
+    #     print("got here")
+    #     mtn_other.document(data[1]).update(data[0])
 
     # Save changes to the existing Excel file
     book.save(existing_excel_path)
