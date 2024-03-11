@@ -904,7 +904,7 @@ def admin_initiate_mtn_transaction(request):
                         cashback_collection.document(user_id).update({'cashback_wallet': new_cashback})
                     except:
                         cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
-                        user_collection.document(user_id).update({'mtn_total_sales': cashback_balance})
+                        user_collection.document(user_id).update({'cashback_wallet': cashback_balance})
 
                     mail_doc_ref = mail_collection.document()
                     file_path = 'business_api/mtn_maill.txt'  # Replace with your file path
