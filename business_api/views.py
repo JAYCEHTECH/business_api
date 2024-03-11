@@ -1582,9 +1582,9 @@ def admin_initiate_big_time(request):
                         return Response(data={"status": "200", "message": "Transaction received successfully"},
                                         status=status.HTTP_200_OK)
                     else:
-                        return Response({"status": 400, "message": "Insufficient balance"}, status=status.HTTP_400_BAD_REQUEST)
+                        return Response({"status": 400, "message": "Something went wrong"}, status=status.HTTP_400_BAD_REQUEST)
                 else:
-                    return Response({"status": '400', 'message': 'Something went wrong'},
+                    return Response({"status": 400, 'message': 'Insufficient Balance'},
                                     status=status.HTTP_400_BAD_REQUEST)
             except Exception as e:
                 print(e)
