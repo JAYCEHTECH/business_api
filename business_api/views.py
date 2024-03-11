@@ -51,6 +51,7 @@ history_web = database.collection(u'History Web').document('all_users')
 totals_collection = database.collection('Totals')
 admin_collection = database.collection('Admin')
 
+
 class BearerTokenAuthentication(TokenAuthentication):
     keyword = 'Bearer'
 
@@ -747,23 +748,27 @@ def initiate_ishare_transaction(request):
                             print(f"new_user_wallet: {new_user_wallet}")
                         else:
                             print("it's fine")
-                    ishare_response = send_and_save_to_history(user_id,float(data_volume),reference,
-                                                                                        float(amount), receiver,
-                                                                                        date,time,
-                                                                                        date_and_time)
+                    ishare_response = send_and_save_to_history(user_id, float(data_volume), reference,
+                                                               float(amount), receiver,
+                                                               date, time,
+                                                               date_and_time)
                     print(ishare_response.status_code)
                     if ishare_response.status_code == 401:
-                        return Response(data={'status_code': ishare_response.status_code, "message": "Authorization Failed"},
-                                        status=status.HTTP_400_BAD_REQUEST)
+                        return Response(
+                            data={'status_code': ishare_response.status_code, "message": "Authorization Failed"},
+                            status=status.HTTP_400_BAD_REQUEST)
                     data = ishare_response.json()
                     try:
                         batch_id = data["batchId"]
                     except KeyError:
-                        return Response(data={'status_code': ishare_response.status_code, "message": "Transaction Failed"},
-                                        status=status.HTTP_400_BAD_REQUEST)
+                        print("key error")
+                        return Response(
+                            data={'status_code': ishare_response.status_code, "message": "Transaction Failed"},
+                            status=status.HTTP_400_BAD_REQUEST)
                     print(data["batchId"])
                     status_code = ishare_response.status_code
                     if batch_id is None:
+                        print("batch id was none")
                         return Response(data={'status_code': status_code, "message": "Transaction Failed"},
                                         status=status.HTTP_400_BAD_REQUEST)
                     sleep(10)
@@ -835,6 +840,7 @@ def initiate_ishare_transaction(request):
                             return Response(data={'status_code': status_code, 'batch_id': batch_id},
                                             status=status.HTTP_200_OK)
                         else:
+                            print("some else before history")
                             doc_ref = history_collection.document(date_and_time)
                             doc_ref.update({'done': 'Failed'})
                             return Response(data={'status_code': status_code, "message": "Transaction Failed"},
@@ -1694,9 +1700,9 @@ def hubtel_webhook_send_and_save_to_history(saved_data, user_id, reference, rece
         print("first save")
 
     ishare_response = send_ishare_bundle(first_name=first_name, last_name=last_name, receiver=receiver,
-                                                      buyer=phone,
-                                                      bundle=data_volume,
-                                                      email=email)
+                                         buyer=phone,
+                                         bundle=data_volume,
+                                         email=email)
     json_response = ishare_response.json()
     print(f"hello:{json_response}")
     status_code = ishare_response.status_code
@@ -1720,7 +1726,8 @@ def hubtel_webhook_send_and_save_to_history(saved_data, user_id, reference, rece
         status=status.HTTP_200_OK)
 
 
-def hubtel_mtn_flexi_transaction(saved_data, reference, email, data_volume, date_and_time, receiver, first_name, user_id, amount):
+def hubtel_mtn_flexi_transaction(saved_data, reference, email, data_volume, date_and_time, receiver, first_name,
+                                 user_id, amount):
     history_collection.document(reference).set(saved_data)
     history_web.collection(email).document(reference).set(saved_data)
     user = history_collection.document(reference)
@@ -1780,7 +1787,8 @@ def hubtel_mtn_flexi_transaction(saved_data, reference, email, data_volume, date
     return Response(data={'code': '0000', 'message': "Transaction Saved"}, status=status.HTTP_200_OK)
 
 
-def hubtel_big_time_transaction(saved_data, reference, email, data_volume, date_and_time, receiver, first_name, amount, user_id):
+def hubtel_big_time_transaction(saved_data, reference, email, data_volume, date_and_time, receiver, first_name, amount,
+                                user_id):
     data = saved_data
     history_collection.document(reference).set(data)
     history_web.collection(email).document(reference).set(saved_data)
@@ -1893,7 +1901,8 @@ def hubtel_webhook(request):
                 doc_ref = history_collection.document(reference)
 
                 if txn_type == "AT Premium Internet":
-                    doc_ref.update({'ishareBalance': "Paid", 'status': "Delivered", "tranxId": str(tranx_id_generator())})
+                    doc_ref.update(
+                        {'ishareBalance': "Paid", 'status': "Delivered", "tranxId": str(tranx_id_generator())})
                     user_details = get_user_details(user_id)
                     if user_details is not None:
                         first_name = user_details['first name']
@@ -1972,7 +1981,8 @@ def hubtel_webhook(request):
                             doc_ref.update({'done': 'Failed'})
                             return JsonResponse({'message': "Success"}, status=200)
                 elif txn_type == "MTN Master Internet":
-                    doc_ref.update({'ishareBalance': "Paid", 'status': "Undelivered", "tranxId": str(tranx_id_generator())})
+                    doc_ref.update(
+                        {'ishareBalance': "Paid", 'status': "Undelivered", "tranxId": str(tranx_id_generator())})
 
                     new_mtn_txn = models.MTNTransaction.objects.create(
                         user_id=user_id,
@@ -2020,7 +2030,8 @@ def hubtel_webhook(request):
                     else:
                         return JsonResponse({'message': "Success"}, status=200)
                 elif txn_type == "AT Big Time Internet":
-                    doc_ref.update({'ishareBalance': "Paid", 'status': "Undelivered", "tranxId": str(tranx_id_generator())})
+                    doc_ref.update(
+                        {'ishareBalance': "Paid", 'status': "Undelivered", "tranxId": str(tranx_id_generator())})
                     user_details = get_user_details(user_id)
                     if user_details is not None:
                         first_name = user_details['first name']
@@ -2040,7 +2051,8 @@ def hubtel_webhook(request):
                     }
                     collection_saved = history_collection.document(reference).get().to_dict()
                     big_time_response = hubtel_big_time_transaction(collection_saved, reference, email, bundle_volume,
-                                                                    date_and_time, receiver, first_name, amount, user_id)
+                                                                    date_and_time, receiver, first_name, amount,
+                                                                    user_id)
                     # saved_data, reference, email, data_volume, date_and_time, receiver, first_name
                     if big_time_response.status_code == 200 or big_time_response.data["code"] == "0000":
                         print("big time donnnneee")
@@ -2048,7 +2060,8 @@ def hubtel_webhook(request):
                     else:
                         return HttpResponse(status=500)
                 elif txn_type == "CloudHub E-Wallet":
-                    doc_ref.update({'ishareBalance': "Paid", 'status': "Credited", "tranxId": str(tranx_id_generator())})
+                    doc_ref.update(
+                        {'ishareBalance': "Paid", 'status': "Credited", "tranxId": str(tranx_id_generator())})
                     user_details = get_user_details(user_id)
                     collection_saved = history_collection.document(reference).get().to_dict()
                     if user_details is not None:
@@ -2319,7 +2332,6 @@ def initiate_at_airtime(request):
                     amount) + ",\r\n    \"CallbackUrl\": \"https://webhook.site/9125cb31-9481-47ad-972f-d1d7765a5957\",\r\n    \"ClientReference\": " + str(
                     reference) + "\r\n}"
 
-
                 url = "https://cs.hubtel.com/commissionservices/2018714/dae2142eb5a14c298eace60240c09e4b"
 
                 airtime_headers = {
@@ -2412,7 +2424,6 @@ def initiate_mtn_airtime(request):
                 time = datetime.datetime.now().strftime("%I:%M:%S %p")
                 date_and_time = datetime.datetime.now().isoformat()
 
-
                 if "wallet" == "wallet":
                     try:
                         enough_balance = check_user_balance_against_price(user_id, amount)
@@ -2486,7 +2497,6 @@ def initiate_mtn_airtime(request):
                 payload = "{\r\n    \"Destination\": " + str(receiver) + ",\r\n    \"Amount\": " + str(
                     amount) + ",\r\n    \"CallbackUrl\": \"https://webhook.site/9125cb31-9481-47ad-972f-d1d7765a5957\",\r\n    \"ClientReference\": " + str(
                     reference) + "\r\n}"
-
 
                 url = "https://cs.hubtel.com/commissionservices/2018714/fdd76c884e614b1c8f669a3207b09a98"
 
@@ -2581,7 +2591,6 @@ def initiate_voda_airtime(request):
                 time = datetime.datetime.now().strftime("%I:%M:%S %p")
                 date_and_time = datetime.datetime.now().isoformat()
 
-
                 if "wallet" == "wallet":
                     try:
                         enough_balance = check_user_balance_against_price(user_id, amount)
@@ -2656,7 +2665,6 @@ def initiate_voda_airtime(request):
                     amount) + ",\r\n    \"CallbackUrl\": \"https://webhook.site/9125cb31-9481-47ad-972f-d1d7765a5957\",\r\n    \"ClientReference\": " + str(
                     reference) + "\r\n}"
 
-
                 url = "https://cs.hubtel.com/commissionservices/2018714/f4be83ad74c742e185224fdae1304800"
 
                 airtime_headers = {
@@ -2714,14 +2722,12 @@ def initiate_voda_airtime(request):
         return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-
 from django.http import HttpResponse
 from io import BytesIO
 from .models import MTNTransaction  # Adjust the import based on your model's location
 
-
-
 from openpyxl import load_workbook
+
 
 @csrf_exempt
 def export_unknown_transactions(request):
@@ -2788,5 +2794,3 @@ def export_unknown_transactions(request):
     response['Content-Disposition'] = f'attachment; filename={datetime.datetime.now()}.xlsx'
 
     return response
-
-
