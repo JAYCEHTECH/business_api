@@ -2431,13 +2431,16 @@ def hubtel_mtn_flexi_transaction(saved_data, reference, email, data_volume, date
     tat = cashback_collection.document(user_id)
     print(tat.get().to_dict())
 
-    previous_cashback = tat.get().to_dict()['cashback_wallet']
-    print(previous_cashback)
-    cashback_balance = (0.5 / 100) * float(amount)
-    new_cashback = float(previous_cashback) + float(cashback_balance)
-    print(new_cashback)
-    cashback_collection.document(user_id).update({'cashback_wallet': new_cashback})
-
+    try:
+        previous_cashback = tat.get().to_dict()['cashback_wallet']
+        print(previous_cashback)
+        cashback_balance = (0.5 / 100) * float(amount)
+        new_cashback = float(previous_cashback) + float(cashback_balance)
+        print(new_cashback)
+        cashback_collection.document(user_id).update({'cashback_wallet': new_cashback})
+    except:
+        cashback_balance = (0.5 / 100) * float(amount)
+        cashback_collection.document(user_id).update({'cashback_wallet': cashback_balance})
     name = first_name
     volume = data_volume
     date = date_and_time
