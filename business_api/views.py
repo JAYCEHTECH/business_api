@@ -613,11 +613,11 @@ def initiate_mtn_transaction(request):
                         print(tot.get().to_dict()['mtn_total_sales'])
                         previous_sale = tot.get().to_dict()['mtn_total_sales']
                         print(f"Previous Sale: {previous_sale}")
-                        new_sale = float(previous_sale) + float(amount)
+                        new_sale = float(previous_sale) + float(amount_to_be_deducted)
                         print(new_sale)
                         user_collection.document(user_id).update({'mtn_total_sales': new_sale})
                     except:
-                        user_collection.document(user_id).update({'mtn_total_sales': amount})
+                        user_collection.document(user_id).update({'mtn_total_sales': amount_to_be_deducted})
 
                     mail_doc_ref = mail_collection.document()
                     file_path = 'business_api/mtn_maill.txt'  # Replace with your file path
@@ -845,11 +845,11 @@ def admin_initiate_mtn_transaction(request):
                         print(tot.get().to_dict()['mtn_total_sales'])
                         previous_sale = tot.get().to_dict()['mtn_total_sales']
                         print(f"Previous Sale: {previous_sale}")
-                        new_sale = float(previous_sale) + float(amount)
+                        new_sale = float(previous_sale) + float(amount_to_be_deducted)
                         print(new_sale)
                         user_collection.document(user_id).update({'mtn_total_sales': new_sale})
                     except:
-                        user_collection.document(user_id).update({'mtn_total_sales': amount})
+                        user_collection.document(user_id).update({'mtn_total_sales': amount_to_be_deducted})
 
                     mail_doc_ref = mail_collection.document()
                     file_path = 'business_api/mtn_maill.txt'  # Replace with your file path
@@ -879,7 +879,7 @@ def admin_initiate_mtn_transaction(request):
                         'message': {
                             'subject': 'MTN Data',
                             'html': html_content,
-                            'messageId': 'Bestpay'
+                            'messageId': 'CloudHub GH'
                         }
                     })
                     print("got to redirect")
@@ -1354,57 +1354,58 @@ def initiate_big_time(request):
 
                 print("yo")
 
-                if not receiver or not data_volume or not reference or not amount:
-                    return Response({'message': 'Body parameters not valid. Check and try again.'},
-                                    status=status.HTTP_400_BAD_REQUEST)
-
-                print("got here")
-                user_details = get_user_details(user_id)
-                print(user_details['first name'])
-
-                date = datetime.datetime.now().strftime("%a, %b %d, %Y")
-                time = datetime.datetime.now().strftime("%I:%M:%S %p")
-                date_and_time = datetime.datetime.now().isoformat()
-
-                if user_details is not None:
-                    print("yes")
-                    first_name = user_details['first name']
-                    print(first_name)
-                    last_name = user_details['last name']
-                    print(last_name)
-                    email = user_details['email']
-                    phone = user_details['phone']
+                if "wallet" == "wallet":
+                    print("used this")
+                    try:
+                        enough_balance = check_user_balance_against_price(user_id, amount)
+                    except:
+                        return Response(
+                            {'code': '0001', 'message': f'User ID does not exist: User ID provided: {user_id}.'},
+                            status=status.HTTP_400_BAD_REQUEST)
                 else:
-                    first_name = ""
-                    last_name = ""
-                    email = ""
-                    phone = ""
-                details = {
-                    'first_name': first_name,
-                    'last_name': last_name,
-                    'email': email,
-                    'user_id': user_id
-                }
-                big_time_response = big_time_transaction(receiver=receiver, date_and_time=date_and_time, date=date,
-                                                         time=time, amount=amount, data_volume=data_volume,
-                                                         channel="MoMo", phone=phone, ref=reference,
-                                                         details=details, txn_status="Undelivered", user_id=user_id)
-                if big_time_response.status_code == 200 or big_time_response.data["code"] == "0000":
-                    if "wallet" == "wallet":
-                        print("updated")
-                        user = get_user_details(user_id)
-                        if user is None:
-                            return None
-                        previous_user_wallet = user['wallet']
-                        print(f"previous wallet: {previous_user_wallet}")
-                        new_balance = float(previous_user_wallet) - float(amount)
-                        print(f"new_balance:{new_balance}")
-                        doc_ref = user_collection.document(user_id)
-                        doc_ref.update({'wallet': new_balance})
-                        user = get_user_details(user_id)
-                        new_user_wallet = user['wallet']
-                        print(f"new_user_wallet: {new_user_wallet}")
-                        if new_user_wallet == previous_user_wallet:
+                    enough_balance = True
+                    print("not wallet")
+                print(enough_balance)
+                if enough_balance:
+
+                    if not receiver or not data_volume or not reference or not amount:
+                        return Response({'message': 'Body parameters not valid. Check and try again.'},
+                                        status=status.HTTP_400_BAD_REQUEST)
+
+                    print("got here")
+                    user_details = get_user_details(user_id)
+                    print(user_details['first name'])
+
+                    date = datetime.datetime.now().strftime("%a, %b %d, %Y")
+                    time = datetime.datetime.now().strftime("%I:%M:%S %p")
+                    date_and_time = datetime.datetime.now().isoformat()
+
+                    if user_details is not None:
+                        print("yes")
+                        first_name = user_details['first name']
+                        print(first_name)
+                        last_name = user_details['last name']
+                        print(last_name)
+                        email = user_details['email']
+                        phone = user_details['phone']
+                    else:
+                        first_name = ""
+                        last_name = ""
+                        email = ""
+                        phone = ""
+                    details = {
+                        'first_name': first_name,
+                        'last_name': last_name,
+                        'email': email,
+                        'user_id': user_id
+                    }
+                    big_time_response = big_time_transaction(receiver=receiver, date_and_time=date_and_time, date=date,
+                                                             time=time, amount=amount, data_volume=data_volume,
+                                                             channel="MoMo", phone=phone, ref=reference,
+                                                             details=details, txn_status="Undelivered", user_id=user_id)
+                    if big_time_response.status_code == 200 or big_time_response.data["code"] == "0000":
+                        if "wallet" == "wallet":
+                            print("updated")
                             user = get_user_details(user_id)
                             if user is None:
                                 return None
@@ -1417,10 +1418,26 @@ def initiate_big_time(request):
                             user = get_user_details(user_id)
                             new_user_wallet = user['wallet']
                             print(f"new_user_wallet: {new_user_wallet}")
-                        else:
-                            print("it's fine")
-                    return Response(data={"status": "200", "message": "Transaction received successfully"},
-                                    status=status.HTTP_200_OK)
+                            if new_user_wallet == previous_user_wallet:
+                                user = get_user_details(user_id)
+                                if user is None:
+                                    return None
+                                previous_user_wallet = user['wallet']
+                                print(f"previous wallet: {previous_user_wallet}")
+                                new_balance = float(previous_user_wallet) - float(amount)
+                                print(f"new_balance:{new_balance}")
+                                doc_ref = user_collection.document(user_id)
+                                doc_ref.update({'wallet': new_balance})
+                                user = get_user_details(user_id)
+                                new_user_wallet = user['wallet']
+                                print(f"new_user_wallet: {new_user_wallet}")
+                            else:
+                                print("it's fine")
+                        return Response(data={"status": "200", "message": "Transaction received successfully"},
+                                        status=status.HTTP_200_OK)
+                    else:
+                        return Response({"status": 400, "message": "Insufficient balance"},
+                                        status=status.HTTP_400_BAD_REQUEST)
                 else:
                     return Response({"status": '400', 'message': 'Something went wrong'},
                                     status=status.HTTP_400_BAD_REQUEST)
@@ -1475,64 +1492,66 @@ def admin_initiate_big_time(request):
 
                 print("yo")
 
-                if not receiver or not data_volume or not reference or not amount:
-                    return Response({'message': 'Body parameters not valid. Check and try again.'},
-                                    status=status.HTTP_400_BAD_REQUEST)
-
-                token_obj = Token.objects.get(key=token)
-                token_key = token_obj.key
-
-                if token_key != config("TOKEN_KEY"):
-                    return Response({'message': 'Authorisation Failed.'},
-                                    status=status.HTTP_400_BAD_REQUEST)
-
-                print("got here")
-                user_details = get_user_details(user_id)
-                print(user_details['first name'])
-
-                date = datetime.datetime.now().strftime("%a, %b %d, %Y")
-                time = datetime.datetime.now().strftime("%I:%M:%S %p")
-                date_and_time = datetime.datetime.now().isoformat()
-
-                if user_details is not None:
-                    print("yes")
-                    first_name = user_details['first name']
-                    print(first_name)
-                    last_name = user_details['last name']
-                    print(last_name)
-                    email = user_details['email']
-                    phone = user_details['phone']
+                if "wallet" == "wallet":
+                    print("used this")
+                    try:
+                        enough_balance = check_user_balance_against_price(user_id, amount)
+                    except:
+                        return Response(
+                            {'code': '0001', 'message': f'User ID does not exist: User ID provided: {user_id}.'},
+                            status=status.HTTP_400_BAD_REQUEST)
                 else:
-                    first_name = ""
-                    last_name = ""
-                    email = ""
-                    phone = ""
-                details = {
-                    'first_name': first_name,
-                    'last_name': last_name,
-                    'email': email,
-                    'user_id': user_id
-                }
-                big_time_response = big_time_transaction(receiver=receiver, date_and_time=date_and_time, date=date,
-                                                         time=time, amount=amount, data_volume=data_volume,
-                                                         channel="MoMo", phone=phone, ref=reference,
-                                                         details=details, txn_status="Undelivered", user_id=user_id)
-                if big_time_response.status_code == 200 or big_time_response.data["code"] == "0000":
-                    if "wallet" == "wallet":
-                        print("updated")
-                        user = get_user_details(user_id)
-                        if user is None:
-                            return None
-                        previous_user_wallet = user['wallet']
-                        print(f"previous wallet: {previous_user_wallet}")
-                        new_balance = float(previous_user_wallet) - float(amount)
-                        print(f"new_balance:{new_balance}")
-                        doc_ref = user_collection.document(user_id)
-                        doc_ref.update({'wallet': new_balance})
-                        user = get_user_details(user_id)
-                        new_user_wallet = user['wallet']
-                        print(f"new_user_wallet: {new_user_wallet}")
-                        if new_user_wallet == previous_user_wallet:
+                    enough_balance = True
+                    print("not wallet")
+                print(enough_balance)
+                if enough_balance:
+
+                    if not receiver or not data_volume or not reference or not amount:
+                        return Response({'message': 'Body parameters not valid. Check and try again.'},
+                                        status=status.HTTP_400_BAD_REQUEST)
+
+                    token_obj = Token.objects.get(key=token)
+                    token_key = token_obj.key
+
+                    if token_key != config("TOKEN_KEY"):
+                        return Response({'message': 'Authorisation Failed.'},
+                                        status=status.HTTP_400_BAD_REQUEST)
+
+
+                    print("got here")
+                    user_details = get_user_details(user_id)
+                    print(user_details['first name'])
+
+                    date = datetime.datetime.now().strftime("%a, %b %d, %Y")
+                    time = datetime.datetime.now().strftime("%I:%M:%S %p")
+                    date_and_time = datetime.datetime.now().isoformat()
+
+                    if user_details is not None:
+                        print("yes")
+                        first_name = user_details['first name']
+                        print(first_name)
+                        last_name = user_details['last name']
+                        print(last_name)
+                        email = user_details['email']
+                        phone = user_details['phone']
+                    else:
+                        first_name = ""
+                        last_name = ""
+                        email = ""
+                        phone = ""
+                    details = {
+                        'first_name': first_name,
+                        'last_name': last_name,
+                        'email': email,
+                        'user_id': user_id
+                    }
+                    big_time_response = big_time_transaction(receiver=receiver, date_and_time=date_and_time, date=date,
+                                                             time=time, amount=amount, data_volume=data_volume,
+                                                             channel="MoMo", phone=phone, ref=reference,
+                                                             details=details, txn_status="Undelivered", user_id=user_id)
+                    if big_time_response.status_code == 200 or big_time_response.data["code"] == "0000":
+                        if "wallet" == "wallet":
+                            print("updated")
                             user = get_user_details(user_id)
                             if user is None:
                                 return None
@@ -1545,10 +1564,25 @@ def admin_initiate_big_time(request):
                             user = get_user_details(user_id)
                             new_user_wallet = user['wallet']
                             print(f"new_user_wallet: {new_user_wallet}")
-                        else:
-                            print("it's fine")
-                    return Response(data={"status": "200", "message": "Transaction received successfully"},
-                                    status=status.HTTP_200_OK)
+                            if new_user_wallet == previous_user_wallet:
+                                user = get_user_details(user_id)
+                                if user is None:
+                                    return None
+                                previous_user_wallet = user['wallet']
+                                print(f"previous wallet: {previous_user_wallet}")
+                                new_balance = float(previous_user_wallet) - float(amount)
+                                print(f"new_balance:{new_balance}")
+                                doc_ref = user_collection.document(user_id)
+                                doc_ref.update({'wallet': new_balance})
+                                user = get_user_details(user_id)
+                                new_user_wallet = user['wallet']
+                                print(f"new_user_wallet: {new_user_wallet}")
+                            else:
+                                print("it's fine")
+                        return Response(data={"status": "200", "message": "Transaction received successfully"},
+                                        status=status.HTTP_200_OK)
+                    else:
+                        return Response({"status": 400, "message": "Insufficient balance"}, status=status.HTTP_400_BAD_REQUEST)
                 else:
                     return Response({"status": '400', 'message': 'Something went wrong'},
                                     status=status.HTTP_400_BAD_REQUEST)
