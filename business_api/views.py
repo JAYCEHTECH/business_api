@@ -906,7 +906,7 @@ def admin_initiate_mtn_transaction(request):
                     except:
                         cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
                         print(cashback_balance)
-                        user_collection.document(user_id).update({'cashback_wallet': cashback_balance})
+                        user_collection.document(user_id).set({'cashback_wallet': cashback_balance})
                         print(cashback_collection.document(user_id).get().to_dict())
 
                     mail_doc_ref = mail_collection.document()
