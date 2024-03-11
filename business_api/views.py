@@ -39,6 +39,7 @@ if not firebase_admin._apps:
 
 database = firestore.client()
 user_collection = database.collection(u'Users')
+cashback_collection = database.collection(u"general_cashback")
 history_collection = database.collection(u'History Web')
 mail_collection = database.collection('mail')
 mtn_history = database.collection('MTN_Admin_History')
@@ -308,6 +309,16 @@ def big_time_transaction(receiver, date, time, date_and_time, phone, amount, dat
         user_collection.document(user_id).update({'bt_total_sales': new_sale})
     except:
         user_collection.document(user_id).update({'bt_total_sales': amount})
+
+    tat = cashback_collection.document(user_id)
+    print(tat.get().to_dict())
+
+    previous_cashback = tat.get().to_dict()['cashback_wallet']
+    print(previous_cashback)
+    cashback_balance = (0.5 / 100) * float(amount)
+    new_cashback = float(previous_cashback) + float(cashback_balance)
+    print(new_cashback)
+    cashback_collection.document(user_id).update({'cashback_wallet': new_cashback})
 
     # previous_big_time_totals = totals_collection.document('BIGTIME TOTALS')
     # all_totals = totals_collection.document('ALL TOTALS')
@@ -619,6 +630,27 @@ def initiate_mtn_transaction(request):
                     except:
                         user_collection.document(user_id).update({'mtn_total_sales': amount_to_be_deducted})
 
+                    try:
+                        print(tot.get().to_dict()['mtn_total_sales'])
+                        previous_sale = tot.get().to_dict()['mtn_total_sales']
+                        print(f"Previous Sale: {previous_sale}")
+                        new_sale = float(previous_sale) + float(amount)
+                        print(new_sale)
+                        user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1').update({'mtn_total_sales': new_sale})
+                    except:
+                        user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1').update({'mtn_total_sales': amount})
+
+
+                    tat = cashback_collection.document(user_id)
+                    print(tat.get().to_dict())
+
+                    previous_cashback = tat.get().to_dict()['cashback_wallet']
+                    print(previous_cashback)
+                    cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
+                    new_cashback = float(previous_cashback) + float(cashback_balance)
+                    print(new_cashback)
+                    cashback_collection.document(user_id).update({'cashback_wallet': new_cashback})
+
                     mail_doc_ref = mail_collection.document()
                     file_path = 'business_api/mtn_maill.txt'  # Replace with your file path
 
@@ -850,6 +882,27 @@ def admin_initiate_mtn_transaction(request):
                         user_collection.document(user_id).update({'mtn_total_sales': new_sale})
                     except:
                         user_collection.document(user_id).update({'mtn_total_sales': amount_to_be_deducted})
+
+
+                    try:
+                        print(tot.get().to_dict()['mtn_total_sales'])
+                        previous_sale = tot.get().to_dict()['mtn_total_sales']
+                        print(f"Previous Sale: {previous_sale}")
+                        new_sale = float(previous_sale) + float(amount)
+                        print(new_sale)
+                        user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1').update({'mtn_total_sales': new_sale})
+                    except:
+                        user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1').update({'mtn_total_sales': amount})
+
+                    tat = cashback_collection.document(user_id)
+                    print(tat.get().to_dict())
+
+                    previous_cashback = tat.get().to_dict()['cashback_wallet']
+                    print(previous_cashback)
+                    cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
+                    new_cashback = float(previous_cashback) + float(cashback_balance)
+                    print(new_cashback)
+                    cashback_collection.document(user_id).update({'cashback_wallet': new_cashback})
 
                     mail_doc_ref = mail_collection.document()
                     file_path = 'business_api/mtn_maill.txt'  # Replace with your file path
@@ -1274,6 +1327,16 @@ def admin_initiate_ishare_transaction(request):
                             except:
                                 user_collection.document(user_id).update({'at_total_sales': amount})
 
+                            tat = cashback_collection.document(user_id)
+                            print(tat.get().to_dict())
+
+                            previous_cashback = tat.get().to_dict()['cashback_wallet']
+                            print(previous_cashback)
+                            cashback_balance = (0.5 / 100) * float(amount)
+                            new_cashback = float(previous_cashback) + float(cashback_balance)
+                            print(new_cashback)
+                            cashback_collection.document(user_id).update({'cashback_wallet': new_cashback})
+
                             return Response(data={'status_code': status_code, 'batch_id': batch_id},
                                             status=status.HTTP_200_OK)
                         else:
@@ -1517,7 +1580,6 @@ def admin_initiate_big_time(request):
                         return Response({'message': 'Authorisation Failed.'},
                                         status=status.HTTP_400_BAD_REQUEST)
 
-
                     print("got here")
                     user_details = get_user_details(user_id)
                     print(user_details['first name'])
@@ -1582,7 +1644,8 @@ def admin_initiate_big_time(request):
                         return Response(data={"status": "200", "message": "Transaction received successfully"},
                                         status=status.HTTP_200_OK)
                     else:
-                        return Response({"status": 400, "message": "Something went wrong"}, status=status.HTTP_400_BAD_REQUEST)
+                        return Response({"status": 400, "message": "Something went wrong"},
+                                        status=status.HTTP_400_BAD_REQUEST)
                 else:
                     return Response({"status": 400, 'message': 'Insufficient Balance'},
                                     status=status.HTTP_400_BAD_REQUEST)
@@ -2354,6 +2417,27 @@ def hubtel_mtn_flexi_transaction(saved_data, reference, email, data_volume, date
     except:
         user_collection.document(user_id).update({'mtn_total_sales': amount})
 
+
+    try:
+        print(tot.get().to_dict()['mtn_total_sales'])
+        previous_sale = tot.get().to_dict()['mtn_total_sales']
+        print(f"Previous Sale: {previous_sale}")
+        new_sale = float(previous_sale) + float(amount)
+        print(new_sale)
+        user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1').update({'mtn_total_sales': new_sale})
+    except:
+        user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1').update({'mtn_total_sales': amount})
+
+    tat = cashback_collection.document(user_id)
+    print(tat.get().to_dict())
+
+    previous_cashback = tat.get().to_dict()['cashback_wallet']
+    print(previous_cashback)
+    cashback_balance = (0.5 / 100) * float(amount)
+    new_cashback = float(previous_cashback) + float(cashback_balance)
+    print(new_cashback)
+    cashback_collection.document(user_id).update({'cashback_wallet': new_cashback})
+
     name = first_name
     volume = data_volume
     date = date_and_time
@@ -2427,6 +2511,16 @@ def hubtel_big_time_transaction(saved_data, reference, email, data_volume, date_
         user_collection.document(user_id).update({'bt_total_sales': new_sale})
     except:
         user_collection.document(user_id).update({'bt_total_sales': amount})
+
+    tat = cashback_collection.document(user_id)
+    print(tat.get().to_dict())
+
+    previous_cashback = tat.get().to_dict()['cashback_wallet']
+    print(previous_cashback)
+    cashback_balance = (0.5 / 100) * float(amount)
+    new_cashback = float(previous_cashback) + float(cashback_balance)
+    print(new_cashback)
+    cashback_collection.document(user_id).update({'cashback_wallet': new_cashback})
 
     for placeholder, value in placeholders.items():
         html_content = html_content.replace(placeholder, str(value))
@@ -2906,7 +3000,9 @@ def initiate_at_airtime(request):
                             print(f"new_user_wallet: {new_user_wallet}")
                         else:
                             print("it's fine")
-
+                else:
+                    return Response({"code": 400, "message": "Insufficient Balance"},
+                                    status=status.HTTP_400_BAD_REQUEST)
                 if user_details is not None:
                     print("yes")
                     first_name = user_details['first name']
