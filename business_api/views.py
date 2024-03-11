@@ -2525,8 +2525,8 @@ def export_unknown_transactions(request):
         record.save()
 
         counter += 1
-        # txn = mtn_other.document(record.firebase_date)
-        # txn.update({'batch_id': 'accepted', 'status': 'Processing'})
+        txn = mtn_other.document(record.firebase_date)
+        txn.update({'batch_id': 'accepted', 'status': 'Processing'})
 
     print(f"Total transactions to export: {counter}")
 
