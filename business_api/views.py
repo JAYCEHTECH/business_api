@@ -2526,7 +2526,16 @@ def export_unknown_transactions(request):
     print(f"Total transactions to export: {counter}")
     print(records_to_update)
     # Bulk update Django records
-    MTNTransaction.objects.bulk_update([MTNTransaction(*data[:-1]) for data in records_to_update], fields=['number', 'bundle_volume', 'batch_id', 'status'])
+    instances_to_update = [MTNTransaction(
+        number=data[0],
+        bundle_volume=data[1],
+        batch_id=data[2],
+        status=data[3],
+        id=data[4]
+    ) for data in records_to_update]
+
+    # Perform bulk update
+    MTNTransaction.objects.bulk_update(instances_to_update, fields=['number', 'bundle_volume', 'batch_id', 'status'])
 
     # Bulk update Firebase transactions
     for data in txns_to_update:
