@@ -3163,6 +3163,174 @@ def initiate_at_airtime(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 @authentication_classes([BearerTokenAuthentication])
+def admin_initiate_at_airtime(request):
+    authorization_header = request.headers.get('Authorization')
+    if authorization_header:
+        auth_type, token = authorization_header.split(' ')
+        if auth_type == 'Bearer':
+            try:
+                token_obj = Token.objects.get(key=token)
+                token_key = token_obj.key
+                if token_key != config("TOKEN_KEY"):
+                    return Response({'message': 'Authorisation Failed.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
+                receiver = request.data.get('receiver')
+                reference = request.data.get('reference')
+                amount = request.data.get('amount')
+                user_id = request.data.get('user_id')
+                print(amount)
+
+                print("yo")
+
+                if not receiver or not reference or not amount:
+                    return Response({'message': 'Body parameters not valid. Check and try again.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
+                print("got here")
+                user_details = get_user_details(user_id)
+                print(user_details['first name'])
+
+                date = datetime.datetime.now().strftime("%a, %b %d, %Y")
+                time = datetime.datetime.now().strftime("%I:%M:%S %p")
+                date_and_time = datetime.datetime.now().isoformat()
+
+                if "wallet" == "wallet":
+                    try:
+                        enough_balance = check_user_balance_against_price(user_id, amount)
+                    except:
+                        return Response(
+                            {'code': '0001', 'message': f'User ID does not exist: User ID provided: {user_id}.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    enough_balance = True
+                    print("not wallet")
+                print(enough_balance)
+                if enough_balance:
+                    user_details = get_user_details(user_id)
+                    email = user_details['email']
+                    print(enough_balance)
+                    # hist = history_web.collection(email).document(date_and_time)
+                    # doc = hist.get()
+                    # if doc.exists:
+                    #     return redirect(f"https://{callback_url}")
+                    # else:
+                    #     print("no record found")
+                    if "wallet" == "wallet":
+                        user = get_user_details(user_id)
+                        if user is None:
+                            return None
+                        previous_user_wallet = user['wallet']
+                        print(f"previous wallet: {previous_user_wallet}")
+                        new_balance = float(previous_user_wallet) - float(amount)
+                        print(f"new_balance:{new_balance}")
+                        doc_ref = user_collection.document(user_id)
+                        doc_ref.update({'wallet': new_balance})
+                        user = get_user_details(user_id)
+                        new_user_wallet = user['wallet']
+                        print(f"new_user_wallet: {new_user_wallet}")
+                        if new_user_wallet == previous_user_wallet:
+                            user = get_user_details(user_id)
+                            if user is None:
+                                return None
+                            previous_user_wallet = user['wallet']
+                            print(f"previous wallet: {previous_user_wallet}")
+                            new_balance = float(previous_user_wallet) - float(amount)
+                            print(f"new_balance:{new_balance}")
+                            doc_ref = user_collection.document(user_id)
+                            doc_ref.update({'wallet': new_balance})
+                            user = get_user_details(user_id)
+                            new_user_wallet = user['wallet']
+                            print(f"new_user_wallet: {new_user_wallet}")
+                        else:
+                            print("it's fine")
+                else:
+                    return Response({"code": 400, "message": "Insufficient Balance"},
+                                    status=status.HTTP_400_BAD_REQUEST)
+                if user_details is not None:
+                    print("yes")
+                    first_name = user_details['first name']
+                    print(first_name)
+                    last_name = user_details['last name']
+                    print(last_name)
+                    email = user_details['email']
+                    phone = user_details['phone']
+                else:
+                    first_name = ""
+                    last_name = ""
+                    email = ""
+                    phone = ""
+                details = {
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'email': email,
+                    'user_id': user_id
+                }
+
+                payload = "{\r\n    \"Destination\": " + str(receiver) + ",\r\n    \"Amount\": " + str(
+                    amount) + ",\r\n    \"CallbackUrl\": \"https://webhook.site/9125cb31-9481-47ad-972f-d1d7765a5957\",\r\n    \"ClientReference\": " + str(
+                    reference) + "\r\n}"
+
+                url = "https://cs.hubtel.com/commissionservices/2018714/dae2142eb5a14c298eace60240c09e4b"
+
+                airtime_headers = {
+                    'Authorization': config("HUBTEL_API_KEY"),
+                    'Content-Type': 'text/plain'
+                }
+
+                response = requests.request("POST", url, headers=airtime_headers, data=payload)
+                airtime_data = response.json()
+                print(airtime_data)
+                print(response.status_code)
+
+                if response.status_code == 200:
+                    data = {
+                        'batch_id': "unknown",
+                        'buyer': phone,
+                        'color_code': "Green",
+                        'amount': amount,
+                        'data_break_down': "",
+                        'data_volume': "",
+                        'date': date,
+                        'date_and_time': date_and_time,
+                        'done': "unknown",
+                        'email': email,
+                        'image': user_id,
+                        'ishareBalance': 0,
+                        'name': f"{first_name} {last_name}",
+                        'number': receiver,
+                        'paid_at': date_and_time,
+                        'reference': reference,
+                        'responseCode': "0",
+                        'status': "Delivered",
+                        'time': time,
+                        'tranxId': str(tranx_id_generator()),
+                        'type': "AT Airtime",
+                        'uid': user_id,
+                        'bal': user_details["wallet"]
+                    }
+                    history_collection.document(date_and_time).set(data)
+                    history_web.collection(email).document(date_and_time).set(data)
+                    print("worked well")
+                    return Response({"status": response.status_code, 'message': f'Something went wrong'},
+                                    )
+                else:
+                    print("not 200 error")
+                    return Response({"status": '200', 'message': f'Transaction Completed Successfully'},
+                                    status=status.HTTP_200_OK)
+            except Exception as e:
+                print(e)
+                return Response({"status": '400', 'message': f'Something went wrong: {e}'},
+                                status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+    else:
+        return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([BearerTokenAuthentication])
 def initiate_mtn_airtime(request):
     authorization_header = request.headers.get('Authorization')
     if authorization_header:
@@ -3306,6 +3474,172 @@ def initiate_mtn_airtime(request):
                         'type': "MTN Airtime",
                         'uid': user_id,
                         'bal': user["wallet"]
+                    }
+                    history_collection.document(date_and_time).set(data)
+                    history_web.collection(email).document(date_and_time).set(data)
+                    print("worked well")
+                    return Response({"status": response.status_code, 'message': f'Something went wrong'},
+                                    )
+                else:
+                    print("not 200 error")
+                    return Response({"status": '200', 'message': f'Transaction Completed Successfully'},
+                                    status=status.HTTP_200_OK)
+            except Exception as e:
+                print(e)
+                return Response({"status": '400', 'message': f'Something went wrong: {e}'},
+                                status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+    else:
+        return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([BearerTokenAuthentication])
+def admin_initiate_mtn_airtime(request):
+    authorization_header = request.headers.get('Authorization')
+    if authorization_header:
+        auth_type, token = authorization_header.split(' ')
+        if auth_type == 'Bearer':
+            try:
+                token_obj = Token.objects.get(key=token)
+                token_key = token_obj.key
+                if token_key != config("TOKEN_KEY"):
+                    return Response({'message': 'Authorisation Failed.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
+                receiver = request.data.get('receiver')
+                reference = request.data.get('reference')
+                amount = request.data.get('amount')
+                user_id = request.data.get('user_id')
+                print(amount)
+
+                print("yo")
+
+                if not receiver or not reference or not amount:
+                    return Response({'message': 'Body parameters not valid. Check and try again.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
+                print("got here")
+                user_details = get_user_details(user_id)
+                print(user_details['first name'])
+
+                date = datetime.datetime.now().strftime("%a, %b %d, %Y")
+                time = datetime.datetime.now().strftime("%I:%M:%S %p")
+                date_and_time = datetime.datetime.now().isoformat()
+
+                if "wallet" == "wallet":
+                    try:
+                        enough_balance = check_user_balance_against_price(user_id, amount)
+                    except:
+                        return Response(
+                            {'code': '0001', 'message': f'User ID does not exist: User ID provided: {user_id}.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    enough_balance = True
+                    print("not wallet")
+                print(enough_balance)
+                if enough_balance:
+                    user_details = get_user_details(user_id)
+                    email = user_details['email']
+                    print(enough_balance)
+                    # hist = history_web.collection(email).document(date_and_time)
+                    # doc = hist.get()
+                    # if doc.exists:
+                    #     return redirect(f"https://{callback_url}")
+                    # else:
+                    #     print("no record found")
+                    if "wallet" == "wallet":
+                        user = get_user_details(user_id)
+                        if user is None:
+                            return None
+                        previous_user_wallet = user['wallet']
+                        print(f"previous wallet: {previous_user_wallet}")
+                        new_balance = float(previous_user_wallet) - float(amount)
+                        print(f"new_balance:{new_balance}")
+                        doc_ref = user_collection.document(user_id)
+                        doc_ref.update({'wallet': new_balance})
+                        user = get_user_details(user_id)
+                        new_user_wallet = user['wallet']
+                        print(f"new_user_wallet: {new_user_wallet}")
+                        if new_user_wallet == previous_user_wallet:
+                            user = get_user_details(user_id)
+                            if user is None:
+                                return None
+                            previous_user_wallet = user['wallet']
+                            print(f"previous wallet: {previous_user_wallet}")
+                            new_balance = float(previous_user_wallet) - float(amount)
+                            print(f"new_balance:{new_balance}")
+                            doc_ref = user_collection.document(user_id)
+                            doc_ref.update({'wallet': new_balance})
+                            user = get_user_details(user_id)
+                            new_user_wallet = user['wallet']
+                            print(f"new_user_wallet: {new_user_wallet}")
+                        else:
+                            print("it's fine")
+
+                if user_details is not None:
+                    print("yes")
+                    first_name = user_details['first name']
+                    print(first_name)
+                    last_name = user_details['last name']
+                    print(last_name)
+                    email = user_details['email']
+                    phone = user_details['phone']
+                else:
+                    first_name = ""
+                    last_name = ""
+                    email = ""
+                    phone = ""
+                details = {
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'email': email,
+                    'user_id': user_id
+                }
+
+                payload = "{\r\n    \"Destination\": " + str(receiver) + ",\r\n    \"Amount\": " + str(
+                    amount) + ",\r\n    \"CallbackUrl\": \"https://webhook.site/9125cb31-9481-47ad-972f-d1d7765a5957\",\r\n    \"ClientReference\": " + str(
+                    reference) + "\r\n}"
+
+                url = "https://cs.hubtel.com/commissionservices/2018714/fdd76c884e614b1c8f669a3207b09a98"
+
+                airtime_headers = {
+                    'Authorization': config("HUBTEL_API_KEY"),
+                    'Content-Type': 'text/plain'
+                }
+
+                response = requests.request("POST", url, headers=airtime_headers, data=payload)
+                airtime_data = response.json()
+                print(airtime_data)
+                print(response.status_code)
+
+                if response.status_code == 200:
+                    data = {
+                        'batch_id': "unknown",
+                        'buyer': phone,
+                        'color_code': "Green",
+                        'amount': amount,
+                        'data_break_down': "",
+                        'data_volume': "",
+                        'date': date,
+                        'date_and_time': date_and_time,
+                        'done': "unknown",
+                        'email': email,
+                        'image': user_id,
+                        'ishareBalance': 0,
+                        'name': f"{first_name} {last_name}",
+                        'number': receiver,
+                        'paid_at': date_and_time,
+                        'reference': reference,
+                        'responseCode': "0",
+                        'status': "Delivered",
+                        'time': time,
+                        'tranxId': str(tranx_id_generator()),
+                        'type': "MTN Airtime",
+                        'uid': user_id,
+                        'bal': user_details["wallet"]
                     }
                     history_collection.document(date_and_time).set(data)
                     history_web.collection(email).document(date_and_time).set(data)
@@ -3473,6 +3807,173 @@ def initiate_voda_airtime(request):
                         'type': "Vodafone Airtime",
                         'uid': user_id,
                         'bal': user["wallet"]
+                    }
+                    history_collection.document(date_and_time).set(data)
+                    history_web.collection(email).document(date_and_time).set(data)
+                    print("worked well")
+                    return Response({"status": response.status_code, 'message': f'Something went wrong'},
+                                    )
+                else:
+                    print("not 200 error")
+                    return Response({"status": '200', 'message': f'Transaction Completed Successfully'},
+                                    status=status.HTTP_200_OK)
+            except Exception as e:
+                print(e)
+                return Response({"status": '400', 'message': f'Something went wrong: {e}'},
+                                status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+    else:
+        return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([BearerTokenAuthentication])
+def admin_initiate_voda_airtime(request):
+    authorization_header = request.headers.get('Authorization')
+    if authorization_header:
+        auth_type, token = authorization_header.split(' ')
+        if auth_type == 'Bearer':
+            try:
+                token_obj = Token.objects.get(key=token)
+                token_key = token_obj.key
+                if token_key != config("TOKEN_KEY"):
+                    return Response({'message': 'Authorisation Failed.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
+                receiver = request.data.get('receiver')
+                reference = request.data.get('reference')
+                amount = request.data.get('amount')
+                user_id = request.data.get('user_id')
+                print(amount)
+                # phone_number = request.data.get('phone_number')
+
+                print("yo")
+
+                if not receiver or not reference or not amount:
+                    return Response({'message': 'Body parameters not valid. Check and try again.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
+                print("got here")
+                user_details = get_user_details(user_id)
+                print(user_details['first name'])
+
+                date = datetime.datetime.now().strftime("%a, %b %d, %Y")
+                time = datetime.datetime.now().strftime("%I:%M:%S %p")
+                date_and_time = datetime.datetime.now().isoformat()
+
+                if "wallet" == "wallet":
+                    try:
+                        enough_balance = check_user_balance_against_price(user_id, amount)
+                    except:
+                        return Response(
+                            {'code': '0001', 'message': f'User ID does not exist: User ID provided: {user_id}.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    enough_balance = True
+                    print("not wallet")
+                print(enough_balance)
+                if enough_balance:
+                    user_details = get_user_details(user_id)
+                    email = user_details['email']
+                    print(enough_balance)
+                    # hist = history_web.collection(email).document(date_and_time)
+                    # doc = hist.get()
+                    # if doc.exists:
+                    #     return redirect(f"https://{callback_url}")
+                    # else:
+                    #     print("no record found")
+                    if "wallet" == "wallet":
+                        user = get_user_details(user_id)
+                        if user is None:
+                            return None
+                        previous_user_wallet = user['wallet']
+                        print(f"previous wallet: {previous_user_wallet}")
+                        new_balance = float(previous_user_wallet) - float(amount)
+                        print(f"new_balance:{new_balance}")
+                        doc_ref = user_collection.document(user_id)
+                        doc_ref.update({'wallet': new_balance})
+                        user = get_user_details(user_id)
+                        new_user_wallet = user['wallet']
+                        print(f"new_user_wallet: {new_user_wallet}")
+                        if new_user_wallet == previous_user_wallet:
+                            user = get_user_details(user_id)
+                            if user is None:
+                                return None
+                            previous_user_wallet = user['wallet']
+                            print(f"previous wallet: {previous_user_wallet}")
+                            new_balance = float(previous_user_wallet) - float(amount)
+                            print(f"new_balance:{new_balance}")
+                            doc_ref = user_collection.document(user_id)
+                            doc_ref.update({'wallet': new_balance})
+                            user = get_user_details(user_id)
+                            new_user_wallet = user['wallet']
+                            print(f"new_user_wallet: {new_user_wallet}")
+                        else:
+                            print("it's fine")
+
+                if user_details is not None:
+                    print("yes")
+                    first_name = user_details['first name']
+                    print(first_name)
+                    last_name = user_details['last name']
+                    print(last_name)
+                    email = user_details['email']
+                    phone = user_details['phone']
+                else:
+                    first_name = ""
+                    last_name = ""
+                    email = ""
+                    phone = ""
+                details = {
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'email': email,
+                    'user_id': user_id
+                }
+
+                payload = "{\r\n    \"Destination\": " + str(receiver) + ",\r\n    \"Amount\": " + str(
+                    amount) + ",\r\n    \"CallbackUrl\": \"https://webhook.site/9125cb31-9481-47ad-972f-d1d7765a5957\",\r\n    \"ClientReference\": " + str(
+                    reference) + "\r\n}"
+
+                url = "https://cs.hubtel.com/commissionservices/2018714/f4be83ad74c742e185224fdae1304800"
+
+                airtime_headers = {
+                    'Authorization': config("HUBTEL_API_KEY"),
+                    'Content-Type': 'text/plain'
+                }
+
+                response = requests.request("POST", url, headers=airtime_headers, data=payload)
+                airtime_data = response.json()
+                print(airtime_data)
+                print(response.status_code)
+
+                if response.status_code == 200:
+                    data = {
+                        'batch_id': "unknown",
+                        'buyer': phone,
+                        'color_code': "Green",
+                        'amount': amount,
+                        'data_break_down': "",
+                        'data_volume': "",
+                        'date': date,
+                        'date_and_time': date_and_time,
+                        'done': "unknown",
+                        'email': email,
+                        'image': user_id,
+                        'ishareBalance': 0,
+                        'name': f"{first_name} {last_name}",
+                        'number': receiver,
+                        'paid_at': date_and_time,
+                        'reference': reference,
+                        'responseCode': "0",
+                        'status': "Delivered",
+                        'time': time,
+                        'tranxId': str(tranx_id_generator()),
+                        'type': "Vodafone Airtime",
+                        'uid': user_id,
+                        'bal': user_details["wallet"]
                     }
                     history_collection.document(date_and_time).set(data)
                     history_web.collection(email).document(date_and_time).set(data)
