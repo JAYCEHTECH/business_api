@@ -3599,9 +3599,7 @@ def admin_initiate_mtn_airtime(request):
                     'user_id': user_id
                 }
 
-                payload = "{\r\n    \"Destination\": " + str(receiver) + ",\r\n    \"Amount\": " + str(
-                    amount) + ",\r\n    \"CallbackUrl\": \"https://webhook.site/9125cb31-9481-47ad-972f-d1d7765a5957\",\r\n    \"ClientReference\": " + str(
-                    reference) + "\r\n}"
+                payload = "{\r\n    \"Destination\": " + str(receiver) + ",\r\n    \"Amount\": " + str(amount) + ",\r\n    \"CallbackUrl\": \"https://webhook.site/9125cb31-9481-47ad-972f-d1d7765a5957\",\r\n    \"ClientReference\": " + str(reference) + "\r\n}"
 
                 url = "https://cs.hubtel.com/commissionservices/2018714/fdd76c884e614b1c8f669a3207b09a98"
 
