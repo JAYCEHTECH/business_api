@@ -916,6 +916,7 @@ def admin_initiate_mtn_transaction(request):
                         print(cashback_balance)
                         cashback_collection.document(user_id).set({'cashback_wallet': cashback_balance})
                         print(cashback_collection.document(user_id).get().to_dict())
+                        print("did")
 
                     mail_doc_ref = mail_collection.document()
                     file_path = 'business_api/mtn_maill.txt'  # Replace with your file path
