@@ -320,12 +320,16 @@ def big_time_transaction(receiver, date, time, date_and_time, phone, amount, dat
         print(cashback_balance)
         new_cashback = float(previous_cashback) + float(cashback_balance)
         print(new_cashback)
-        cashback_collection.document(user_id).update({'cashback_wallet': new_cashback})
-    except:
+        cashback_collection.document(user_id).update(
+            {'cashback_wallet': new_cashback, 'phone_number': phone})
+    except TypeError as e:
+        print(e)
         cashback_balance = (0.5 / 100) * float(amount)
         print(cashback_balance)
-        cashback_collection.document(user_id).update({'cashback_wallet': cashback_balance})
+        cashback_collection.document(user_id).set(
+            {'cashback_wallet': cashback_balance, 'phone_number': phone})
         print(cashback_collection.document(user_id).get().to_dict())
+        print("did")
 
     # previous_big_time_totals = totals_collection.document('BIGTIME TOTALS')
     # all_totals = totals_collection.document('ALL TOTALS')
@@ -909,12 +913,12 @@ def admin_initiate_mtn_transaction(request):
                         print(cashback_balance)
                         new_cashback = float(previous_cashback) + float(cashback_balance)
                         print(new_cashback)
-                        cashback_collection.document(user_id).update({'cashback_wallet': new_cashback})
+                        cashback_collection.document(user_id).update({'cashback_wallet': new_cashback, 'phone_number': user_details['phone']})
                     except TypeError as e:
                         print(e)
                         cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
                         print(cashback_balance)
-                        cashback_collection.document(user_id).set({'cashback_wallet': cashback_balance})
+                        cashback_collection.document(user_id).set({'cashback_wallet': cashback_balance, 'phone_number': user_details['phone']})
                         print(cashback_collection.document(user_id).get().to_dict())
                         print("did")
 
@@ -1351,12 +1355,16 @@ def admin_initiate_ishare_transaction(request):
                                 print(cashback_balance)
                                 new_cashback = float(previous_cashback) + float(cashback_balance)
                                 print(new_cashback)
-                                cashback_collection.document(user_id).update({'cashback_wallet': new_cashback})
-                            except:
+                                cashback_collection.document(user_id).update(
+                                    {'cashback_wallet': new_cashback, 'phone_number': user_details['phone']})
+                            except TypeError as e:
+                                print(e)
                                 cashback_balance = (0.5 / 100) * float(amount)
                                 print(cashback_balance)
-                                cashback_collection.document(user_id).update({'cashback_wallet': cashback_balance})
+                                cashback_collection.document(user_id).set(
+                                    {'cashback_wallet': cashback_balance, 'phone_number': user_details['phone']})
                                 print(cashback_collection.document(user_id).get().to_dict())
+                                print("did")
 
                             return Response(data={'status_code': status_code, 'batch_id': batch_id},
                                             status=status.HTTP_200_OK)
@@ -2410,7 +2418,7 @@ def hubtel_webhook_send_and_save_to_history(saved_data, user_id, reference, rece
 
 
 def hubtel_mtn_flexi_transaction(saved_data, reference, email, data_volume, date_and_time, receiver, first_name,
-                                 user_id, amount):
+                                 user_id, amount, phone):
     history_collection.document(reference).set(saved_data)
     history_web.collection(email).document(reference).set(saved_data)
     user = history_collection.document(reference)
@@ -2454,6 +2462,9 @@ def hubtel_mtn_flexi_transaction(saved_data, reference, email, data_volume, date
     tat = cashback_collection.document(user_id)
     print(tat.get().to_dict())
 
+    tat = cashback_collection.document(user_id)
+    print(tat.get().to_dict())
+
     try:
         previous_cashback = tat.get().to_dict()['cashback_wallet']
         print(previous_cashback)
@@ -2461,12 +2472,16 @@ def hubtel_mtn_flexi_transaction(saved_data, reference, email, data_volume, date
         print(cashback_balance)
         new_cashback = float(previous_cashback) + float(cashback_balance)
         print(new_cashback)
-        cashback_collection.document(user_id).update({'cashback_wallet': new_cashback})
-    except:
+        cashback_collection.document(user_id).update(
+            {'cashback_wallet': new_cashback, 'phone_number': phone})
+    except TypeError as e:
+        print(e)
         cashback_balance = (0.5 / 100) * float(amount)
         print(cashback_balance)
-        cashback_collection.document(user_id).update({'cashback_wallet': cashback_balance})
+        cashback_collection.document(user_id).set(
+            {'cashback_wallet': cashback_balance, 'phone_number': phone})
         print(cashback_collection.document(user_id).get().to_dict())
+        print("did")
     name = first_name
     volume = data_volume
     date = date_and_time
@@ -2500,7 +2515,7 @@ def hubtel_mtn_flexi_transaction(saved_data, reference, email, data_volume, date
 
 
 def hubtel_big_time_transaction(saved_data, reference, email, data_volume, date_and_time, receiver, first_name, amount,
-                                user_id):
+                                user_id, phone):
     data = saved_data
     history_collection.document(reference).set(data)
     history_web.collection(email).document(reference).set(saved_data)
@@ -2544,12 +2559,23 @@ def hubtel_big_time_transaction(saved_data, reference, email, data_volume, date_
     tat = cashback_collection.document(user_id)
     print(tat.get().to_dict())
 
-    previous_cashback = tat.get().to_dict()['cashback_wallet']
-    print(previous_cashback)
-    cashback_balance = (0.5 / 100) * float(amount)
-    new_cashback = float(previous_cashback) + float(cashback_balance)
-    print(new_cashback)
-    cashback_collection.document(user_id).update({'cashback_wallet': new_cashback})
+    try:
+        previous_cashback = tat.get().to_dict()['cashback_wallet']
+        print(previous_cashback)
+        cashback_balance = (0.5 / 100) * float(amount)
+        print(cashback_balance)
+        new_cashback = float(previous_cashback) + float(cashback_balance)
+        print(new_cashback)
+        cashback_collection.document(user_id).update(
+            {'cashback_wallet': new_cashback, 'phone_number': phone})
+    except TypeError as e:
+        print(e)
+        cashback_balance = (0.5 / 100) * float(amount)
+        print(cashback_balance)
+        cashback_collection.document(user_id).set(
+            {'cashback_wallet': cashback_balance, 'phone_number': phone})
+        print(cashback_collection.document(user_id).get().to_dict())
+        print("did")
 
     for placeholder, value in placeholders.items():
         html_content = html_content.replace(placeholder, str(value))
@@ -2674,6 +2700,27 @@ def hubtel_webhook(request):
                             reference_t = reference
                             receiver_t = receiver
 
+                            tat = cashback_collection.document(user_id)
+                            print(tat.get().to_dict())
+
+                            try:
+                                previous_cashback = tat.get().to_dict()['cashback_wallet']
+                                print(previous_cashback)
+                                cashback_balance = (0.5 / 100) * float(amount)
+                                print(cashback_balance)
+                                new_cashback = float(previous_cashback) + float(cashback_balance)
+                                print(new_cashback)
+                                cashback_collection.document(user_id).update(
+                                    {'cashback_wallet': new_cashback, 'phone_number': user_details['phone']})
+                            except TypeError as e:
+                                print(e)
+                                cashback_balance = (0.5 / 100) * float(amount)
+                                print(cashback_balance)
+                                cashback_collection.document(user_id).set(
+                                    {'cashback_wallet': cashback_balance, 'phone_number': user_details['phone']})
+                                print(cashback_collection.document(user_id).get().to_dict())
+                                print("did")
+
                             with open(file_path, 'r') as file:
                                 html_content = file.read()
 
@@ -2733,7 +2780,7 @@ def hubtel_webhook(request):
                     }
                     collection_saved = history_collection.document(reference).get().to_dict()
                     mtn_response = hubtel_mtn_flexi_transaction(collection_saved, reference, email, bundle_volume,
-                                                                date_and_time, receiver, first_name, user_id, amount)
+                                                                date_and_time, receiver, first_name, user_id, amount, phone)
                     print(mtn_response)
                     # new_mtn_txn = models.MTNTransaction.objects.create(
                     #     user_id=user_id,
@@ -2774,7 +2821,7 @@ def hubtel_webhook(request):
                     collection_saved = history_collection.document(reference).get().to_dict()
                     big_time_response = hubtel_big_time_transaction(collection_saved, reference, email, bundle_volume,
                                                                     date_and_time, receiver, first_name, amount,
-                                                                    user_id)
+                                                                    user_id, phone)
                     # saved_data, reference, email, data_volume, date_and_time, receiver, first_name
                     if big_time_response.status_code == 200 or big_time_response.data["code"] == "0000":
                         print("big time donnnneee")
