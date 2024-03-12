@@ -910,7 +910,8 @@ def admin_initiate_mtn_transaction(request):
                         new_cashback = float(previous_cashback) + float(cashback_balance)
                         print(new_cashback)
                         cashback_collection.document(user_id).update({'cashback_wallet': new_cashback})
-                    except:
+                    except TypeError as e:
+                        print(e)
                         cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
                         print(cashback_balance)
                         cashback_collection.document(user_id).set({'cashback_wallet': cashback_balance})
