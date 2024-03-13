@@ -649,7 +649,8 @@ def initiate_mtn_transaction(request):
                         print(new_sale)
                         user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1').update({'mtn_total_sales': new_sale})
                     except:
-                        user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1').update({'mtn_total_sales': amount_to_be_deducted})
+                        user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1').update(
+                            {'mtn_total_sales': amount_to_be_deducted})
 
                     tat = cashback_collection.document(user_id)
                     print(tat.get().to_dict())
@@ -901,7 +902,8 @@ def admin_initiate_mtn_transaction(request):
                         print(new_sale)
                         user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1').update({'mtn_total_sales': new_sale})
                     except:
-                        user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1').update({'mtn_total_sales': amount_to_be_deducted})
+                        user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1').update(
+                            {'mtn_total_sales': amount_to_be_deducted})
 
                     tat = cashback_collection.document(user_id)
                     print(tat.get().to_dict())
@@ -913,12 +915,14 @@ def admin_initiate_mtn_transaction(request):
                         print(cashback_balance)
                         new_cashback = float(previous_cashback) + float(cashback_balance)
                         print(new_cashback)
-                        cashback_collection.document(user_id).update({'cashback_wallet': new_cashback, 'phone_number': user_details['phone']})
+                        cashback_collection.document(user_id).update(
+                            {'cashback_wallet': new_cashback, 'phone_number': user_details['phone']})
                     except TypeError as e:
                         print(e)
                         cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
                         print(cashback_balance)
-                        cashback_collection.document(user_id).set({'cashback_wallet': cashback_balance, 'phone_number': user_details['phone']})
+                        cashback_collection.document(user_id).set(
+                            {'cashback_wallet': cashback_balance, 'phone_number': user_details['phone']})
                         print(cashback_collection.document(user_id).get().to_dict())
                         print("did")
 
@@ -2781,7 +2785,8 @@ def hubtel_webhook(request):
                     }
                     collection_saved = history_collection.document(reference).get().to_dict()
                     mtn_response = hubtel_mtn_flexi_transaction(collection_saved, reference, email, bundle_volume,
-                                                                date_and_time, receiver, first_name, user_id, that_amount, phone)
+                                                                date_and_time, receiver, first_name, user_id,
+                                                                that_amount, phone)
                     print(mtn_response)
                     # new_mtn_txn = models.MTNTransaction.objects.create(
                     #     user_id=user_id,
@@ -3100,7 +3105,6 @@ def initiate_at_airtime(request):
                     'user_id': user_id
                 }
 
-
                 url = "https://cs.hubtel.com/commissionservices/2018714/dae2142eb5a14c298eace60240c09e4b"
 
                 payload = json.dumps({
@@ -3270,7 +3274,6 @@ def admin_initiate_at_airtime(request):
                     'user_id': user_id
                 }
 
-
                 url = "https://cs.hubtel.com/commissionservices/2018714/dae2142eb5a14c298eace60240c09e4b"
 
                 payload = json.dumps({
@@ -3437,7 +3440,6 @@ def initiate_mtn_airtime(request):
                     'email': email,
                     'user_id': user_id
                 }
-
 
                 url = "https://cs.hubtel.com/commissionservices/2018714/fdd76c884e614b1c8f669a3207b09a98"
 
@@ -3654,15 +3656,15 @@ def admin_initiate_mtn_airtime(request):
                     history_collection.document(date_and_time).set(data)
                     history_web.collection(email).document(date_and_time).set(data)
                     print("worked well")
-                    return Response({"status": response.status_code, 'message': f'Something went wrong'},
+                    return Response({"status": response.status_code, 'message': f'Transaction Completed Successfully'},
                                     )
                 else:
                     print("not 200 error")
-                    return Response({"status": '200', 'message': f'Transaction Completed Successfully'},
+                    return Response({"status": response.status_code, 'message': f'Something went wrong'},
                                     status=status.HTTP_200_OK)
             except Exception as e:
                 print(e)
-                return Response({"status": '400', 'message': f'Something went wrong: {e}'},
+                return Response({"status": "400", 'message': f'Something went wrong: {e}'},
                                 status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -3775,7 +3777,6 @@ def initiate_voda_airtime(request):
                     'email': email,
                     'user_id': user_id
                 }
-
 
                 url = "https://cs.hubtel.com/commissionservices/2018714/f4be83ad74c742e185224fdae1304800"
 
@@ -3944,8 +3945,6 @@ def admin_initiate_voda_airtime(request):
                     'email': email,
                     'user_id': user_id
                 }
-
-
 
                 url = "https://cs.hubtel.com/commissionservices/2018714/f4be83ad74c742e185224fdae1304800"
 
