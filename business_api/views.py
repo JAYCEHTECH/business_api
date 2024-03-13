@@ -2644,6 +2644,7 @@ def hubtel_webhook(request):
                 date_and_time = collection_saved['date_and_time']
                 txn_type = collection_saved['type']
                 user_id = collection_saved['uid']
+                that_amount = collection_saved['amount']
                 print(receiver, bundle_volume, name, email, phone_number)
 
                 doc_ref = history_collection.document(reference)
@@ -2856,7 +2857,7 @@ def hubtel_webhook(request):
                     print(f"ya{history_collection.document(date_and_time).get().to_dict()}")
                     print("f saved")
                     print(f"yo{history_web.collection(email).document(date_and_time).get().to_dict()}")
-                    to_be_added = float(amount)
+                    to_be_added = float(that_amount)
                     print(f"amount to be added: {to_be_added}")
                     new_balance = previous_wallet + to_be_added
                     print(f" new balance: {new_balance}")
@@ -2899,7 +2900,7 @@ def hubtel_webhook(request):
                     })
 
                     sms_message = f"GHS {to_be_added} was deposited in your wallet. Available balance is now GHS {new_balance}"
-                    sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to=0{user_details['phone']}&from=Bestpay&sms={sms_message}"
+                    sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to=0{user_details['phone']}&from=CloudHub GH&sms={sms_message}"
                     response = requests.request("GET", url=sms_url)
                     print(response.status_code)
                     return JsonResponse({'message': "Success"}, status=200)
