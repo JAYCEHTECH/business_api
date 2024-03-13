@@ -3600,13 +3600,18 @@ def admin_initiate_mtn_airtime(request):
                     'user_id': user_id
                 }
 
-                payload = "{\r\n    \"Destination\": " + str(receiver) + ",\r\n    \"Amount\": " + str(amount) + ",\r\n    \"CallbackUrl\": \"https://webhook.site/9125cb31-9481-47ad-972f-d1d7765a5957\",\r\n    \"ClientReference\": " + str(reference) + "\r\n}"
-
+                # payload = "{\r\n    \"Destination\": " + str(receiver) + ",\r\n    \"Amount\": " + str(amount) + ",\r\n    \"CallbackUrl\": \"https://webhook.site/9125cb31-9481-47ad-972f-d1d7765a5957\",\r\n    \"ClientReference\": " + str(reference) + "\r\n}"
+                payload = {
+                    "Destination": str(receiver),
+                    "Amount": amount,
+                    "CallbackURL": "https://merchant.cloudhubgh.com/hubtel_webhook",
+                    "ClientReference": reference
+                }
                 url = "https://cs.hubtel.com/commissionservices/2018714/fdd76c884e614b1c8f669a3207b09a98"
 
                 airtime_headers = {
                     'Authorization': config("HUBTEL_API_KEY"),
-                    'Content-Type': 'text/plain'
+                    'Content-Type': 'application/json'
                 }
 
                 response = requests.request("POST", url, headers=airtime_headers, data=payload)
