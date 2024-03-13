@@ -3612,6 +3612,8 @@ def admin_initiate_mtn_airtime(request):
 
                 url = "https://cs.hubtel.com/commissionservices/2018714/fdd76c884e614b1c8f669a3207b09a98"
 
+                print(f"receiver: {receiver}")
+
                 payload = json.dumps({
                     "Destination": str(receiver),
                     "Amount": amount,
