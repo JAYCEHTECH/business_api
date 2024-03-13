@@ -3100,21 +3100,23 @@ def initiate_at_airtime(request):
                     'user_id': user_id
                 }
 
-                payload = "{\r\n    \"Destination\": " + str(receiver) + ",\r\n    \"Amount\": " + str(
-                    amount) + ",\r\n    \"CallbackUrl\": \"https://webhook.site/9125cb31-9481-47ad-972f-d1d7765a5957\",\r\n    \"ClientReference\": " + str(
-                    reference) + "\r\n}"
 
                 url = "https://cs.hubtel.com/commissionservices/2018714/dae2142eb5a14c298eace60240c09e4b"
 
-                airtime_headers = {
+                payload = json.dumps({
+                    "Destination": str(receiver),
+                    "Amount": amount,
+                    "CallbackURL": "https://merchant.cloudhubgh.com/hubtel_webhook",
+                    "ClientReference": reference
+                })
+                headers = {
                     'Authorization': config("HUBTEL_API_KEY"),
-                    'Content-Type': 'text/plain'
+                    'Content-Type': 'application/json'
                 }
 
-                response = requests.request("POST", url, headers=airtime_headers, data=payload)
-                airtime_data = response.json()
-                print(airtime_data)
-                print(response.status_code)
+                response = requests.request("POST", url, headers=headers, data=payload)
+
+                print(response.text)
 
                 if response.status_code == 200:
                     data = {
@@ -3268,21 +3270,23 @@ def admin_initiate_at_airtime(request):
                     'user_id': user_id
                 }
 
-                payload = "{\r\n    \"Destination\": " + str(receiver) + ",\r\n    \"Amount\": " + str(
-                    amount) + ",\r\n    \"CallbackUrl\": \"https://webhook.site/9125cb31-9481-47ad-972f-d1d7765a5957\",\r\n    \"ClientReference\": " + str(
-                    reference) + "\r\n}"
 
                 url = "https://cs.hubtel.com/commissionservices/2018714/dae2142eb5a14c298eace60240c09e4b"
 
-                airtime_headers = {
+                payload = json.dumps({
+                    "Destination": str(receiver),
+                    "Amount": amount,
+                    "CallbackURL": "https://merchant.cloudhubgh.com/hubtel_webhook",
+                    "ClientReference": reference
+                })
+                headers = {
                     'Authorization': config("HUBTEL_API_KEY"),
-                    'Content-Type': 'text/plain'
+                    'Content-Type': 'application/json'
                 }
 
-                response = requests.request("POST", url, headers=airtime_headers, data=payload)
-                airtime_data = response.json()
-                print(airtime_data)
-                print(response.status_code)
+                response = requests.request("POST", url, headers=headers, data=payload)
+
+                print(response.text)
 
                 if response.status_code == 200:
                     data = {
@@ -3434,21 +3438,23 @@ def initiate_mtn_airtime(request):
                     'user_id': user_id
                 }
 
-                payload = "{\r\n    \"Destination\": " + str(receiver) + ",\r\n    \"Amount\": " + str(
-                    amount) + ",\r\n    \"CallbackUrl\": \"https://webhook.site/9125cb31-9481-47ad-972f-d1d7765a5957\",\r\n    \"ClientReference\": " + str(
-                    reference) + "\r\n}"
 
                 url = "https://cs.hubtel.com/commissionservices/2018714/fdd76c884e614b1c8f669a3207b09a98"
 
-                airtime_headers = {
+                payload = json.dumps({
+                    "Destination": str(receiver),
+                    "Amount": amount,
+                    "CallbackURL": "https://merchant.cloudhubgh.com/hubtel_webhook",
+                    "ClientReference": reference
+                })
+                headers = {
                     'Authorization': config("HUBTEL_API_KEY"),
-                    'Content-Type': 'text/plain'
+                    'Content-Type': 'application/json'
                 }
 
-                response = requests.request("POST", url, headers=airtime_headers, data=payload)
-                airtime_data = response.json()
-                print(airtime_data)
-                print(response.status_code)
+                response = requests.request("POST", url, headers=headers, data=payload)
+
+                print(response.text)
 
                 if response.status_code == 200:
                     data = {
@@ -3601,23 +3607,23 @@ def admin_initiate_mtn_airtime(request):
                 }
 
                 # payload = "{\r\n    \"Destination\": " + str(receiver) + ",\r\n    \"Amount\": " + str(amount) + ",\r\n    \"CallbackUrl\": \"https://webhook.site/9125cb31-9481-47ad-972f-d1d7765a5957\",\r\n    \"ClientReference\": " + str(reference) + "\r\n}"
-                payload = {
+
+                url = "https://cs.hubtel.com/commissionservices/2018714/fdd76c884e614b1c8f669a3207b09a98"
+
+                payload = json.dumps({
                     "Destination": str(receiver),
                     "Amount": amount,
                     "CallbackURL": "https://merchant.cloudhubgh.com/hubtel_webhook",
                     "ClientReference": reference
-                }
-                url = "https://cs.hubtel.com/commissionservices/2018714/fdd76c884e614b1c8f669a3207b09a98"
-
-                airtime_headers = {
+                })
+                headers = {
                     'Authorization': config("HUBTEL_API_KEY"),
                     'Content-Type': 'application/json'
                 }
 
-                response = requests.request("POST", url, headers=airtime_headers, data=payload)
-                airtime_data = response.json()
-                print(airtime_data)
-                print(response.status_code)
+                response = requests.request("POST", url, headers=headers, data=payload)
+
+                print(response.text)
 
                 if response.status_code == 200:
                     data = {
@@ -3770,21 +3776,23 @@ def initiate_voda_airtime(request):
                     'user_id': user_id
                 }
 
-                payload = "{\r\n    \"Destination\": " + str(receiver) + ",\r\n    \"Amount\": " + str(
-                    amount) + ",\r\n    \"CallbackUrl\": \"https://webhook.site/9125cb31-9481-47ad-972f-d1d7765a5957\",\r\n    \"ClientReference\": " + str(
-                    reference) + "\r\n}"
 
                 url = "https://cs.hubtel.com/commissionservices/2018714/f4be83ad74c742e185224fdae1304800"
 
-                airtime_headers = {
+                payload = json.dumps({
+                    "Destination": str(receiver),
+                    "Amount": amount,
+                    "CallbackURL": "https://merchant.cloudhubgh.com/hubtel_webhook",
+                    "ClientReference": reference
+                })
+                headers = {
                     'Authorization': config("HUBTEL_API_KEY"),
-                    'Content-Type': 'text/plain'
+                    'Content-Type': 'application/json'
                 }
 
-                response = requests.request("POST", url, headers=airtime_headers, data=payload)
-                airtime_data = response.json()
-                print(airtime_data)
-                print(response.status_code)
+                response = requests.request("POST", url, headers=headers, data=payload)
+
+                print(response.text)
 
                 if response.status_code == 200:
                     data = {
@@ -3937,21 +3945,24 @@ def admin_initiate_voda_airtime(request):
                     'user_id': user_id
                 }
 
-                payload = "{\r\n    \"Destination\": " + str(receiver) + ",\r\n    \"Amount\": " + str(
-                    amount) + ",\r\n    \"CallbackUrl\": \"https://webhook.site/9125cb31-9481-47ad-972f-d1d7765a5957\",\r\n    \"ClientReference\": " + str(
-                    reference) + "\r\n}"
+
 
                 url = "https://cs.hubtel.com/commissionservices/2018714/f4be83ad74c742e185224fdae1304800"
 
-                airtime_headers = {
+                payload = json.dumps({
+                    "Destination": str(receiver),
+                    "Amount": amount,
+                    "CallbackURL": "https://merchant.cloudhubgh.com/hubtel_webhook",
+                    "ClientReference": reference
+                })
+                headers = {
                     'Authorization': config("HUBTEL_API_KEY"),
-                    'Content-Type': 'text/plain'
+                    'Content-Type': 'application/json'
                 }
 
-                response = requests.request("POST", url, headers=airtime_headers, data=payload)
-                airtime_data = response.json()
-                print(airtime_data)
-                print(response.status_code)
+                response = requests.request("POST", url, headers=headers, data=payload)
+
+                print(response.text)
 
                 if response.status_code == 200:
                     data = {
