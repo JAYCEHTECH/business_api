@@ -645,11 +645,11 @@ def initiate_mtn_transaction(request):
                         print(tot.get().to_dict()['mtn_total_sales'])
                         previous_sale = tot.get().to_dict()['mtn_total_sales']
                         print(f"Previous Sale: {previous_sale}")
-                        new_sale = float(previous_sale) + float(amount)
+                        new_sale = float(previous_sale) + float(amount_to_be_deducted)
                         print(new_sale)
                         user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1').update({'mtn_total_sales': new_sale})
                     except:
-                        user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1').update({'mtn_total_sales': amount})
+                        user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1').update({'mtn_total_sales': amount_to_be_deducted})
 
                     tat = cashback_collection.document(user_id)
                     print(tat.get().to_dict())
