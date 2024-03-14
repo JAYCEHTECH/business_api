@@ -2983,6 +2983,202 @@ def hubtel_webhook(request):
                     response = requests.request("GET", url=sms_url)
                     print(response.status_code)
                     return JsonResponse({'message': "Success"}, status=200)
+                elif txn_type == "MTN_AIRTIME":
+                    doc_ref.update(
+                        {'ishareBalance': "Paid", 'status': "Credited", "tranxId": str(tranx_id_generator())})
+                    user_details = get_user_details(user_id)
+                    if user_details is not None:
+                        print(user_details)
+                        first_name = user_details['first name']
+                        last_name = user_details['last name']
+                        email = user_details['email']
+                        phone = user_details['phone']
+                    else:
+                        first_name = ""
+                        last_name = ""
+                        email = ""
+                        phone = ""
+                    url = "https://cs.hubtel.com/commissionservices/2018714/fdd76c884e614b1c8f669a3207b09a98"
+                    print(url)
+
+                    print(f"receiver: {receiver}")
+
+                    payload = json.dumps({
+                        "Destination": receiver,
+                        "Amount": that_amount,
+                        "CallbackURL": "https://merchant.cloudhubgh.com/hubtel_webhook",
+                        "ClientReference": reference
+                    })
+                    headers = {
+                        'Authorization': config("HUBTEL_API_KEY"),
+                        'Content-Type': 'application/json'
+                    }
+
+                    response = requests.request("POST", url, headers=headers, data=payload)
+
+                    print(response.text)
+
+                    if response.status_code == 200:
+                        doc_ref = history_collection.document(date_and_time)
+                        if doc_ref.get().exists:
+                            doc_ref.update({'done': 'Successful'})
+                        else:
+                            print("no entry")
+                        print("worked well")
+                        return Response(
+                            {"status": response.status_code, 'message': f'Transaction Completed Successfully'},
+                            )
+                    else:
+                        print("not 200 error")
+                        return Response({"status": response.status_code, 'message': f'Something went wrong'},
+                                        status=400)
+                elif txn_type == "VODA_AIRTIME":
+                    doc_ref.update(
+                        {'ishareBalance': "Paid", 'status': "Credited", "tranxId": str(tranx_id_generator())})
+                    user_details = get_user_details(user_id)
+                    if user_details is not None:
+                        print(user_details)
+                        first_name = user_details['first name']
+                        last_name = user_details['last name']
+                        email = user_details['email']
+                        phone = user_details['phone']
+                    else:
+                        first_name = ""
+                        last_name = ""
+                        email = ""
+                        phone = ""
+                    url = "https://cs.hubtel.com/commissionservices/2016884/f4be83ad74c742e185224fdae1304800"
+                    print(url)
+
+                    print(f"receiver: {receiver}")
+
+                    payload = json.dumps({
+                        "Destination": receiver,
+                        "Amount": that_amount,
+                        "CallbackURL": "https://merchant.cloudhubgh.com/hubtel_webhook",
+                        "ClientReference": reference
+                    })
+                    headers = {
+                        'Authorization': config("HUBTEL_API_KEY"),
+                        'Content-Type': 'application/json'
+                    }
+
+                    response = requests.request("POST", url, headers=headers, data=payload)
+
+                    print(response.text)
+
+                    if response.status_code == 200:
+                        doc_ref = history_collection.document(date_and_time)
+                        if doc_ref.get().exists:
+                            doc_ref.update({'done': 'Successful'})
+                        else:
+                            print("no entry")
+                        print("worked well")
+                        return Response(
+                            {"status": response.status_code, 'message': f'Transaction Completed Successfully'},
+                            )
+                    else:
+                        print("not 200 error")
+                        return Response({"status": response.status_code, 'message': f'Something went wrong'},
+                                        status=400)
+                elif txn_type == "AT_AIRTIME":
+                    doc_ref.update(
+                        {'ishareBalance': "Paid", 'status': "Credited", "tranxId": str(tranx_id_generator())})
+                    user_details = get_user_details(user_id)
+                    if user_details is not None:
+                        print(user_details)
+                        first_name = user_details['first name']
+                        last_name = user_details['last name']
+                        email = user_details['email']
+                        phone = user_details['phone']
+                    else:
+                        first_name = ""
+                        last_name = ""
+                        email = ""
+                        phone = ""
+                    url = "https://cs.hubtel.com/commissionservices/2016884/dae2142eb5a14c298eace60240c09e4b"
+                    print(url)
+
+                    print(f"receiver: {receiver}")
+
+                    payload = json.dumps({
+                        "Destination": receiver,
+                        "Amount": that_amount,
+                        "CallbackURL": "https://merchant.cloudhubgh.com/hubtel_webhook",
+                        "ClientReference": reference
+                    })
+                    headers = {
+                        'Authorization': config("HUBTEL_API_KEY"),
+                        'Content-Type': 'application/json'
+                    }
+
+                    response = requests.request("POST", url, headers=headers, data=payload)
+
+                    print(response.text)
+
+                    if response.status_code == 200:
+                        doc_ref = history_collection.document(date_and_time)
+                        if doc_ref.get().exists:
+                            doc_ref.update({'done': 'Successful'})
+                        else:
+                            print("no entry")
+                        print("worked well")
+                        return Response(
+                            {"status": response.status_code, 'message': f'Transaction Completed Successfully'},
+                            )
+                    else:
+                        print("not 200 error")
+                        return Response({"status": response.status_code, 'message': f'Something went wrong'},
+                                        status=400)
+                elif txn_type == "GLO_AIRTIME":
+                    doc_ref.update(
+                        {'ishareBalance': "Paid", 'status': "Credited", "tranxId": str(tranx_id_generator())})
+                    user_details = get_user_details(user_id)
+                    if user_details is not None:
+                        print(user_details)
+                        first_name = user_details['first name']
+                        last_name = user_details['last name']
+                        email = user_details['email']
+                        phone = user_details['phone']
+                    else:
+                        first_name = ""
+                        last_name = ""
+                        email = ""
+                        phone = ""
+                    url = "https://cs.hubtel.com/commissionservices/2016884/47d88e88f50f47468a34a14ac73e8ab5"
+                    print(url)
+
+                    print(f"receiver: {receiver}")
+
+                    payload = json.dumps({
+                        "Destination": receiver,
+                        "Amount": that_amount,
+                        "CallbackURL": "https://merchant.cloudhubgh.com/hubtel_webhook",
+                        "ClientReference": reference
+                    })
+                    headers = {
+                        'Authorization': config("HUBTEL_API_KEY"),
+                        'Content-Type': 'application/json'
+                    }
+
+                    response = requests.request("POST", url, headers=headers, data=payload)
+
+                    print(response.text)
+
+                    if response.status_code == 200:
+                        doc_ref = history_collection.document(date_and_time)
+                        if doc_ref.get().exists:
+                            doc_ref.update({'done': 'Successful'})
+                        else:
+                            print("no entry")
+                        print("worked well")
+                        return Response(
+                            {"status": response.status_code, 'message': f'Transaction Completed Successfully'},
+                            )
+                    else:
+                        print("not 200 error")
+                        return Response({"status": response.status_code, 'message': f'Something went wrong'},
+                                        status=400)
                 else:
                     print("no type found")
                     return JsonResponse({'message': "No Type Found"}, status=500)
