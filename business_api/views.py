@@ -642,6 +642,7 @@ def initiate_mtn_transaction(request):
                         user_collection.document(user_id).update({'mtn_total_sales': amount_to_be_deducted})
 
                     try:
+                        tot = user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1')
                         print(tot.get().to_dict()['mtn_total_sales'])
                         previous_sale = tot.get().to_dict()['mtn_total_sales']
                         print(f"Previous Sale: {previous_sale}")
@@ -895,6 +896,7 @@ def admin_initiate_mtn_transaction(request):
                         user_collection.document(user_id).update({'mtn_total_sales': amount_to_be_deducted})
 
                     try:
+                        tot = user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1')
                         print(tot.get().to_dict()['mtn_total_sales'])
                         previous_sale = tot.get().to_dict()['mtn_total_sales']
                         print(f"Previous Sale: {previous_sale}")
@@ -2569,6 +2571,7 @@ def hubtel_mtn_flexi_transaction(saved_data, reference, email, data_volume, date
         user_collection.document(user_id).update({'mtn_total_sales': amount})
 
     try:
+        tot = user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1')
         print(tot.get().to_dict()['mtn_total_sales'])
         previous_sale = tot.get().to_dict()['mtn_total_sales']
         print(f"Previous Sale: {previous_sale}")
