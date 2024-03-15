@@ -2352,7 +2352,7 @@ def paystack_webhook(request):
         return HttpResponse(status=405)
 
 
-def hubtel_webhook_send_and_save_to_history(saved_data, user_id, reference, receiver, data_volume, amount):
+def hubtel_webhook_send_and_save_to_history(saved_data, user_id, reference, receiver, data_volume, amount, date_and_time, time):
     user_details = get_user_details(user_id)
     first_name = user_details['first name']
     last_name = user_details['last name']
@@ -2398,27 +2398,145 @@ def hubtel_webhook_send_and_save_to_history(saved_data, user_id, reference, rece
                                          buyer=phone,
                                          bundle=data_volume,
                                          email=email)
-    json_response = ishare_response.json()
-    print(f"hello:{json_response}")
-    status_code = ishare_response.status_code
-    print(status_code)
+    if ishare_response.status_code == 401:
+        return Response(
+            data={'status_code': ishare_response.status_code, "message": "Authorization Failed"},
+            status=status.HTTP_400_BAD_REQUEST)
+    data = ishare_response.json()
     try:
-        batch_id = json_response["batch_id"]
+        print("entered the try")
+        batch_id = data["batchId"]
+        print("batch id")
     except KeyError:
-        batch_id = "unknown"
-    print(batch_id)
+        print("key error")
+        return Response(
+            data={'status_code': ishare_response.status_code, "message": "Transaction Failed"},
+            status=status.HTTP_400_BAD_REQUEST)
+    print(data["batchId"])
+    status_code = ishare_response.status_code
+    if batch_id is None:
+        print("batch id was none")
+        return Response(data={'status_code': status_code, "message": "Transaction Failed"},
+                        status=status.HTTP_400_BAD_REQUEST)
+    sleep(10)
+    ishare_verification_response = ishare_verification(batch_id)
+    if ishare_verification_response is not False:
+        code = \
+            ishare_verification_response["flexiIshareTranxStatus"]["flexiIshareTranxStatusResult"][
+                "apiResponse"][
+                "responseCode"]
+        ishare_response = \
+            ishare_verification_response["flexiIshareTranxStatus"]["flexiIshareTranxStatusResult"][
+                "ishareApiResponseData"][
+                "apiResponseData"][
+                0][
+                "responseMsg"]
+        print(code)
+        print(ishare_response)
+        if code == '200' or ishare_response == 'Crediting Successful.':
+            sms = f"Your account has been credited with {data_volume}MB."
+            r_sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to={receiver}&from=CloudHub GH&sms={sms}"
+            response = requests.request("GET", url=r_sms_url)
+            print(response.text)
+            doc_ref = history_collection.document(date_and_time)
+            doc_ref.update({'done': 'Successful'})
+            mail_doc_ref = mail_collection.document(f"{batch_id}-Mail")
+            file_path = 'business_api/mail.txt'  # Replace with your file path
 
-    doc_ref = history_collection.document(reference)
-    if doc_ref.get().exists:
-        doc_ref.update({'batch_id': batch_id, 'responseCode': status_code})
-        history_web.collection(email).document(reference).update({'batch_id': batch_id, 'responseCode': status_code})
+            name = user_details["first name"]
+            volume = data_volume
+            date = date_and_time
+            reference_t = reference
+            receiver_t = receiver
+
+            with open(file_path, 'r') as file:
+                html_content = file.read()
+
+            placeholders = {
+                '{name}': name,
+                '{volume}': volume,
+                '{date}': date,
+                '{reference}': reference_t,
+                '{receiver}': receiver_t
+            }
+
+            for placeholder, value in placeholders.items():
+                html_content = html_content.replace(placeholder, str(value))
+
+            mail_doc_ref.set({
+                'to': email,
+                'message': {
+                    'subject': 'AT Flexi Bundle',
+                    'html': html_content,
+                    'messageId': 'CloudHub GH'
+                }
+            })
+
+            tot = user_collection.document(user_id)
+            print(tot.get().to_dict())
+            try:
+                print(tot.get().to_dict()['at_total_sales'])
+                previous_sale = tot.get().to_dict()['at_total_sales']
+                print(f"Previous Sale: {previous_sale}")
+                new_sale = float(previous_sale) + float(amount)
+                print(new_sale)
+                user_collection.document(user_id).update({'at_total_sales': new_sale})
+            except:
+                user_collection.document(user_id).update({'at_total_sales': amount})
+
+            tat = cashback_collection.document(user_id)
+            print(tat.get().to_dict())
+
+            try:
+                previous_cashback = tat.get().to_dict()['cashback_wallet']
+                print(previous_cashback)
+                cashback_balance = (0.5 / 100) * float(amount)
+                print(cashback_balance)
+                new_cashback = float(previous_cashback) + float(cashback_balance)
+                print(new_cashback)
+                cashback_collection.document(user_id).update(
+                    {'cashback_wallet': new_cashback, 'phone_number': user_details['phone']})
+            except TypeError as e:
+                print(e)
+                cashback_balance = (0.5 / 100) * float(amount)
+                print(cashback_balance)
+                cashback_collection.document(user_id).set(
+                    {'cashback_wallet': cashback_balance, 'phone_number': user_details['phone']})
+                print(cashback_collection.document(user_id).get().to_dict())
+                print("did")
+
+            return Response(data={'status_code': status_code, 'batch_id': batch_id},
+                            status=status.HTTP_200_OK)
+        else:
+            print("some else before history")
+            doc_ref = history_collection.document(date_and_time)
+            doc_ref.update({'done': 'Failed'})
+            return Response(data={'status_code': status_code, "message": "Transaction Failed"},
+                            status=status.HTTP_400_BAD_REQUEST)
     else:
-        print("didn't find any entry to update")
-    print("firebase saved")
-    # return status_code, batch_id if batch_id else "No batchId", email, first_name
-    return Response(
-        data=json_response,
-        status=status.HTTP_200_OK)
+        return Response(data={'status_code': status_code, "message": "Could not verify transaction"},
+                        status=status.HTTP_400_BAD_REQUEST)
+    # json_response = ishare_response.json()
+    # print(f"hello:{json_response}")
+    # status_code = ishare_response.status_code
+    # print(status_code)
+    # try:
+    #     batch_id = json_response["batch_id"]
+    # except KeyError:
+    #     batch_id = "unknown"
+    # print(batch_id)
+    #
+    # doc_ref = history_collection.document(reference)
+    # if doc_ref.get().exists:
+    #     doc_ref.update({'batch_id': batch_id, 'responseCode': status_code})
+    #     history_web.collection(email).document(reference).update({'batch_id': batch_id, 'responseCode': status_code})
+    # else:
+    #     print("didn't find any entry to update")
+    # print("firebase saved")
+    # # return status_code, batch_id if batch_id else "No batchId", email, first_name
+    # return Response(
+    #     data=json_response,
+    #     status=status.HTTP_200_OK)
 
 
 def hubtel_mtn_flexi_transaction(saved_data, reference, email, data_volume, date_and_time, receiver, first_name,
@@ -2646,6 +2764,7 @@ def hubtel_webhook(request):
                 email = collection_saved['email']
                 phone_number = collection_saved['buyer']
                 date_and_time = collection_saved['date_and_time']
+                time = collection_saved["time"]
                 txn_type = collection_saved['type']
                 user_id = collection_saved['uid']
                 that_amount = collection_saved['amount']
@@ -2669,91 +2788,11 @@ def hubtel_webhook(request):
                         phone = ""
                     collection_saved = history_collection.document(reference).get().to_dict()
                     send_response = hubtel_webhook_send_and_save_to_history(collection_saved, user_id, reference,
-                                                                            receiver, bundle_volume, amount)
+                                                                            receiver, bundle_volume, amount, date_and_time, time)
                     # saved_data, user_id, reference, receiver, data_volume
-                    data = send_response.data
-                    json_response = data
-                    print(json_response)
-                    if json_response["code"] == "0002":
-                        return HttpResponse(status=200)
-                    elif json_response["code"] == "0001":
-                        return HttpResponse(status=500)
-                    else:
-                        print(send_response.status_code)
-                        try:
-                            batch_id = json_response["batch_id"]
-                        except KeyError:
-                            return HttpResponse(status=500)
+                    print(send_response)
+                    return HttpResponse(status=send_response.status_code)
 
-                        print(batch_id)
-
-                        if json_response["code"] == '0000':
-                            sms = f"Your account has been credited with {bundle_volume}MB."
-                            r_sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to={receiver}&from=CloudHub GH&sms={sms}"
-                            response = requests.request("GET", url=r_sms_url)
-                            doc_ref = history_collection.document(date_and_time)
-                            if doc_ref.get().exists:
-                                doc_ref.update({'done': 'Successful'})
-                            else:
-                                print("no entry")
-                            mail_doc_ref = mail_collection.document(f"{batch_id}-Mail")
-                            file_path = 'business_api/mail.txt'  # Replace with your file path
-
-                            name = first_name
-                            volume = bundle_volume
-                            date = date_and_time
-                            reference_t = reference
-                            receiver_t = receiver
-
-                            tat = cashback_collection.document(user_id)
-                            print(tat.get().to_dict())
-
-                            try:
-                                previous_cashback = tat.get().to_dict()['cashback_wallet']
-                                print(previous_cashback)
-                                cashback_balance = (0.5 / 100) * float(amount)
-                                print(cashback_balance)
-                                new_cashback = float(previous_cashback) + float(cashback_balance)
-                                print(new_cashback)
-                                cashback_collection.document(user_id).update(
-                                    {'cashback_wallet': new_cashback, 'phone_number': user_details['phone']})
-                            except TypeError as e:
-                                print(e)
-                                cashback_balance = (0.5 / 100) * float(amount)
-                                print(cashback_balance)
-                                cashback_collection.document(user_id).set(
-                                    {'cashback_wallet': cashback_balance, 'phone_number': user_details['phone']})
-                                print(cashback_collection.document(user_id).get().to_dict())
-                                print("did")
-
-                            with open(file_path, 'r') as file:
-                                html_content = file.read()
-
-                            placeholders = {
-                                '{name}': name,
-                                '{volume}': volume,
-                                '{date}': date,
-                                '{reference}': reference_t,
-                                '{receiver}': receiver_t
-                            }
-
-                            for placeholder, value in placeholders.items():
-                                html_content = html_content.replace(placeholder, str(value))
-
-                            mail_doc_ref.set({
-                                'to': email,
-                                'message': {
-                                    'subject': 'AT Flexi Bundle',
-                                    'html': html_content,
-                                    'messageId': 'Bestpay'
-                                }
-                            })
-                            print("donnee")
-                            return JsonResponse({'message': "Success"}, status=200)
-                        else:
-                            doc_ref = history_collection.document(date_and_time)
-                            doc_ref.update({'done': 'Failed'})
-                            return JsonResponse({'message': "Success"}, status=200)
                 elif txn_type == "MTN Master Internet":
                     doc_ref.update(
                         {'ishareBalance': "Paid", 'status': "Undelivered", "tranxId": str(tranx_id_generator())})
@@ -3784,83 +3823,86 @@ def admin_initiate_mtn_airtime(request):
                         else:
                             print("it's fine")
 
-                if user_details is not None:
-                    print("yes")
-                    first_name = user_details['first name']
-                    print(first_name)
-                    last_name = user_details['last name']
-                    print(last_name)
-                    email = user_details['email']
-                    phone = user_details['phone']
-                else:
-                    first_name = ""
-                    last_name = ""
-                    email = ""
-                    phone = ""
-                details = {
-                    'first_name': first_name,
-                    'last_name': last_name,
-                    'email': email,
-                    'user_id': user_id
-                }
-
-                print("before url")
-
-                url = "https://cs.hubtel.com/commissionservices/2018714/fdd76c884e614b1c8f669a3207b09a98"
-                print(url)
-
-                print(f"receiver: {receiver}")
-
-                payload = json.dumps({
-                    "Destination": receiver,
-                    "Amount": amount,
-                    "CallbackURL": "https://merchant.cloudhubgh.com/hubtel_webhook",
-                    "ClientReference": reference
-                })
-                headers = {
-                    'Authorization': config("HUBTEL_API_KEY"),
-                    'Content-Type': 'application/json'
-                }
-
-                response = requests.request("POST", url, headers=headers, data=payload)
-
-                print(response.text)
-
-                if response.status_code == 200:
-                    data = {
-                        'batch_id': "unknown",
-                        'buyer': phone,
-                        'color_code': "Green",
-                        'amount': amount,
-                        'data_break_down': "",
-                        'data_volume': "",
-                        'date': date,
-                        'date_and_time': date_and_time,
-                        'done': "unknown",
+                    if user_details is not None:
+                        print("yes")
+                        first_name = user_details['first name']
+                        print(first_name)
+                        last_name = user_details['last name']
+                        print(last_name)
+                        email = user_details['email']
+                        phone = user_details['phone']
+                    else:
+                        first_name = ""
+                        last_name = ""
+                        email = ""
+                        phone = ""
+                    details = {
+                        'first_name': first_name,
+                        'last_name': last_name,
                         'email': email,
-                        'image': user_id,
-                        'ishareBalance': 0,
-                        'name': f"{first_name} {last_name}",
-                        'number': receiver,
-                        'paid_at': date_and_time,
-                        'reference': reference,
-                        'responseCode': "0",
-                        'status': "Delivered",
-                        'time': time,
-                        'tranxId': str(tranx_id_generator()),
-                        'type': "MTN Airtime",
-                        'uid': user_id,
-                        'bal': user_details["wallet"]
+                        'user_id': user_id
                     }
-                    history_collection.document(date_and_time).set(data)
-                    history_web.collection(email).document(date_and_time).set(data)
-                    print("worked well")
-                    return Response({"status": response.status_code, 'message': f'Transaction Completed Successfully'},
-                                    )
+
+                    print("before url")
+
+                    url = "https://cs.hubtel.com/commissionservices/2018714/fdd76c884e614b1c8f669a3207b09a98"
+                    print(url)
+
+                    print(f"receiver: {receiver}")
+
+                    payload = json.dumps({
+                        "Destination": receiver,
+                        "Amount": amount,
+                        "CallbackURL": "https://merchant.cloudhubgh.com/hubtel_webhook",
+                        "ClientReference": reference
+                    })
+                    headers = {
+                        'Authorization': config("HUBTEL_API_KEY"),
+                        'Content-Type': 'application/json'
+                    }
+
+                    response = requests.request("POST", url, headers=headers, data=payload)
+
+                    print(response.text)
+
+                    if response.status_code == 200:
+                        data = {
+                            'batch_id': "unknown",
+                            'buyer': phone,
+                            'color_code': "Green",
+                            'amount': amount,
+                            'data_break_down': "",
+                            'data_volume': "",
+                            'date': date,
+                            'date_and_time': date_and_time,
+                            'done': "unknown",
+                            'email': email,
+                            'image': user_id,
+                            'ishareBalance': 0,
+                            'name': f"{first_name} {last_name}",
+                            'number': receiver,
+                            'paid_at': date_and_time,
+                            'reference': reference,
+                            'responseCode': "0",
+                            'status': "Delivered",
+                            'time': time,
+                            'tranxId': str(tranx_id_generator()),
+                            'type': "MTN Airtime",
+                            'uid': user_id,
+                            'bal': user_details["wallet"]
+                        }
+                        history_collection.document(date_and_time).set(data)
+                        history_web.collection(email).document(date_and_time).set(data)
+                        print("worked well")
+                        return Response({"status": response.status_code, 'message': f'Transaction Completed Successfully'},
+                                        )
+                    else:
+                        print("not 200 error")
+                        return Response({"status": response.status_code, 'message': f'Something went wrong'},
+                                        status=status.HTTP_200_OK)
                 else:
-                    print("not 200 error")
-                    return Response({"status": response.status_code, 'message': f'Something went wrong'},
-                                    status=status.HTTP_200_OK)
+                    return Response({"status": 400, 'message': f'Insufficient Balance'},
+                                    status=status.HTTP_400_BAD_REQUEST)
             except Exception as e:
                 print(e)
                 return Response({"status": "400", 'message': f'Something went wrong: {e}'},
@@ -4125,78 +4167,81 @@ def admin_initiate_voda_airtime(request):
                         else:
                             print("it's fine")
 
-                if user_details is not None:
-                    print("yes")
-                    first_name = user_details['first name']
-                    print(first_name)
-                    last_name = user_details['last name']
-                    print(last_name)
-                    email = user_details['email']
-                    phone = user_details['phone']
-                else:
-                    first_name = ""
-                    last_name = ""
-                    email = ""
-                    phone = ""
-                details = {
-                    'first_name': first_name,
-                    'last_name': last_name,
-                    'email': email,
-                    'user_id': user_id
-                }
-
-                url = "https://cs.hubtel.com/commissionservices/2018714/f4be83ad74c742e185224fdae1304800"
-
-                payload = json.dumps({
-                    "Destination": str(receiver),
-                    "Amount": amount,
-                    "CallbackURL": "https://merchant.cloudhubgh.com/hubtel_webhook",
-                    "ClientReference": reference
-                })
-                headers = {
-                    'Authorization': config("HUBTEL_API_KEY"),
-                    'Content-Type': 'application/json'
-                }
-
-                response = requests.request("POST", url, headers=headers, data=payload)
-
-                print(response.text)
-
-                if response.status_code == 200:
-                    data = {
-                        'batch_id': "unknown",
-                        'buyer': phone,
-                        'color_code': "Green",
-                        'amount': amount,
-                        'data_break_down': "",
-                        'data_volume': "",
-                        'date': date,
-                        'date_and_time': date_and_time,
-                        'done': "unknown",
+                    if user_details is not None:
+                        print("yes")
+                        first_name = user_details['first name']
+                        print(first_name)
+                        last_name = user_details['last name']
+                        print(last_name)
+                        email = user_details['email']
+                        phone = user_details['phone']
+                    else:
+                        first_name = ""
+                        last_name = ""
+                        email = ""
+                        phone = ""
+                    details = {
+                        'first_name': first_name,
+                        'last_name': last_name,
                         'email': email,
-                        'image': user_id,
-                        'ishareBalance': 0,
-                        'name': f"{first_name} {last_name}",
-                        'number': receiver,
-                        'paid_at': date_and_time,
-                        'reference': reference,
-                        'responseCode': "0",
-                        'status': "Delivered",
-                        'time': time,
-                        'tranxId': str(tranx_id_generator()),
-                        'type': "Vodafone Airtime",
-                        'uid': user_id,
-                        'bal': user_details["wallet"]
+                        'user_id': user_id
                     }
-                    history_collection.document(date_and_time).set(data)
-                    history_web.collection(email).document(date_and_time).set(data)
-                    print("worked well")
-                    return Response({"status": response.status_code, 'message': f'Transaction Completed Successfully'},
-                                    )
+
+                    url = "https://cs.hubtel.com/commissionservices/2018714/f4be83ad74c742e185224fdae1304800"
+
+                    payload = json.dumps({
+                        "Destination": str(receiver),
+                        "Amount": amount,
+                        "CallbackURL": "https://merchant.cloudhubgh.com/hubtel_webhook",
+                        "ClientReference": reference
+                    })
+                    headers = {
+                        'Authorization': config("HUBTEL_API_KEY"),
+                        'Content-Type': 'application/json'
+                    }
+
+                    response = requests.request("POST", url, headers=headers, data=payload)
+
+                    print(response.text)
+
+                    if response.status_code == 200:
+                        data = {
+                            'batch_id': "unknown",
+                            'buyer': phone,
+                            'color_code': "Green",
+                            'amount': amount,
+                            'data_break_down': "",
+                            'data_volume': "",
+                            'date': date,
+                            'date_and_time': date_and_time,
+                            'done': "unknown",
+                            'email': email,
+                            'image': user_id,
+                            'ishareBalance': 0,
+                            'name': f"{first_name} {last_name}",
+                            'number': receiver,
+                            'paid_at': date_and_time,
+                            'reference': reference,
+                            'responseCode': "0",
+                            'status': "Delivered",
+                            'time': time,
+                            'tranxId': str(tranx_id_generator()),
+                            'type': "Vodafone Airtime",
+                            'uid': user_id,
+                            'bal': user_details["wallet"]
+                        }
+                        history_collection.document(date_and_time).set(data)
+                        history_web.collection(email).document(date_and_time).set(data)
+                        print("worked well")
+                        return Response({"status": response.status_code, 'message': f'Transaction Completed Successfully'},
+                                        )
+                    else:
+                        print("not 200 error")
+                        return Response({"status": response.status_code, 'message': f'Something went wrong'},
+                                        status=status.HTTP_200_OK)
                 else:
-                    print("not 200 error")
-                    return Response({"status": response.status_code, 'message': f'Something went wrong'},
-                                    status=status.HTTP_200_OK)
+                    return Response({"status": 400, 'message': f'Insufficient Balance'},
+                                    status=status.HTTP_400_BAD_REQUEST)
             except Exception as e:
                 print(e)
                 return Response({"status": '400', 'message': f'Something went wrong: {e}'},
@@ -4461,78 +4506,81 @@ def admin_initiate_glo_airtime(request):
                         else:
                             print("it's fine")
 
-                if user_details is not None:
-                    print("yes")
-                    first_name = user_details['first name']
-                    print(first_name)
-                    last_name = user_details['last name']
-                    print(last_name)
-                    email = user_details['email']
-                    phone = user_details['phone']
-                else:
-                    first_name = ""
-                    last_name = ""
-                    email = ""
-                    phone = ""
-                details = {
-                    'first_name': first_name,
-                    'last_name': last_name,
-                    'email': email,
-                    'user_id': user_id
-                }
+                        if user_details is not None:
+                            print("yes")
+                            first_name = user_details['first name']
+                            print(first_name)
+                            last_name = user_details['last name']
+                            print(last_name)
+                            email = user_details['email']
+                            phone = user_details['phone']
+                        else:
+                            first_name = ""
+                            last_name = ""
+                            email = ""
+                            phone = ""
+                        details = {
+                            'first_name': first_name,
+                            'last_name': last_name,
+                            'email': email,
+                            'user_id': user_id
+                        }
 
-                url = "https://cs.hubtel.com/commissionservices/2016884/47d88e88f50f47468a34a14ac73e8ab5"
+                        url = "https://cs.hubtel.com/commissionservices/2016884/47d88e88f50f47468a34a14ac73e8ab5"
 
-                payload = json.dumps({
-                    "Destination": str(receiver),
-                    "Amount": amount,
-                    "CallbackURL": "https://merchant.cloudhubgh.com/hubtel_webhook",
-                    "ClientReference": reference
-                })
-                headers = {
-                    'Authorization': config("HUBTEL_API_KEY"),
-                    'Content-Type': 'application/json'
-                }
+                        payload = json.dumps({
+                            "Destination": str(receiver),
+                            "Amount": amount,
+                            "CallbackURL": "https://merchant.cloudhubgh.com/hubtel_webhook",
+                            "ClientReference": reference
+                        })
+                        headers = {
+                            'Authorization': config("HUBTEL_API_KEY"),
+                            'Content-Type': 'application/json'
+                        }
 
-                response = requests.request("POST", url, headers=headers, data=payload)
+                        response = requests.request("POST", url, headers=headers, data=payload)
 
-                print(response.text)
+                        print(response.text)
 
-                if response.status_code == 200:
-                    data = {
-                        'batch_id': "unknown",
-                        'buyer': phone,
-                        'color_code': "Green",
-                        'amount': amount,
-                        'data_break_down': "",
-                        'data_volume': "",
-                        'date': date,
-                        'date_and_time': date_and_time,
-                        'done': "unknown",
-                        'email': email,
-                        'image': user_id,
-                        'ishareBalance': 0,
-                        'name': f"{first_name} {last_name}",
-                        'number': receiver,
-                        'paid_at': date_and_time,
-                        'reference': reference,
-                        'responseCode': "0",
-                        'status': "Delivered",
-                        'time': time,
-                        'tranxId': str(tranx_id_generator()),
-                        'type': "Glo GH Airtime",
-                        'uid': user_id,
-                        'bal': user_details["wallet"]
-                    }
-                    history_collection.document(date_and_time).set(data)
-                    history_web.collection(email).document(date_and_time).set(data)
-                    print("worked well")
-                    return Response({"status": response.status_code, 'message': f'Transaction Completed Successfully'},
-                                    )
-                else:
-                    print("not 200 error")
-                    return Response({"status": response.status_code, 'message': f'Something went wrong'},
-                                    status=status.HTTP_200_OK)
+                        if response.status_code == 200:
+                            data = {
+                                'batch_id': "unknown",
+                                'buyer': phone,
+                                'color_code': "Green",
+                                'amount': amount,
+                                'data_break_down': "",
+                                'data_volume': "",
+                                'date': date,
+                                'date_and_time': date_and_time,
+                                'done': "unknown",
+                                'email': email,
+                                'image': user_id,
+                                'ishareBalance': 0,
+                                'name': f"{first_name} {last_name}",
+                                'number': receiver,
+                                'paid_at': date_and_time,
+                                'reference': reference,
+                                'responseCode': "0",
+                                'status': "Delivered",
+                                'time': time,
+                                'tranxId': str(tranx_id_generator()),
+                                'type': "Glo GH Airtime",
+                                'uid': user_id,
+                                'bal': user_details["wallet"]
+                            }
+                            history_collection.document(date_and_time).set(data)
+                            history_web.collection(email).document(date_and_time).set(data)
+                            print("worked well")
+                            return Response({"status": response.status_code, 'message': f'Transaction Completed Successfully'},
+                                            )
+                        else:
+                            print("not 200 error")
+                            return Response({"status": response.status_code, 'message': f'Something went wrong'},
+                                            status=status.HTTP_200_OK)
+                    else:
+                        return Response({"status": 400, 'message': f'Insufficient Balance'},
+                                        status=status.HTTP_400_BAD_REQUEST)
             except Exception as e:
                 print(e)
                 return Response({"status": '400', 'message': f'Something went wrong: {e}'},
