@@ -1302,7 +1302,7 @@ def admin_initiate_ishare_transaction(request):
                         print(ishare_response)
                         if code == '200' or ishare_response == 'Crediting Successful.':
                             sms = f"Your account has been credited with {data_volume}MB."
-                            r_sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to={receiver}&from=CloudHub GH&sms={sms}"
+                            r_sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to={receiver}&from=Bundle&sms={sms}"
                             response = requests.request("GET", url=r_sms_url)
                             print(response.text)
                             doc_ref = history_collection.document(date_and_time)
@@ -2947,7 +2947,7 @@ def hubtel_webhook(request):
                     })
 
                     sms_message = f"GHS {to_be_added} was deposited in your wallet. Available balance is now GHS {new_balance}"
-                    sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to=0{user_details['phone']}&from=CloudHub GH&sms={sms_message}"
+                    sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to=0{user_details['phone']}&from=Bundle&sms={sms_message}"
                     response = requests.request("GET", url=sms_url)
                     print(response.status_code)
                     return JsonResponse({'message': "Success"}, status=200)
