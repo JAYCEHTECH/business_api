@@ -3016,12 +3016,12 @@ def hubtel_webhook(request):
                         'message': {
                             'subject': 'Wallet Topup',
                             'html': html_content,
-                            'messageId': 'Bestpay'
+                            'messageId': 'CloudHub GH'
                         }
                     })
 
                     sms_message = f"GHS {to_be_added} was deposited in your AT Wallet. Available AT Wallet balance is now GHS {new_balance}"
-                    sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to=0{user_details['phone']}&from=Bestpay&sms={sms_message}"
+                    sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to=0{user_details['phone']}&from=CloudHub GH&sms={sms_message}"
                     response = requests.request("GET", url=sms_url)
                     print(response.status_code)
                     return JsonResponse({'message': "Success"}, status=200)
@@ -3040,7 +3040,7 @@ def hubtel_webhook(request):
                         last_name = ""
                         email = ""
                         phone = ""
-                    url = "https://cs.hubtel.com/commissionservices/2018714/fdd76c884e614b1c8f669a3207b09a98"
+                    url = "https://cs.hubtel.com/commissionservices/2019345/fdd76c884e614b1c8f669a3207b09a98"
                     print(url)
 
                     print(f"receiver: {receiver}")
@@ -3343,7 +3343,7 @@ def initiate_at_airtime(request):
                     'user_id': user_id
                 }
 
-                url = "https://cs.hubtel.com/commissionservices/2018714/dae2142eb5a14c298eace60240c09e4b"
+                url = "https://cs.hubtel.com/commissionservices/2019345/dae2142eb5a14c298eace60240c09e4b"
 
                 payload = json.dumps({
                     "Destination": str(receiver),
@@ -3512,7 +3512,7 @@ def admin_initiate_at_airtime(request):
                     'user_id': user_id
                 }
 
-                url = "https://cs.hubtel.com/commissionservices/2018714/dae2142eb5a14c298eace60240c09e4b"
+                url = "https://cs.hubtel.com/commissionservices/2019345/dae2142eb5a14c298eace60240c09e4b"
 
                 payload = json.dumps({
                     "Destination": str(receiver),
@@ -3679,7 +3679,7 @@ def initiate_mtn_airtime(request):
                     'user_id': user_id
                 }
 
-                url = "https://cs.hubtel.com/commissionservices/2018714/fdd76c884e614b1c8f669a3207b09a98"
+                url = "https://cs.hubtel.com/commissionservices/2019345/fdd76c884e614b1c8f669a3207b09a98"
 
                 payload = json.dumps({
                     "Destination": str(receiver),
@@ -3848,7 +3848,7 @@ def admin_initiate_mtn_airtime(request):
 
                     print("before url")
 
-                    url = "https://cs.hubtel.com/commissionservices/2018714/fdd76c884e614b1c8f669a3207b09a98"
+                    url = "https://cs.hubtel.com/commissionservices/2019345/fdd76c884e614b1c8f669a3207b09a98"
                     print(url)
 
                     print(f"receiver: {receiver}")
@@ -4022,7 +4022,7 @@ def initiate_voda_airtime(request):
                     'user_id': user_id
                 }
 
-                url = "https://cs.hubtel.com/commissionservices/2018714/f4be83ad74c742e185224fdae1304800"
+                url = "https://cs.hubtel.com/commissionservices/2019345/f4be83ad74c742e185224fdae1304800"
 
                 payload = json.dumps({
                     "Destination": str(receiver),
@@ -4190,7 +4190,7 @@ def admin_initiate_voda_airtime(request):
                         'user_id': user_id
                     }
 
-                    url = "https://cs.hubtel.com/commissionservices/2018714/f4be83ad74c742e185224fdae1304800"
+                    url = "https://cs.hubtel.com/commissionservices/2019345/f4be83ad74c742e185224fdae1304800"
 
                     payload = json.dumps({
                         "Destination": str(receiver),
