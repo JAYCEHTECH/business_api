@@ -493,10 +493,10 @@ def initiate_mtn_transaction(request):
                     15000: 48,
                     20000: 64,
                     25000: 78,
-                    30000: 94,
-                    40000: 128,
-                    50000: 155,
-                    100000: 290
+                    30000: 97,
+                    40000: 134,
+                    50000: 160,
+                    100000: 295
                 }
 
                 amount_to_be_deducted = prices_dict[data_volume]
@@ -747,10 +747,10 @@ def admin_initiate_mtn_transaction(request):
                     15000: 48,
                     20000: 64,
                     25000: 78,
-                    30000: 94,
-                    40000: 128,
-                    50000: 155,
-                    100000: 290
+                    30000: 97,
+                    40000: 134,
+                    50000: 160,
+                    100000: 295
                 }
 
                 amount_to_be_deducted = prices_dict[data_volume]
