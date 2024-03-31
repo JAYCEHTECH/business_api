@@ -26,3 +26,7 @@ class CashBack(models.Model):
     user_number = models.CharField(max_length=200, null=False, blank=False)
     amount = models.FloatField(null=False, blank=False, default=0)
     date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user_id} - {self.amount}"
+
