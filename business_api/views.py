@@ -325,10 +325,10 @@ def big_time_transaction(receiver, date, time, date_and_time, phone, amount, dat
         if models.CashBack.objects.filter(user_id=user_id).exists():
             user_instance = models.CashBack.objects.filter(user_id=user_id).first()
             user_instance.amount = new_cashback
-            user_instance.phone = phone
+            user_instance.user_number = phone
             user_instance.save()
         else:
-            new_instance = models.CashBack.objects.create(phone=phone, user_id=user_id, amount=new_cashback)
+            new_instance = models.CashBack.objects.create(user_number=phone, user_id=user_id, amount=new_cashback)
             new_instance.save()
     except TypeError as e:
         print(e)
@@ -339,10 +339,10 @@ def big_time_transaction(receiver, date, time, date_and_time, phone, amount, dat
         if models.CashBack.objects.filter(user_id=user_id).exists():
             user_instance = models.CashBack.objects.filter(user_id=user_id).first()
             user_instance.amount = cashback_balance
-            user_instance.phone = phone
+            user_instance.user_number = phone
             user_instance.save()
         else:
-            new_instance = models.CashBack.objects.create(phone=phone, user_id=user_id, amount=cashback_balance)
+            new_instance = models.CashBack.objects.create(user_number=phone, user_id=user_id, amount=cashback_balance)
             new_instance.save()
         print(cashback_collection.document(user_id).get().to_dict())
         print("did")
@@ -682,10 +682,10 @@ def initiate_mtn_transaction(request):
                     if models.CashBack.objects.filter(user_id=user_id).exists():
                         user_instance = models.CashBack.objects.filter(user_id=user_id).first()
                         user_instance.amount = new_cashback
-                        user_instance.phone = phone
+                        user_instance.user_number = phone
                         user_instance.save()
                     else:
-                        new_instance = models.CashBack.objects.create(phone=phone, user_id=user_id, amount=new_cashback)
+                        new_instance = models.CashBack.objects.create(user_number=phone, user_id=user_id, amount=new_cashback)
                         new_instance.save()
 
                     mail_doc_ref = mail_collection.document()
@@ -947,10 +947,10 @@ def admin_initiate_mtn_transaction(request):
                         if models.CashBack.objects.filter(user_id=user_id).exists():
                             user_instance = models.CashBack.objects.filter(user_id=user_id).first()
                             user_instance.amount = new_cashback
-                            user_instance.phone = phone
+                            user_instance.user_number = phone
                             user_instance.save()
                         else:
-                            new_instance = models.CashBack.objects.create(phone=phone, user_id=user_id,
+                            new_instance = models.CashBack.objects.create(user_number=phone, user_id=user_id,
                                                                           amount=new_cashback)
                             new_instance.save()
                     except TypeError as e:
@@ -962,10 +962,10 @@ def admin_initiate_mtn_transaction(request):
                         if models.CashBack.objects.filter(user_id=user_id).exists():
                             user_instance = models.CashBack.objects.filter(user_id=user_id).first()
                             user_instance.amount = cashback_balance
-                            user_instance.phone = phone
+                            user_instance.user_number = phone
                             user_instance.save()
                         else:
-                            new_instance = models.CashBack.objects.create(phone=phone, user_id=user_id,
+                            new_instance = models.CashBack.objects.create(user_number=phone, user_id=user_id,
                                                                           amount=cashback_balance)
                             new_instance.save()
                         print(cashback_collection.document(user_id).get().to_dict())
@@ -2567,10 +2567,10 @@ def hubtel_webhook_send_and_save_to_history(saved_data, user_id, reference, rece
                 if models.CashBack.objects.filter(user_id=user_id).exists():
                     user_instance = models.CashBack.objects.filter(user_id=user_id).first()
                     user_instance.amount = new_cashback
-                    user_instance.phone = phone
+                    user_instance.user_number = phone
                     user_instance.save()
                 else:
-                    new_instance = models.CashBack.objects.create(phone=phone, user_id=user_id, amount=new_cashback)
+                    new_instance = models.CashBack.objects.create(user_number=phone, user_id=user_id, amount=new_cashback)
                     new_instance.save()
             except TypeError as e:
                 print(e)
@@ -2581,10 +2581,10 @@ def hubtel_webhook_send_and_save_to_history(saved_data, user_id, reference, rece
                 if models.CashBack.objects.filter(user_id=user_id).exists():
                     user_instance = models.CashBack.objects.filter(user_id=user_id).first()
                     user_instance.amount = cashback_balance
-                    user_instance.phone = phone
+                    user_instance.user_number = phone
                     user_instance.save()
                 else:
-                    new_instance = models.CashBack.objects.create(phone=phone, user_id=user_id, amount=cashback_balance)
+                    new_instance = models.CashBack.objects.create(user_number=phone, user_id=user_id, amount=cashback_balance)
                     new_instance.save()
                 print(cashback_collection.document(user_id).get().to_dict())
                 print("did")
@@ -2684,10 +2684,10 @@ def hubtel_mtn_flexi_transaction(saved_data, reference, email, data_volume, date
         if models.CashBack.objects.filter(user_id=user_id).exists():
             user_instance = models.CashBack.objects.filter(user_id=user_id).first()
             user_instance.amount = new_cashback
-            user_instance.phone = phone
+            user_instance.user_number = phone
             user_instance.save()
         else:
-            new_instance = models.CashBack.objects.create(phone=phone, user_id=user_id, amount=new_cashback)
+            new_instance = models.CashBack.objects.create(user_number=phone, user_id=user_id, amount=new_cashback)
             new_instance.save()
     except TypeError as e:
         print(e)
@@ -2698,10 +2698,10 @@ def hubtel_mtn_flexi_transaction(saved_data, reference, email, data_volume, date
         if models.CashBack.objects.filter(user_id=user_id).exists():
             user_instance = models.CashBack.objects.filter(user_id=user_id).first()
             user_instance.amount = cashback_balance
-            user_instance.phone = phone
+            user_instance.user_number = phone
             user_instance.save()
         else:
-            new_instance = models.CashBack.objects.create(phone=phone, user_id=user_id, amount=cashback_balance)
+            new_instance = models.CashBack.objects.create(user_number=phone, user_id=user_id, amount=cashback_balance)
             new_instance.save()
         print(cashback_collection.document(user_id).get().to_dict())
         print("did")
@@ -2794,10 +2794,10 @@ def hubtel_big_time_transaction(saved_data, reference, email, data_volume, date_
         if models.CashBack.objects.filter(user_id=user_id).exists():
             user_instance = models.CashBack.objects.filter(user_id=user_id).first()
             user_instance.amount = new_cashback
-            user_instance.phone = phone
+            user_instance.user_number = phone
             user_instance.save()
         else:
-            new_instance = models.CashBack.objects.create(phone=phone, user_id=user_id, amount=new_cashback)
+            new_instance = models.CashBack.objects.create(user_number=phone, user_id=user_id, amount=new_cashback)
             new_instance.save()
     except TypeError as e:
         print(e)
@@ -2808,10 +2808,10 @@ def hubtel_big_time_transaction(saved_data, reference, email, data_volume, date_
         if models.CashBack.objects.filter(user_id=user_id).exists():
             user_instance = models.CashBack.objects.filter(user_id=user_id).first()
             user_instance.amount = cashback_balance
-            user_instance.phone = phone
+            user_instance.user_number = phone
             user_instance.save()
         else:
-            new_instance = models.CashBack.objects.create(phone=phone, user_id=user_id, amount=cashback_balance)
+            new_instance = models.CashBack.objects.create(user_number=phone, user_id=user_id, amount=cashback_balance)
             new_instance.save()
         print(cashback_collection.document(user_id).get().to_dict())
         print("did")
