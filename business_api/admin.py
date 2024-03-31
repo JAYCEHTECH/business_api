@@ -5,5 +5,5 @@ from rest_framework.authtoken.models import Token
 
 # Register your models here.
 admin.site.register(models.CustomUser)
-
+admin.site.register(models.CashBack)
 
