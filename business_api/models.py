@@ -19,3 +19,10 @@ class MTNTransaction(models.Model):
     number = models.CharField(max_length=200, null=False, blank=False)
     date = models.DateTimeField(auto_now_add=True)
     firebase_date = models.CharField(max_length=200, null=True, blank=True)
+
+
+class CashBack(models.Model):
+    user_id = models.CharField(max_length=200, null=False, blank=False)
+    user_number = models.CharField(max_length=200, null=False, blank=False)
+    amount = models.FloatField(null=False, blank=False, default=0)
+    date = models.DateTimeField(auto_now_add=True)
