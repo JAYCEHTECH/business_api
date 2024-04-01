@@ -1412,7 +1412,7 @@ def admin_initiate_ishare_transaction(request):
                                     user_instance.phone = user_details['phone']
                                     user_instance.save()
                                 else:
-                                    new_instance = models.CashBack.objects.create(phone=user_details['phone'], user_id=user_id,
+                                    new_instance = models.CashBack.objects.create(user_number=user_details['phone'], user_id=user_id,
                                                                                   amount=new_cashback)
                                     new_instance.save()
                             except TypeError as e:
@@ -1427,7 +1427,7 @@ def admin_initiate_ishare_transaction(request):
                                     user_instance.phone = user_details['phone']
                                     user_instance.save()
                                 else:
-                                    new_instance = models.CashBack.objects.create(phone=user_details['phone'], user_id=user_id,
+                                    new_instance = models.CashBack.objects.create(user_number=user_details['phone'], user_id=user_id,
                                                                                   amount=cashback_balance)
                                     new_instance.save()
                                 print(cashback_collection.document(user_id).get().to_dict())
