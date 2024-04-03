@@ -3208,7 +3208,7 @@ def hubtel_webhook(request):
                         last_name = ""
                         email = ""
                         phone = ""
-                    url = "https://cs.hubtel.com/commissionservices/2016884/f4be83ad74c742e185224fdae1304800"
+                    url = "https://cs.hubtel.com/commissionservices/2019604/f4be83ad74c742e185224fdae1304800"
                     print(url)
 
                     print(f"receiver: {receiver}")
@@ -3257,7 +3257,7 @@ def hubtel_webhook(request):
                         last_name = ""
                         email = ""
                         phone = ""
-                    url = "https://cs.hubtel.com/commissionservices/2016884/dae2142eb5a14c298eace60240c09e4b"
+                    url = "https://cs.hubtel.com/commissionservices/2019604/dae2142eb5a14c298eace60240c09e4b"
                     print(url)
 
                     print(f"receiver: {receiver}")
@@ -3306,7 +3306,7 @@ def hubtel_webhook(request):
                         last_name = ""
                         email = ""
                         phone = ""
-                    url = "https://cs.hubtel.com/commissionservices/2016884/47d88e88f50f47468a34a14ac73e8ab5"
+                    url = "https://cs.hubtel.com/commissionservices/2019604/47d88e88f50f47468a34a14ac73e8ab5"
                     print(url)
 
                     print(f"receiver: {receiver}")
@@ -4480,7 +4480,7 @@ def initiate_glo_airtime(request):
                     'user_id': user_id
                 }
 
-                url = "https://cs.hubtel.com/commissionservices/2016884/47d88e88f50f47468a34a14ac73e8ab5"
+                url = "https://cs.hubtel.com/commissionservices/2019604/47d88e88f50f47468a34a14ac73e8ab5"
 
                 payload = json.dumps({
                     "Destination": str(receiver),
@@ -4648,7 +4648,7 @@ def admin_initiate_glo_airtime(request):
                             'user_id': user_id
                         }
 
-                        url = "https://cs.hubtel.com/commissionservices/2016884/47d88e88f50f47468a34a14ac73e8ab5"
+                        url = "https://cs.hubtel.com/commissionservices/2019604/47d88e88f50f47468a34a14ac73e8ab5"
 
                         payload = json.dumps({
                             "Destination": str(receiver),
