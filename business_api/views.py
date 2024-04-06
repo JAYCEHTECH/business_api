@@ -1488,12 +1488,12 @@ def initiate_big_time(request):
                 print("hiiiii")
 
                 prices_dict = {
-                    30000: 70,
-                    40000: 80,
-                    50000: 85,
-                    80000: 150,
-                    100000: 160,
-                    200000: 300,
+                    30000: 80,
+                    40000: 100,
+                    50000: 120,
+                    80000: 200,
+                    100000: 230,
+                    200000: 450,
                 }
 
                 receiver = request.data.get('receiver')
@@ -1625,12 +1625,12 @@ def admin_initiate_big_time(request):
                 print("hiiiii")
 
                 prices_dict = {
-                    30000: 70,
-                    40000: 80,
-                    50000: 85,
-                    80000: 150,
-                    100000: 160,
-                    200000: 300,
+                    30000: 80,
+                    40000: 100,
+                    50000: 120,
+                    80000: 200,
+                    100000: 230,
+                    200000: 450,
                 }
 
                 receiver = request.data.get('receiver')
