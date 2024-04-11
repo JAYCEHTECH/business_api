@@ -1771,6 +1771,18 @@ def wallet_topup(request):
                 amount = request.data.get('topup_amount')
                 reference = request.data.get('reference')
 
+                try:
+                    receiver_id = request.date.get('receiver_id')
+                except:
+                    return Response({'message': 'Something went wrong.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
+                try:
+                    user_id = request.data.get("user_id")
+                except:
+                    return Response({'message': 'Something went wrong.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
                 if not amount or not reference:
                     return Response({'message': 'Body parameters not valid. Check and try again.'},
                                     status=status.HTTP_400_BAD_REQUEST)
@@ -1779,7 +1791,15 @@ def wallet_topup(request):
                 time = datetime.datetime.now().strftime("%I:%M:%S %p")
                 date_and_time = datetime.datetime.now().isoformat()
 
+                token_key = token_obj.key
+
+                if token_key != config("TOKEN_KEY"):
+                    return Response({'message': 'Authorisation Failed.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
                 user_details = get_user_details(user_id)
+                receiver_details = get_user_details(receiver_id)
+
                 if user_details is not None:
                     print(user_details)
                     first_name = user_details['first name']
@@ -1787,9 +1807,18 @@ def wallet_topup(request):
                     email = user_details['email']
                     phone = user_details['phone']
                     try:
-                        previous_wallet = user_details['wallet']
+                        previous_user_wallet = user_details['wallet']
                     except KeyError:
-                        previous_wallet = 0
+                        previous_user_wallet = 0
+
+                    if float(previous_user_wallet) < float(amount):
+                        return Response({'message': 'Insufficient Balance.'},
+                                        status=status.HTTP_200_OK)
+
+                    try:
+                        previous_receiver_wallet = receiver_details['wallet']
+                    except KeyError:
+                        previous_receiver_wallet = 0
                 else:
                     first_name = ""
                     last_name = ""
@@ -1820,22 +1849,33 @@ def wallet_topup(request):
                     'type': "WALLETTOPUP",
                     'uid': user_id
                 }
-                history_web.collection(email).document(date_and_time).set(all_data)
-                print("f saved")
-                history_collection.document(date_and_time).set(all_data)
-                print(f"ya{history_collection.document(date_and_time).get().to_dict()}")
-                print("f saved")
-                print(f"yo{history_web.collection(email).document(date_and_time).get().to_dict()}")
+                # history_web.collection(email).document(date_and_time).set(all_data)
+                # print("f saved")
+                # history_collection.document(date_and_time).set(all_data)
+                # print(f"ya{history_collection.document(date_and_time).get().to_dict()}")
+                # print("f saved")
+                # print(f"yo{history_web.collection(email).document(date_and_time).get().to_dict()}")
                 to_be_added = float(amount)
+                to_be_deducted = float(amount)
+
                 print(f"amount to be added: {to_be_added}")
-                new_balance = previous_wallet + to_be_added
-                print(f" new balance: {new_balance}")
-                doc_ref = user_collection.document(user_id)
-                doc_ref.update(
-                    {'wallet': new_balance, 'wallet_last_update': date_and_time,
+
+                new_balance_for_receiver = previous_receiver_wallet + to_be_added
+                print(f" new balance: {new_balance_for_receiver}")
+                receiver_doc_ref = user_collection.document(receiver_id)
+                receiver_doc_ref.update(
+                    {'wallet': new_balance_for_receiver, 'wallet_last_update': date_and_time,
                      'recent_wallet_reference': reference})
-                print(doc_ref.get().to_dict())
+                print(receiver_doc_ref.get().to_dict())
                 print("before all data")
+
+                new_balance_for_user = previous_user_wallet - to_be_deducted
+                print(f" new balance: {new_balance_for_user}")
+                user_doc_ref = user_collection.document(user_id)
+                user_doc_ref.update(
+                    {'wallet': new_balance_for_receiver, 'wallet_last_update': date_and_time,
+                     'recent_wallet_reference': reference})
+                print(receiver_doc_ref.get().to_dict())
                 all_data = {
                     'batch_id': "unknown",
                     'buyer': phone,
@@ -1860,40 +1900,40 @@ def wallet_topup(request):
                     'type': "WALLETTOPUP",
                     'uid': user_id
                 }
-                history_web.collection(email).document(date_and_time).set(all_data)
-                print("saved")
-                history_collection.document(date_and_time).set(all_data)
-                print(f"ya{history_collection.document(date_and_time).get().to_dict()}")
-                print("saved")
-                print(f"yo{history_web.collection(email).document(date_and_time).get().to_dict()}")
+                # history_web.collection(email).document(date_and_time).set(all_data)
+                # print("saved")
+                # history_collection.document(date_and_time).set(all_data)
+                # print(f"ya{history_collection.document(date_and_time).get().to_dict()}")
+                # print("saved")
+                # print(f"yo{history_web.collection(email).document(date_and_time).get().to_dict()}")
 
-                name = f"{first_name} {last_name}"
-                amount = to_be_added
-                file_path = 'business_api/wallet_mail.txt'
-                mail_doc_ref = mail_collection.document()
+                # name = f"{first_name} {last_name}"
+                # amount = to_be_added
+                # file_path = 'business_api/wallet_mail.txt'
+                # mail_doc_ref = mail_collection.document()
+                #
+                # with open(file_path, 'r') as file:
+                #     html_content = file.read()
+                #
+                # placeholders = {
+                #     '{name}': name,
+                #     '{amount}': amount
+                # }
+                #
+                # for placeholder, value in placeholders.items():
+                #     html_content = html_content.replace(placeholder, str(value))
+                #
+                # mail_doc_ref.set({
+                #     'to': email,
+                #     'message': {
+                #         'subject': 'Wallet Topup',
+                #         'html': html_content,
+                #         'messageId': 'CloudHub GH'
+                #     }
+                # })
 
-                with open(file_path, 'r') as file:
-                    html_content = file.read()
-
-                placeholders = {
-                    '{name}': name,
-                    '{amount}': amount
-                }
-
-                for placeholder, value in placeholders.items():
-                    html_content = html_content.replace(placeholder, str(value))
-
-                mail_doc_ref.set({
-                    'to': email,
-                    'message': {
-                        'subject': 'Wallet Topup',
-                        'html': html_content,
-                        'messageId': 'CloudHub GH'
-                    }
-                })
-
-                sms_message = f"GHS {to_be_added} was deposited in your wallet. Available balance is now GHS {round(new_balance, 2)}"
-                sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to=0{user_details['phone']}&from=CloudHub GH&sms={sms_message}"
+                sms_message = f"GHS {to_be_added} was deposited in your wallet. Available balance is now GHS {round(new_balance_for_receiver, 2)}"
+                sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to=0{receiver_details['phone']}&from=CloudHub GH&sms={sms_message}"
                 response = requests.request("GET", url=sms_url)
                 print(response.status_code)
                 return Response(data={"status": "200", "message": "Wallet Topup Successful"},

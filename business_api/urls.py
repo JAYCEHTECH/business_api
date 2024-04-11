@@ -15,7 +15,8 @@ urlpatterns = [
     path('api/initiate_big_time', views.initiate_big_time, name='big_time'),
     path('api/initiate_wallet_topup', views.wallet_topup, name='wallet_topup'),
 
-    path('hubtel_webhook', views.hubtel_webhook, name='hubtel_Webhook'),
+    path('hubtel_webhook', views.hubtel_webhook, name='hubtel_webhook'),
+    path('paystack_webhook', views.paystack_webhook, name='paystack_webhook'),
     path('export_unknown_transactions/', views.export_unknown_transactions, name='export_unknown_transactions'),
 
     path('api/initiate_mtn_airtime', views.initiate_at_airtime, name='initiate_mtn_airtime'),
