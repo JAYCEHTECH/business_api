@@ -1771,7 +1771,7 @@ def wallet_topup(request):
 
                 amount = request.data.get('topup_amount')
                 reference = request.data.get('reference')
-                receiver_id = request.date.get('receiver_id')
+                receiver_id = request.data.get('receiver_id')
                 user_id = request.data.get("user_id")
 
                 print("==================================================================================================")
