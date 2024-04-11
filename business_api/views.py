@@ -1764,24 +1764,22 @@ def wallet_topup(request):
         auth_type, token = authorization_header.split(' ')
         if auth_type == 'Bearer':
             try:
+                print("****************************************************************************************************")
                 token_obj = Token.objects.get(key=token)
                 user = token_obj.user
                 user_id = user.user_id
 
                 amount = request.data.get('topup_amount')
                 reference = request.data.get('reference')
+                receiver_id = request.date.get('receiver_id')
+                user_id = request.data.get("user_id")
 
-                try:
-                    receiver_id = request.date.get('receiver_id')
-                except:
-                    return Response({'message': 'Something went wrong.'},
-                                    status=status.HTTP_400_BAD_REQUEST)
-
-                try:
-                    user_id = request.data.get("user_id")
-                except:
-                    return Response({'message': 'Something went wrong.'},
-                                    status=status.HTTP_400_BAD_REQUEST)
+                print("==================================================================================================")
+                print(
+                    "==================================================================================================")
+                print(
+                    "==================================================================================================")
+                print(amount, reference, receiver_id, user_id)
 
                 if not amount or not reference:
                     return Response({'message': 'Body parameters not valid. Check and try again.'},
