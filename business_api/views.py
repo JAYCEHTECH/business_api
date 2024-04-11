@@ -1871,7 +1871,7 @@ def wallet_topup(request):
                 print(f" new balance: {new_balance_for_user}")
                 user_doc_ref = user_collection.document(user_id)
                 user_doc_ref.update(
-                    {'wallet': new_balance_for_receiver, 'wallet_last_update': date_and_time,
+                    {'wallet': new_balance_for_user, 'wallet_last_update': date_and_time,
                      'recent_wallet_reference': reference})
                 print(receiver_doc_ref.get().to_dict())
                 all_data = {
