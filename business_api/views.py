@@ -1825,7 +1825,7 @@ def wallet_topup(request):
                     previous_wallet = 0
                 all_data = {
                     'batch_id': "unknown",
-                    'buyer': phone,
+                    'buyer': user_details['phone'],
                     'color_code': "Green",
                     'amount': amount,
                     'data_break_down': amount,
@@ -1837,7 +1837,7 @@ def wallet_topup(request):
                     'image': user_id,
                     'ishareBalance': 0,
                     'name': f"{first_name} {last_name}",
-                    'number': phone,
+                    'number': receiver_details['phone'],
                     'paid_at': date_and_time,
                     'reference': reference,
                     'responseCode': 200,
@@ -1847,12 +1847,12 @@ def wallet_topup(request):
                     'type': "WALLETTOPUP",
                     'uid': user_id
                 }
-                # history_web.collection(email).document(date_and_time).set(all_data)
-                # print("f saved")
-                # history_collection.document(date_and_time).set(all_data)
-                # print(f"ya{history_collection.document(date_and_time).get().to_dict()}")
-                # print("f saved")
-                # print(f"yo{history_web.collection(email).document(date_and_time).get().to_dict()}")
+                history_web.collection(email).document(date_and_time).set(all_data)
+                print("f saved")
+                history_collection.document(date_and_time).set(all_data)
+                print(f"ya{history_collection.document(date_and_time).get().to_dict()}")
+                print("f saved")
+                print(f"yo{history_web.collection(email).document(date_and_time).get().to_dict()}")
                 to_be_added = float(amount)
                 to_be_deducted = float(amount)
 
@@ -1876,7 +1876,7 @@ def wallet_topup(request):
                 print(receiver_doc_ref.get().to_dict())
                 all_data = {
                     'batch_id': "unknown",
-                    'buyer': phone,
+                    'buyer': user_details['phone'],
                     'color_code': "Green",
                     'amount': amount,
                     'data_break_down': amount,
@@ -1888,7 +1888,7 @@ def wallet_topup(request):
                     'image': user_id,
                     'ishareBalance': 0,
                     'name': f"{first_name} {last_name}",
-                    'number': phone,
+                    'number': receiver_details['phone'],
                     'paid_at': date_and_time,
                     'reference': reference,
                     'responseCode': 200,
@@ -1898,12 +1898,12 @@ def wallet_topup(request):
                     'type': "WALLETTOPUP",
                     'uid': user_id
                 }
-                # history_web.collection(email).document(date_and_time).set(all_data)
-                # print("saved")
-                # history_collection.document(date_and_time).set(all_data)
-                # print(f"ya{history_collection.document(date_and_time).get().to_dict()}")
-                # print("saved")
-                # print(f"yo{history_web.collection(email).document(date_and_time).get().to_dict()}")
+                history_web.collection(email).document(date_and_time).set(all_data)
+                print("saved")
+                history_collection.document(date_and_time).set(all_data)
+                print(f"ya{history_collection.document(date_and_time).get().to_dict()}")
+                print("saved")
+                print(f"yo{history_web.collection(email).document(date_and_time).get().to_dict()}")
 
                 # name = f"{first_name} {last_name}"
                 # amount = to_be_added
