@@ -2012,16 +2012,16 @@ def webhook_send_and_save_to_history(user_id, txn_type: str, paid_at: str, ishar
     if history_collection.document(date_and_time).get().exists:
         print("first save")
 
-    ishare_response, status_code = send_ishare_bundle(first_name=first_name, last_name=last_name, receiver=receiver,
+    ishare_response = send_ishare_bundle(first_name=first_name, last_name=last_name, receiver=receiver,
                                                       buyer=phone,
                                                       bundle=data_volume,
                                                       email=email)
     json_response = ishare_response.json()
     print(f"hello:{json_response}")
-    status_code = status_code
+    status_code = ishare_response.status_code
     print(status_code)
     try:
-        batch_id = json_response["batch_id"]
+        batch_id = json_response["batchId"]
     except KeyError:
         batch_id = "unknown"
     print(batch_id)
@@ -2035,9 +2035,7 @@ def webhook_send_and_save_to_history(user_id, txn_type: str, paid_at: str, ishar
         print("didn't find any entry to update")
     print("firebase saved")
     # return status_code, batch_id if batch_id else "No batchId", email, first_name
-    return Response(
-        data=json_response,
-        status=status.HTTP_200_OK)
+    return ishare_response
 
 
 def mtn_flexi_transaction(receiver, date, time, date_and_time, phone, amount, data_volume, details: dict, ref,
@@ -2212,13 +2210,11 @@ def paystack_webhook(request):
                                                                      txn_type="AT Premium Bundle",
                                                                      color_code="Green", data_volume=bundle_package,
                                                                      ishare_balance=0, txn_status=txn_status)
-                    data = send_response.data
-                    json_response = data
+                    data = send_response
+                    json_response = data.json()
                     print(json_response)
-                    if json_response["code"] == "0002":
+                    if data.status_code == 200:
                         return HttpResponse(status=200)
-                    elif json_response["code"] == "0001":
-                        return HttpResponse(status=500)
                     else:
                         print(send_response.status_code)
                         try:
@@ -2228,7 +2224,7 @@ def paystack_webhook(request):
 
                         print(batch_id)
 
-                        if json_response["code"] == '0000':
+                        if data.status_code == 200:
                             sms = f"Hey there\nYour account has been credited with {bundle_package}MB.\nConfirm your new balance using the AT Mobile App"
                             r_sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to={receiver}&from=CloudHub GH&sms={sms}"
                             response = requests.request("GET", url=r_sms_url)
@@ -2238,7 +2234,7 @@ def paystack_webhook(request):
                             else:
                                 print("no entry")
                             mail_doc_ref = mail_collection.document(f"{batch_id}-Mail")
-                            file_path = 'business_api/mail.txt'  # Replace with your file path
+                            file_path = 'wallet_api_app/mail.txt'  # Replace with your file path
 
                             name = first_name
                             volume = bundle_package
@@ -2323,7 +2319,7 @@ def paystack_webhook(request):
                     big_time_response = big_time_transaction(receiver=receiver, date_and_time=date_and_time, date=date,
                                                              time=time, amount=amount, data_volume=bundle_package,
                                                              channel="MoMo", phone=phone, ref=reference,
-                                                             details=details, txn_status=txn_status, user_id=user_id)
+                                                             details=details, txn_status=txn_status)
                     if big_time_response.status_code == 200 or big_time_response.data["code"] == "0000":
                         print("big time donnnneee")
                         return HttpResponse(status=200)
@@ -2420,7 +2416,7 @@ def paystack_webhook(request):
 
                     name = f"{first_name} {last_name}"
                     amount = to_be_added
-                    file_path = 'business_api/wallet_mail.txt'
+                    file_path = 'wallet_api_app/wallet_mail.txt'
                     mail_doc_ref = mail_collection.document()
 
                     with open(file_path, 'r') as file:
