@@ -2234,7 +2234,7 @@ def paystack_webhook(request):
                             else:
                                 print("no entry")
                             mail_doc_ref = mail_collection.document(f"{batch_id}-Mail")
-                            file_path = 'wallet_api_app/mail.txt'  # Replace with your file path
+                            file_path = 'business_api/mail.txt'  # Replace with your file path
 
                             name = first_name
                             volume = bundle_package
@@ -2416,7 +2416,7 @@ def paystack_webhook(request):
 
                     name = f"{first_name} {last_name}"
                     amount = to_be_added
-                    file_path = 'wallet_api_app/wallet_mail.txt'
+                    file_path = 'business_api/wallet_mail.txt'
                     mail_doc_ref = mail_collection.document()
 
                     with open(file_path, 'r') as file:
