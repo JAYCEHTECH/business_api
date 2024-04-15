@@ -2195,7 +2195,7 @@ def paystack_webhook(request):
                                                                      color_code="Green", data_volume=bundle_package,
                                                                      ishare_balance=0, txn_status=txn_status)
                     data = send_response
-                    json_response = data.json()
+                    json_response = data
                     print(json_response)
                     if data.status_code == 200:
                         return HttpResponse(status=200)
