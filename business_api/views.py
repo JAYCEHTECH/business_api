@@ -2185,75 +2185,78 @@ def paystack_webhook(request):
                 print(response.status_code)
 
                 if channel == "ishare":
-                    send_response = webhook_send_and_save_to_history(user_id=user_id, date_and_time=date_and_time,
-                                                                     date=date,
-                                                                     time=time,
-                                                                     amount=amount, receiver=receiver,
-                                                                     reference=reference,
-                                                                     paid_at=date_and_time,
-                                                                     txn_type="AT Premium Bundle",
-                                                                     color_code="Green", data_volume=bundle_package,
-                                                                     ishare_balance=0, txn_status=txn_status)
-                    data = send_response
-                    json_response = data
-                    print(json_response)
-                    if data.status_code == 200:
-                        return HttpResponse(status=200)
-                    else:
-                        print(send_response.status_code)
-                        try:
-                            batch_id = json_response["batch_id"]
-                        except KeyError:
-                            return HttpResponse(status=200)
-
-                        print(batch_id)
-
+                    try:
+                        send_response = webhook_send_and_save_to_history(user_id=user_id, date_and_time=date_and_time,
+                                                                         date=date,
+                                                                         time=time,
+                                                                         amount=amount, receiver=receiver,
+                                                                         reference=reference,
+                                                                         paid_at=date_and_time,
+                                                                         txn_type="AT Premium Bundle",
+                                                                         color_code="Green", data_volume=bundle_package,
+                                                                         ishare_balance=0, txn_status=txn_status)
+                        data = send_response
+                        json_response = data
+                        print(json_response)
                         if data.status_code == 200:
-                            sms = f"Hey there\nYour account has been credited with {bundle_package}MB.\nConfirm your new balance using the AT Mobile App"
-                            r_sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to={receiver}&from=CloudHub GH&sms={sms}"
-                            response = requests.request("GET", url=r_sms_url)
-                            doc_ref = history_collection.document(date_and_time)
-                            if doc_ref.get().exists:
-                                doc_ref.update({'done': 'Successful'})
-                            else:
-                                print("no entry")
-                            mail_doc_ref = mail_collection.document(f"{batch_id}-Mail")
-                            file_path = 'business_api/mail.txt'  # Replace with your file path
-
-                            name = first_name
-                            volume = bundle_package
-                            date = date_and_time
-                            reference_t = reference
-                            receiver_t = receiver
-
-                            with open(file_path, 'r') as file:
-                                html_content = file.read()
-
-                            placeholders = {
-                                '{name}': name,
-                                '{volume}': volume,
-                                '{date}': date,
-                                '{reference}': reference_t,
-                                '{receiver}': receiver_t
-                            }
-
-                            for placeholder, value in placeholders.items():
-                                html_content = html_content.replace(placeholder, str(value))
-
-                            mail_doc_ref.set({
-                                'to': email,
-                                'message': {
-                                    'subject': 'AT Flexi Bundle',
-                                    'html': html_content,
-                                    'messageId': 'CloudHub GH'
-                                }
-                            })
-                            print("donnee")
                             return HttpResponse(status=200)
                         else:
-                            doc_ref = history_collection.document(date_and_time)
-                            doc_ref.update({'done': 'Failed'})
-                            return HttpResponse(status=200)
+                            print(send_response.status_code)
+                            try:
+                                batch_id = json_response["batch_id"]
+                            except KeyError:
+                                return HttpResponse(status=200)
+
+                            print(batch_id)
+
+                            if data.status_code == 200:
+                                sms = f"Hey there\nYour account has been credited with {bundle_package}MB.\nConfirm your new balance using the AT Mobile App"
+                                r_sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to={receiver}&from=CloudHub GH&sms={sms}"
+                                response = requests.request("GET", url=r_sms_url)
+                                doc_ref = history_collection.document(date_and_time)
+                                if doc_ref.get().exists:
+                                    doc_ref.update({'done': 'Successful'})
+                                else:
+                                    print("no entry")
+                                mail_doc_ref = mail_collection.document(f"{batch_id}-Mail")
+                                file_path = 'business_api/mail.txt'  # Replace with your file path
+
+                                name = first_name
+                                volume = bundle_package
+                                date = date_and_time
+                                reference_t = reference
+                                receiver_t = receiver
+
+                                with open(file_path, 'r') as file:
+                                    html_content = file.read()
+
+                                placeholders = {
+                                    '{name}': name,
+                                    '{volume}': volume,
+                                    '{date}': date,
+                                    '{reference}': reference_t,
+                                    '{receiver}': receiver_t
+                                }
+
+                                for placeholder, value in placeholders.items():
+                                    html_content = html_content.replace(placeholder, str(value))
+
+                                mail_doc_ref.set({
+                                    'to': email,
+                                    'message': {
+                                        'subject': 'AT Flexi Bundle',
+                                        'html': html_content,
+                                        'messageId': 'CloudHub GH'
+                                    }
+                                })
+                                print("donnee")
+                                return HttpResponse(status=200)
+                            else:
+                                doc_ref = history_collection.document(date_and_time)
+                                doc_ref.update({'done': 'Failed'})
+                                return HttpResponse(status=200)
+                    except:
+                        return HttpResponse(status=200)
                 elif channel == "mtn_flexi":
                     user_details = get_user_details(user_id)
                     if user_details is not None:
