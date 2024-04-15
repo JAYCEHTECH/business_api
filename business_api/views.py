@@ -2310,124 +2310,127 @@ def paystack_webhook(request):
                     else:
                         return HttpResponse(status=200)
                 elif channel == "top_up":
-                    user_details = get_user_details(user_id)
-                    if user_details is not None:
-                        print(user_details)
-                        first_name = user_details['first name']
-                        last_name = user_details['last name']
-                        email = user_details['email']
-                        phone = user_details['phone']
-                        try:
-                            previous_wallet = user_details['wallet']
-                        except KeyError:
+                    try:
+                        user_details = get_user_details(user_id)
+                        if user_details is not None:
+                            print(user_details)
+                            first_name = user_details['first name']
+                            last_name = user_details['last name']
+                            email = user_details['email']
+                            phone = user_details['phone']
+                            try:
+                                previous_wallet = user_details['wallet']
+                            except KeyError:
+                                previous_wallet = 0
+                        else:
+                            first_name = ""
+                            last_name = ""
+                            email = ""
+                            phone = ""
                             previous_wallet = 0
-                    else:
-                        first_name = ""
-                        last_name = ""
-                        email = ""
-                        phone = ""
-                        previous_wallet = 0
-                    all_data = {
-                        'batch_id': "unknown",
-                        'buyer': phone,
-                        'color_code': "Green",
-                        'amount': amount,
-                        'data_break_down': amount,
-                        'data_volume': bundle_package,
-                        'date': date,
-                        'date_and_time': date_and_time,
-                        'done': "Success",
-                        'email': email,
-                        'image': user_id,
-                        'ishareBalance': 0,
-                        'name': f"{first_name} {last_name}",
-                        'number': receiver,
-                        'paid_at': date_and_time,
-                        'reference': reference,
-                        'responseCode': 200,
-                        'status': txn_status,
-                        'time': time,
-                        'tranxId': str(tranx_id_generator()),
-                        'type': "WALLETTOPUP",
-                        'uid': user_id
-                    }
-                    history_web.collection(email).document(date_and_time).set(all_data)
-                    print("f saved")
-                    history_collection.document(date_and_time).set(all_data)
-                    print(f"ya{history_collection.document(date_and_time).get().to_dict()}")
-                    print("f saved")
-                    print(f"yo{history_web.collection(email).document(date_and_time).get().to_dict()}")
-                    to_be_added = float(amount)
-                    print(f"amount to be added: {to_be_added}")
-                    new_balance = previous_wallet + to_be_added
-                    print(f" new balance: {new_balance}")
-                    doc_ref = user_collection.document(user_id)
-                    doc_ref.update(
-                        {'wallet': new_balance, 'wallet_last_update': date_and_time,
-                         'recent_wallet_reference': reference})
-                    print(doc_ref.get().to_dict())
-                    print("before all data")
-                    all_data = {
-                        'batch_id': "unknown",
-                        'buyer': phone,
-                        'color_code': "Green",
-                        'amount': amount,
-                        'data_break_down': amount,
-                        'data_volume': bundle_package,
-                        'date': date,
-                        'date_and_time': date_and_time,
-                        'done': "Success",
-                        'email': email,
-                        'image': user_id,
-                        'ishareBalance': 0,
-                        'name': f"{first_name} {last_name}",
-                        'number': receiver,
-                        'paid_at': date_and_time,
-                        'reference': reference,
-                        'responseCode': 200,
-                        'status': txn_status,
-                        'time': time,
-                        'tranxId': str(tranx_id_generator()),
-                        'type': "WALLETTOPUP",
-                        'uid': user_id
-                    }
-                    history_web.collection(email).document(date_and_time).set(all_data)
-                    print("saved")
-                    history_collection.document(date_and_time).set(all_data)
-                    print(f"ya{history_collection.document(date_and_time).get().to_dict()}")
-                    print("saved")
-                    print(f"yo{history_web.collection(email).document(date_and_time).get().to_dict()}")
-
-                    name = f"{first_name} {last_name}"
-                    amount = to_be_added
-                    file_path = 'business_api/wallet_mail.txt'
-                    mail_doc_ref = mail_collection.document()
-
-                    with open(file_path, 'r') as file:
-                        html_content = file.read()
-
-                    placeholders = {
-                        '{name}': name,
-                        '{amount}': amount
-                    }
-
-                    for placeholder, value in placeholders.items():
-                        html_content = html_content.replace(placeholder, str(value))
-
-                    mail_doc_ref.set({
-                        'to': email,
-                        'message': {
-                            'subject': 'Wallet Topup',
-                            'html': html_content,
-                            'messageId': 'CloudHub GH'
+                        all_data = {
+                            'batch_id': "unknown",
+                            'buyer': phone,
+                            'color_code': "Green",
+                            'amount': amount,
+                            'data_break_down': amount,
+                            'data_volume': bundle_package,
+                            'date': date,
+                            'date_and_time': date_and_time,
+                            'done': "Success",
+                            'email': email,
+                            'image': user_id,
+                            'ishareBalance': 0,
+                            'name': f"{first_name} {last_name}",
+                            'number': receiver,
+                            'paid_at': date_and_time,
+                            'reference': reference,
+                            'responseCode': 200,
+                            'status': txn_status,
+                            'time': time,
+                            'tranxId': str(tranx_id_generator()),
+                            'type': "WALLETTOPUP",
+                            'uid': user_id
                         }
-                    })
+                        history_web.collection(email).document(date_and_time).set(all_data)
+                        print("f saved")
+                        history_collection.document(date_and_time).set(all_data)
+                        print(f"ya{history_collection.document(date_and_time).get().to_dict()}")
+                        print("f saved")
+                        print(f"yo{history_web.collection(email).document(date_and_time).get().to_dict()}")
+                        to_be_added = float(amount)
+                        print(f"amount to be added: {to_be_added}")
+                        new_balance = previous_wallet + to_be_added
+                        print(f" new balance: {new_balance}")
+                        doc_ref = user_collection.document(user_id)
+                        doc_ref.update(
+                            {'wallet': new_balance, 'wallet_last_update': date_and_time,
+                             'recent_wallet_reference': reference})
+                        print(doc_ref.get().to_dict())
+                        print("before all data")
+                        all_data = {
+                            'batch_id': "unknown",
+                            'buyer': phone,
+                            'color_code': "Green",
+                            'amount': amount,
+                            'data_break_down': amount,
+                            'data_volume': bundle_package,
+                            'date': date,
+                            'date_and_time': date_and_time,
+                            'done': "Success",
+                            'email': email,
+                            'image': user_id,
+                            'ishareBalance': 0,
+                            'name': f"{first_name} {last_name}",
+                            'number': receiver,
+                            'paid_at': date_and_time,
+                            'reference': reference,
+                            'responseCode': 200,
+                            'status': txn_status,
+                            'time': time,
+                            'tranxId': str(tranx_id_generator()),
+                            'type': "WALLETTOPUP",
+                            'uid': user_id
+                        }
+                        history_web.collection(email).document(date_and_time).set(all_data)
+                        print("saved")
+                        history_collection.document(date_and_time).set(all_data)
+                        print(f"ya{history_collection.document(date_and_time).get().to_dict()}")
+                        print("saved")
+                        print(f"yo{history_web.collection(email).document(date_and_time).get().to_dict()}")
 
-                    sms_message = f"GHS {to_be_added} was deposited in your wallet. Available balance is now GHS {round(new_balance, 2)}"
-                    sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to=0{user_details['phone']}&from=CloudHub GH&sms={sms_message}"
-                    response = requests.request("GET", url=sms_url)
-                    print(response.status_code)
-                    return HttpResponse(status=200)
+                        name = f"{first_name} {last_name}"
+                        amount = to_be_added
+                        file_path = 'business_api/wallet_mail.txt'
+                        mail_doc_ref = mail_collection.document()
+
+                        with open(file_path, 'r') as file:
+                            html_content = file.read()
+
+                        placeholders = {
+                            '{name}': name,
+                            '{amount}': amount
+                        }
+
+                        for placeholder, value in placeholders.items():
+                            html_content = html_content.replace(placeholder, str(value))
+
+                        mail_doc_ref.set({
+                            'to': email,
+                            'message': {
+                                'subject': 'Wallet Topup',
+                                'html': html_content,
+                                'messageId': 'CloudHub GH'
+                            }
+                        })
+
+                        sms_message = f"GHS {to_be_added} was deposited in your wallet. Available balance is now GHS {round(new_balance, 2)}"
+                        sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to=0{user_details['phone']}&from=CloudHub GH&sms={sms_message}"
+                        response = requests.request("GET", url=sms_url)
+                        print(response.status_code)
+                        return HttpResponse(status=200)
+                    except:
+                        return HttpResponse(status=200)
                 else:
                     return HttpResponse(status=200)
             else:
