@@ -636,14 +636,6 @@ def initiate_mtn_transaction(request):
                     }
                     mtn_other.document(date_and_time).set(second_data)
                     print("pu")
-                    new_mtn_txn = models.MTNTransaction.objects.create(
-                        user_id=user_id,
-                        amount=amount,
-                        bundle_volume=data_volume,
-                        number=receiver,
-                        firebase_date=date_and_time
-                    )
-                    new_mtn_txn.save()
 
                     tot = user_collection.document(user_id)
                     print(tot.get().to_dict())
@@ -899,14 +891,6 @@ def admin_initiate_mtn_transaction(request):
                     }
                     mtn_other.document(date_and_time).set(second_data)
                     print("pu")
-                    new_mtn_txn = models.MTNTransaction.objects.create(
-                        user_id=user_id,
-                        amount=amount,
-                        bundle_volume=data_volume,
-                        number=receiver,
-                        firebase_date=date_and_time
-                    )
-                    new_mtn_txn.save()
 
                     tot = user_collection.document(user_id)
                     print(tot.get().to_dict())
