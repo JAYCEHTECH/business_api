@@ -2204,7 +2204,7 @@ def paystack_webhook(request):
                         try:
                             batch_id = json_response["batch_id"]
                         except KeyError:
-                            return HttpResponse(status=500)
+                            return HttpResponse(status=200)
 
                         print(batch_id)
 
@@ -2253,7 +2253,7 @@ def paystack_webhook(request):
                         else:
                             doc_ref = history_collection.document(date_and_time)
                             doc_ref.update({'done': 'Failed'})
-                            return HttpResponse(status=500)
+                            return HttpResponse(status=200)
                 elif channel == "mtn_flexi":
                     user_details = get_user_details(user_id)
                     if user_details is not None:
@@ -2282,7 +2282,7 @@ def paystack_webhook(request):
                         print("yooo")
                         return HttpResponse(status=200)
                     else:
-                        return HttpResponse(status=500)
+                        return HttpResponse(status=200)
                 elif channel == "big-time":
                     if user_details is not None:
                         first_name = user_details['first name']
@@ -2308,7 +2308,7 @@ def paystack_webhook(request):
                         print("big time donnnneee")
                         return HttpResponse(status=200)
                     else:
-                        return HttpResponse(status=500)
+                        return HttpResponse(status=200)
                 elif channel == "top_up":
                     user_details = get_user_details(user_id)
                     if user_details is not None:
@@ -2433,9 +2433,9 @@ def paystack_webhook(request):
             else:
                 return HttpResponse(status=200)
         else:
-            return HttpResponse(status=401)
+            return HttpResponse(status=200)
     else:
-        return HttpResponse(status=405)
+        return HttpResponse(status=200)
 
 
 def hubtel_webhook_send_and_save_to_history(saved_data, user_id, reference, receiver, data_volume, amount, date_and_time, time):
