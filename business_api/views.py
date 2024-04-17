@@ -2011,9 +2011,11 @@ def paystack_webhook(request):
                             print(batch_id)
 
                             if data.status_code == 200:
+                                print("enetered into the 200000000000000000000000000000000000000000000000000")
                                 sms = f"Hey there\nYour account has been credited with {bundle_package}MB.\nConfirm your new balance using the AT Mobile App"
                                 r_sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to={receiver}&from=CloudHub GH&sms={sms}"
                                 response = requests.request("GET", url=r_sms_url)
+                                print(response.text)
                                 doc_ref = history_collection.document(date_and_time)
                                 if doc_ref.get().exists:
                                     doc_ref.update({'done': 'Successful'})
