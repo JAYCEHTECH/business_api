@@ -298,18 +298,6 @@ def big_time_transaction(receiver, date, time, date_and_time, phone, amount, dat
     reference_t = ref
     receiver_t = receiver
 
-    tot = user_collection.document(user_id)
-    print(tot.get().to_dict())
-    try:
-        print(tot.get().to_dict()['bt_total_sales'])
-        previous_sale = tot.get().to_dict()['bt_total_sales']
-        print(f"Previous Sale: {previous_sale}")
-        new_sale = float(previous_sale) + float(amount)
-        print(new_sale)
-        user_collection.document(user_id).update({'bt_total_sales': new_sale})
-    except:
-        user_collection.document(user_id).update({'bt_total_sales': amount})
-
 
     # previous_big_time_totals = totals_collection.document('BIGTIME TOTALS')
     # all_totals = totals_collection.document('ALL TOTALS')
@@ -601,30 +589,6 @@ def initiate_mtn_transaction(request):
                     mtn_other.document(date_and_time).set(second_data)
                     print("pu")
 
-                    tot = user_collection.document(user_id)
-                    print(tot.get().to_dict())
-                    try:
-                        print(tot.get().to_dict()['mtn_total_sales'])
-                        previous_sale = tot.get().to_dict()['mtn_total_sales']
-                        print(f"Previous Sale: {previous_sale}")
-                        new_sale = float(previous_sale) + float(amount_to_be_deducted)
-                        print(new_sale)
-                        user_collection.document(user_id).update({'mtn_total_sales': new_sale})
-                    except:
-                        user_collection.document(user_id).update({'mtn_total_sales': amount_to_be_deducted})
-
-                    try:
-                        tot = user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1')
-                        print(tot.get().to_dict()['mtn_total_sales'])
-                        previous_sale = tot.get().to_dict()['mtn_total_sales']
-                        print(f"Previous Sale: {previous_sale}")
-                        new_sale = float(previous_sale) + float(amount_to_be_deducted)
-                        print(new_sale)
-                        user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1').update({'mtn_total_sales': new_sale})
-                    except:
-                        user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1').update(
-                            {'mtn_total_sales': amount_to_be_deducted})
-
                     mail_doc_ref = mail_collection.document()
                     file_path = 'business_api/mtn_maill.txt'  # Replace with your file path
 
@@ -836,31 +800,6 @@ def admin_initiate_mtn_transaction(request):
                     }
                     mtn_other.document(date_and_time).set(second_data)
                     print("pu")
-
-                    tot = user_collection.document(user_id)
-                    print(tot.get().to_dict())
-                    try:
-                        print(tot.get().to_dict()['mtn_total_sales'])
-                        previous_sale = tot.get().to_dict()['mtn_total_sales']
-                        print(f"Previous Sale: {previous_sale}")
-                        new_sale = float(previous_sale) + float(amount_to_be_deducted)
-                        print(new_sale)
-                        user_collection.document(user_id).update({'mtn_total_sales': new_sale})
-                    except:
-                        user_collection.document(user_id).update({'mtn_total_sales': amount_to_be_deducted})
-
-                    try:
-                        tot = user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1')
-                        print(tot.get().to_dict()['mtn_total_sales'])
-                        previous_sale = tot.get().to_dict()['mtn_total_sales']
-                        print(f"Previous Sale: {previous_sale}")
-                        new_sale = float(previous_sale) + float(amount_to_be_deducted)
-                        print(new_sale)
-                        user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1').update({'mtn_total_sales': new_sale})
-                    except:
-                        user_collection.document('9VA0qyq6lXYPZ6Ut867TVcBvF2t1').update(
-                            {'mtn_total_sales': amount_to_be_deducted})
-
 
                     mail_doc_ref = mail_collection.document()
                     file_path = 'business_api/mtn_maill.txt'  # Replace with your file path
@@ -1272,19 +1211,6 @@ def admin_initiate_ishare_transaction(request):
                                     'messageId': 'CloudHub GH'
                                 }
                             })
-
-                            tot = user_collection.document(user_id)
-                            print(tot.get().to_dict())
-                            try:
-                                print(tot.get().to_dict()['at_total_sales'])
-                                previous_sale = tot.get().to_dict()['at_total_sales']
-                                print(f"Previous Sale: {previous_sale}")
-                                new_sale = float(previous_sale) + float(amount)
-                                print(new_sale)
-                                user_collection.document(user_id).update({'at_total_sales': new_sale})
-                            except:
-                                user_collection.document(user_id).update({'at_total_sales': amount})
-
 
                             return Response(data={'status_code': status_code, 'batch_id': batch_id},
                                             status=status.HTTP_200_OK)
