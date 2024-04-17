@@ -2004,7 +2004,7 @@ def paystack_webhook(request):
                         else:
                             print(send_response.status_code)
                             try:
-                                batch_id = json_response["batch_id"]
+                                batch_id = json_response["batchId"]
                             except KeyError:
                                 return HttpResponse(status=200)
 
