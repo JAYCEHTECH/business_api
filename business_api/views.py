@@ -1927,7 +1927,7 @@ def mtn_flexi_transaction(receiver, date, time, date_and_time, phone, amount, da
 @csrf_exempt
 def paystack_webhook(request):
     if request.method == "POST":
-        paystack_secret_key = config("PAYSTACK_SECRET_KEY")
+        paystack_secret_key = "paystack"
         # print(paystack_secret_key)
         payload = json.loads(request.body)
 
