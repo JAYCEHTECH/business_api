@@ -1130,75 +1130,52 @@ def admin_initiate_ishare_transaction(request):
                             status=status.HTTP_400_BAD_REQUEST)
                     print(data["batchId"])
                     status_code = ishare_response.status_code
+                    print(f"status codeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee: {status_code}")
                     if batch_id is None:
                         print("batch id was none")
                         return Response(data={'status_code': status_code, "message": "Transaction Failed"},
                                         status=status.HTTP_400_BAD_REQUEST)
-                    sleep(10)
-                    ishare_verification_response = ishare_verification(batch_id)
-                    if ishare_verification_response is not False:
-                        code = \
-                            ishare_verification_response["flexiIshareTranxStatus"]["flexiIshareTranxStatusResult"][
-                                "apiResponse"][
-                                "responseCode"]
-                        ishare_response = \
-                            ishare_verification_response["flexiIshareTranxStatus"]["flexiIshareTranxStatusResult"][
-                                "ishareApiResponseData"][
-                                "apiResponseData"][
-                                0][
-                                "responseMsg"]
-                        print(code)
-                        print(ishare_response)
-                        if code == '200' or ishare_response == 'Crediting Successful.':
-                            sms = f"Your account has been credited with {data_volume}MB."
-                            r_sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to={receiver}&from=Bundle&sms={sms}"
-                            response = requests.request("GET", url=r_sms_url)
-                            print(response.text)
-                            doc_ref = history_collection.document(date_and_time)
-                            doc_ref.update({'done': 'Successful'})
-                            mail_doc_ref = mail_collection.document(f"{batch_id}-Mail")
-                            file_path = 'business_api/mail.txt'  # Replace with your file path
 
-                            name = user_details["first name"]
-                            volume = data_volume
-                            date = date_and_time
-                            reference_t = reference
-                            receiver_t = receiver
+                    sms = f"Your account has been credited with {data_volume}MB."
+                    r_sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to={receiver}&from=Bundle&sms={sms}"
+                    response = requests.request("GET", url=r_sms_url)
+                    print(response.text)
+                    doc_ref = history_collection.document(date_and_time)
+                    doc_ref.update({'done': 'Successful'})
+                    mail_doc_ref = mail_collection.document(f"{batch_id}-Mail")
+                    file_path = 'business_api/mail.txt'  # Replace with your file path
 
-                            with open(file_path, 'r') as file:
-                                html_content = file.read()
+                    name = user_details["first name"]
+                    volume = data_volume
+                    date = date_and_time
+                    reference_t = reference
+                    receiver_t = receiver
 
-                            placeholders = {
-                                '{name}': name,
-                                '{volume}': volume,
-                                '{date}': date,
-                                '{reference}': reference_t,
-                                '{receiver}': receiver_t
-                            }
+                    with open(file_path, 'r') as file:
+                        html_content = file.read()
 
-                            for placeholder, value in placeholders.items():
-                                html_content = html_content.replace(placeholder, str(value))
+                    placeholders = {
+                        '{name}': name,
+                        '{volume}': volume,
+                        '{date}': date,
+                        '{reference}': reference_t,
+                        '{receiver}': receiver_t
+                    }
 
-                            mail_doc_ref.set({
-                                'to': email,
-                                'message': {
-                                    'subject': 'AT Flexi Bundle',
-                                    'html': html_content,
-                                    'messageId': 'CloudHub GH'
-                                }
-                            })
+                    for placeholder, value in placeholders.items():
+                        html_content = html_content.replace(placeholder, str(value))
 
-                            return Response(data={'status_code': status_code, 'batch_id': batch_id},
-                                            status=status.HTTP_200_OK)
-                        else:
-                            print("some else before history")
-                            doc_ref = history_collection.document(date_and_time)
-                            doc_ref.update({'done': 'Failed'})
-                            return Response(data={'status_code': status_code, "message": "Transaction Failed"},
-                                            status=status.HTTP_400_BAD_REQUEST)
-                    else:
-                        return Response(data={'status_code': status_code, "message": "Could not verify transaction"},
-                                        status=status.HTTP_400_BAD_REQUEST)
+                    mail_doc_ref.set({
+                        'to': email,
+                        'message': {
+                            'subject': 'AT Flexi Bundle',
+                            'html': html_content,
+                            'messageId': 'CloudHub GH'
+                        }
+                    })
+
+                    return Response(data={'status_code': status_code, 'batch_id': batch_id},
+                                    status=status.HTTP_200_OK)
                 else:
                     return Response(data={'status_code': 400, "message": "Not enough balance"},
                                     status=status.HTTP_400_BAD_REQUEST)
