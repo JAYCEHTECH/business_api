@@ -81,6 +81,7 @@ CORS_ALLOWED_ORIGINS = [  # Replace with your allowed domain(s)
     'https://web.cloudhubgh.com',
     'https://cloudhubgh-refreshed.web.app',
     'https://www.cloudhubgh.com',
+    'https://reseller.cloudhubgh.com',
     'https://merchant-wvwod.ondigitalocean.app'
 ]
 
