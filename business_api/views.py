@@ -310,27 +310,27 @@ def big_time_transaction(receiver, date, time, date_and_time, phone, amount, dat
     except:
         user_collection.document(user_id).update({'bt_total_sales': amount})
 
-    tat = cashback_collection.document(user_id)
-    print(tat.get().to_dict())
-
-    try:
-        previous_cashback = tat.get().to_dict()['cashback_wallet']
-        print(previous_cashback)
-        cashback_balance = (0.5 / 100) * float(amount)
-        print(cashback_balance)
-        new_cashback = float(previous_cashback) + float(cashback_balance)
-        print(new_cashback)
-        cashback_collection.document(user_id).update(
-            {'cashback_wallet': new_cashback, 'phone_number': phone})
-    except TypeError as e:
-        print(e)
-        cashback_balance = (0.5 / 100) * float(amount)
-        print(cashback_balance)
-        cashback_collection.document(user_id).set(
-            {'cashback_wallet': cashback_balance, 'phone_number': phone})
-
-        print(cashback_collection.document(user_id).get().to_dict())
-        print("did")
+    # tat = cashback_collection.document(user_id)
+    # print(tat.get().to_dict())
+    #
+    # try:
+    #     previous_cashback = tat.get().to_dict()['cashback_wallet']
+    #     print(previous_cashback)
+    #     cashback_balance = (0.5 / 100) * float(amount)
+    #     print(cashback_balance)
+    #     new_cashback = float(previous_cashback) + float(cashback_balance)
+    #     print(new_cashback)
+    #     cashback_collection.document(user_id).update(
+    #         {'cashback_wallet': new_cashback, 'phone_number': phone})
+    # except TypeError as e:
+    #     print(e)
+    #     cashback_balance = (0.5 / 100) * float(amount)
+    #     print(cashback_balance)
+    #     cashback_collection.document(user_id).set(
+    #         {'cashback_wallet': cashback_balance, 'phone_number': phone})
+    #
+    #     print(cashback_collection.document(user_id).get().to_dict())
+    #     print("did")
 
 
     # previous_big_time_totals = totals_collection.document('BIGTIME TOTALS')
@@ -636,28 +636,28 @@ def initiate_mtn_transaction(request):
                         user_collection.document(user_id).update({'mtn_total_sales': amount_to_be_deducted})
 
 
-                    tat = cashback_collection.document(user_id)
-                    print(tat.get().to_dict())
-
-                    try:
-                        previous_cashback = tat.get().to_dict()['cashback_wallet']
-                        print(previous_cashback)
-                        cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
-                        print(cashback_balance)
-                        new_cashback = float(previous_cashback) + float(cashback_balance)
-                        print(new_cashback)
-                        cashback_collection.document(user_id).update(
-                            {'cashback_wallet': new_cashback, 'phone_number': user_details['phone']})
-
-                    except TypeError as e:
-                        print(e)
-                        cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
-                        print(cashback_balance)
-                        cashback_collection.document(user_id).set(
-                            {'cashback_wallet': cashback_balance, 'phone_number': user_details['phone']})
-
-                        print(cashback_collection.document(user_id).get().to_dict())
-                        print("did")
+                    # tat = cashback_collection.document(user_id)
+                    # print(tat.get().to_dict())
+                    #
+                    # try:
+                    #     previous_cashback = tat.get().to_dict()['cashback_wallet']
+                    #     print(previous_cashback)
+                    #     cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
+                    #     print(cashback_balance)
+                    #     new_cashback = float(previous_cashback) + float(cashback_balance)
+                    #     print(new_cashback)
+                    #     cashback_collection.document(user_id).update(
+                    #         {'cashback_wallet': new_cashback, 'phone_number': user_details['phone']})
+                    #
+                    # except TypeError as e:
+                    #     print(e)
+                    #     cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
+                    #     print(cashback_balance)
+                    #     cashback_collection.document(user_id).set(
+                    #         {'cashback_wallet': cashback_balance, 'phone_number': user_details['phone']})
+                    #
+                    #     print(cashback_collection.document(user_id).get().to_dict())
+                    #     print("did")
 
                     mail_doc_ref = mail_collection.document()
                     file_path = 'business_api/mtn_maill.txt'  # Replace with your file path
@@ -883,28 +883,28 @@ def admin_initiate_mtn_transaction(request):
                     except:
                         user_collection.document(user_id).update({'mtn_total_sales': amount_to_be_deducted})
 
-                    tat = cashback_collection.document(user_id)
-                    print(tat.get().to_dict())
-
-                    try:
-                        previous_cashback = tat.get().to_dict()['cashback_wallet']
-                        print(previous_cashback)
-                        cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
-                        print(cashback_balance)
-                        new_cashback = float(previous_cashback) + float(cashback_balance)
-                        print(new_cashback)
-                        cashback_collection.document(user_id).update(
-                            {'cashback_wallet': new_cashback, 'phone_number': user_details['phone']})
-
-                    except TypeError as e:
-                        print(e)
-                        cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
-                        print(cashback_balance)
-                        cashback_collection.document(user_id).set(
-                            {'cashback_wallet': cashback_balance, 'phone_number': user_details['phone']})
-
-                        print(cashback_collection.document(user_id).get().to_dict())
-                        print("did")
+#                     tat = cashback_collection.document(user_id)
+#                     print(tat.get().to_dict())
+#
+#                     try:
+#                         previous_cashback = tat.get().to_dict()['cashback_wallet']
+#                         print(previous_cashback)
+#                         cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
+#                         print(cashback_balance)
+#                         new_cashback = float(previous_cashback) + float(cashback_balance)
+#                         print(new_cashback)
+#                         cashback_collection.document(user_id).update(
+#                             {'cashback_wallet': new_cashback, 'phone_number': user_details['phone']})
+#
+#                     except TypeError as e:
+#                         print(e)
+#                         cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
+#                         print(cashback_balance)
+#                         cashback_collection.document(user_id).set(
+#                             {'cashback_wallet': cashback_balance, 'phone_number': user_details['phone']})
+#
+#                         print(cashback_collection.document(user_id).get().to_dict())
+#                         print("did")
 
                     mail_doc_ref = mail_collection.document()
                     file_path = 'business_api/mtn_maill.txt'  # Replace with your file path
@@ -1112,28 +1112,28 @@ def initiate_ishare_transaction(request):
                     except:
                         user_collection.document(user_id).update({'at_total_sales': amount})
 
-                    tat = cashback_collection.document(user_id)
-                    print(tat.get().to_dict())
-
-                    try:
-                        previous_cashback = tat.get().to_dict()['cashback_wallet']
-                        print(previous_cashback)
-                        cashback_balance = (0.5 / 100) * float(amount)
-                        print(cashback_balance)
-                        new_cashback = float(previous_cashback) + float(cashback_balance)
-                        print(new_cashback)
-                        cashback_collection.document(user_id).update(
-                            {'cashback_wallet': new_cashback, 'phone_number': user_details['phone']})
-
-                    except TypeError as e:
-                        print(e)
-                        cashback_balance = (0.5 / 100) * float(amount)
-                        print(cashback_balance)
-                        cashback_collection.document(user_id).set(
-                            {'cashback_wallet': cashback_balance, 'phone_number': user_details['phone']})
-
-                        print(cashback_collection.document(user_id).get().to_dict())
-                        print("did")
+                    # tat = cashback_collection.document(user_id)
+                    # print(tat.get().to_dict())
+                    #
+                    # try:
+                    #     previous_cashback = tat.get().to_dict()['cashback_wallet']
+                    #     print(previous_cashback)
+                    #     cashback_balance = (0.5 / 100) * float(amount)
+                    #     print(cashback_balance)
+                    #     new_cashback = float(previous_cashback) + float(cashback_balance)
+                    #     print(new_cashback)
+                    #     cashback_collection.document(user_id).update(
+                    #         {'cashback_wallet': new_cashback, 'phone_number': user_details['phone']})
+                    #
+                    # except TypeError as e:
+                    #     print(e)
+                    #     cashback_balance = (0.5 / 100) * float(amount)
+                    #     print(cashback_balance)
+                    #     cashback_collection.document(user_id).set(
+                    #         {'cashback_wallet': cashback_balance, 'phone_number': user_details['phone']})
+                    #
+                    #     print(cashback_collection.document(user_id).get().to_dict())
+                    #     print("did")
 
                     return Response(data={'status_code': status_code, 'batch_id': batch_id},
                                     status=status.HTTP_200_OK)
@@ -1314,28 +1314,28 @@ def admin_initiate_ishare_transaction(request):
                     except:
                         user_collection.document(user_id).update({'at_total_sales': amount})
 
-                    tat = cashback_collection.document(user_id)
-                    print(tat.get().to_dict())
-
-                    try:
-                        previous_cashback = tat.get().to_dict()['cashback_wallet']
-                        print(previous_cashback)
-                        cashback_balance = (0.5 / 100) * float(amount)
-                        print(cashback_balance)
-                        new_cashback = float(previous_cashback) + float(cashback_balance)
-                        print(new_cashback)
-                        cashback_collection.document(user_id).update(
-                            {'cashback_wallet': new_cashback, 'phone_number': user_details['phone']})
-
-                    except TypeError as e:
-                        print(e)
-                        cashback_balance = (0.5 / 100) * float(amount)
-                        print(cashback_balance)
-                        cashback_collection.document(user_id).set(
-                            {'cashback_wallet': cashback_balance, 'phone_number': user_details['phone']})
-
-                        print(cashback_collection.document(user_id).get().to_dict())
-                        print("did")
+#                     tat = cashback_collection.document(user_id)
+#                     print(tat.get().to_dict())
+#
+#                     try:
+#                         previous_cashback = tat.get().to_dict()['cashback_wallet']
+#                         print(previous_cashback)
+#                         cashback_balance = (0.5 / 100) * float(amount)
+#                         print(cashback_balance)
+#                         new_cashback = float(previous_cashback) + float(cashback_balance)
+#                         print(new_cashback)
+#                         cashback_collection.document(user_id).update(
+#                             {'cashback_wallet': new_cashback, 'phone_number': user_details['phone']})
+#
+#                     except TypeError as e:
+#                         print(e)
+#                         cashback_balance = (0.5 / 100) * float(amount)
+#                         print(cashback_balance)
+#                         cashback_collection.document(user_id).set(
+#                             {'cashback_wallet': cashback_balance, 'phone_number': user_details['phone']})
+#
+#                         print(cashback_collection.document(user_id).get().to_dict())
+#                         print("did")
 
                     return Response(data={'status_code': status_code, 'batch_id': batch_id},
                                     status=status.HTTP_200_OK)
