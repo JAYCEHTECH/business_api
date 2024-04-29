@@ -137,7 +137,8 @@ def send_ishare_bundle(first_name: str, last_name: str, buyer, receiver: str, em
     }
 
     response = requests.request("POST", url, headers=headers, data=payload)
-    print(f"{response.json()} from first method +++++++++++++++++++++++++++++++++++++==========================================")
+    print(
+        f"{response.json()} from first method +++++++++++++++++++++++++++++++++++++==========================================")
     return response
 
 
@@ -331,7 +332,6 @@ def big_time_transaction(receiver, date, time, date_and_time, phone, amount, dat
     #
     #     print(cashback_collection.document(user_id).get().to_dict())
     #     print("did")
-
 
     # previous_big_time_totals = totals_collection.document('BIGTIME TOTALS')
     # all_totals = totals_collection.document('ALL TOTALS')
@@ -635,7 +635,6 @@ def initiate_mtn_transaction(request):
                     except:
                         user_collection.document(user_id).update({'mtn_total_sales': amount_to_be_deducted})
 
-
                     # tat = cashback_collection.document(user_id)
                     # print(tat.get().to_dict())
                     #
@@ -883,28 +882,28 @@ def admin_initiate_mtn_transaction(request):
                     except:
                         user_collection.document(user_id).update({'mtn_total_sales': amount_to_be_deducted})
 
-#                     tat = cashback_collection.document(user_id)
-#                     print(tat.get().to_dict())
-#
-#                     try:
-#                         previous_cashback = tat.get().to_dict()['cashback_wallet']
-#                         print(previous_cashback)
-#                         cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
-#                         print(cashback_balance)
-#                         new_cashback = float(previous_cashback) + float(cashback_balance)
-#                         print(new_cashback)
-#                         cashback_collection.document(user_id).update(
-#                             {'cashback_wallet': new_cashback, 'phone_number': user_details['phone']})
-#
-#                     except TypeError as e:
-#                         print(e)
-#                         cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
-#                         print(cashback_balance)
-#                         cashback_collection.document(user_id).set(
-#                             {'cashback_wallet': cashback_balance, 'phone_number': user_details['phone']})
-#
-#                         print(cashback_collection.document(user_id).get().to_dict())
-#                         print("did")
+                    #                     tat = cashback_collection.document(user_id)
+                    #                     print(tat.get().to_dict())
+                    #
+                    #                     try:
+                    #                         previous_cashback = tat.get().to_dict()['cashback_wallet']
+                    #                         print(previous_cashback)
+                    #                         cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
+                    #                         print(cashback_balance)
+                    #                         new_cashback = float(previous_cashback) + float(cashback_balance)
+                    #                         print(new_cashback)
+                    #                         cashback_collection.document(user_id).update(
+                    #                             {'cashback_wallet': new_cashback, 'phone_number': user_details['phone']})
+                    #
+                    #                     except TypeError as e:
+                    #                         print(e)
+                    #                         cashback_balance = (0.5 / 100) * float(amount_to_be_deducted)
+                    #                         print(cashback_balance)
+                    #                         cashback_collection.document(user_id).set(
+                    #                             {'cashback_wallet': cashback_balance, 'phone_number': user_details['phone']})
+                    #
+                    #                         print(cashback_collection.document(user_id).get().to_dict())
+                    #                         print("did")
 
                     mail_doc_ref = mail_collection.document()
                     file_path = 'business_api/mtn_maill.txt'  # Replace with your file path
@@ -1314,28 +1313,28 @@ def admin_initiate_ishare_transaction(request):
                     except:
                         user_collection.document(user_id).update({'at_total_sales': amount})
 
-#                     tat = cashback_collection.document(user_id)
-#                     print(tat.get().to_dict())
-#
-#                     try:
-#                         previous_cashback = tat.get().to_dict()['cashback_wallet']
-#                         print(previous_cashback)
-#                         cashback_balance = (0.5 / 100) * float(amount)
-#                         print(cashback_balance)
-#                         new_cashback = float(previous_cashback) + float(cashback_balance)
-#                         print(new_cashback)
-#                         cashback_collection.document(user_id).update(
-#                             {'cashback_wallet': new_cashback, 'phone_number': user_details['phone']})
-#
-#                     except TypeError as e:
-#                         print(e)
-#                         cashback_balance = (0.5 / 100) * float(amount)
-#                         print(cashback_balance)
-#                         cashback_collection.document(user_id).set(
-#                             {'cashback_wallet': cashback_balance, 'phone_number': user_details['phone']})
-#
-#                         print(cashback_collection.document(user_id).get().to_dict())
-#                         print("did")
+                    #                     tat = cashback_collection.document(user_id)
+                    #                     print(tat.get().to_dict())
+                    #
+                    #                     try:
+                    #                         previous_cashback = tat.get().to_dict()['cashback_wallet']
+                    #                         print(previous_cashback)
+                    #                         cashback_balance = (0.5 / 100) * float(amount)
+                    #                         print(cashback_balance)
+                    #                         new_cashback = float(previous_cashback) + float(cashback_balance)
+                    #                         print(new_cashback)
+                    #                         cashback_collection.document(user_id).update(
+                    #                             {'cashback_wallet': new_cashback, 'phone_number': user_details['phone']})
+                    #
+                    #                     except TypeError as e:
+                    #                         print(e)
+                    #                         cashback_balance = (0.5 / 100) * float(amount)
+                    #                         print(cashback_balance)
+                    #                         cashback_collection.document(user_id).set(
+                    #                             {'cashback_wallet': cashback_balance, 'phone_number': user_details['phone']})
+                    #
+                    #                         print(cashback_collection.document(user_id).get().to_dict())
+                    #                         print("did")
 
                     return Response(data={'status_code': status_code, 'batch_id': batch_id},
                                     status=status.HTTP_200_OK)
@@ -1753,6 +1752,8 @@ def wallet_topup(request):
                 to_be_added = float(amount)
                 to_be_deducted = float(amount)
 
+                print("######################### got here ###########################################################")
+
                 print(f"amount to be added: {to_be_added}")
 
                 new_balance_for_receiver = previous_receiver_wallet + to_be_added
@@ -1764,6 +1765,8 @@ def wallet_topup(request):
                 print(receiver_doc_ref.get().to_dict())
                 print("before all data")
 
+                print("######################### then here ###########################################################")
+
                 new_balance_for_user = previous_user_wallet - to_be_deducted
                 print(f" new balance: {new_balance_for_user}")
                 user_doc_ref = user_collection.document(user_id)
@@ -1771,6 +1774,7 @@ def wallet_topup(request):
                     {'wallet': new_balance_for_user, 'wallet_last_update': date_and_time,
                      'recent_wallet_reference': reference})
                 print(receiver_doc_ref.get().to_dict())
+                print("got to all data")
                 all_data = {
                     'batch_id': "unknown",
                     'buyer': user_details['phone'],
@@ -1795,13 +1799,15 @@ def wallet_topup(request):
                     'type': "WALLETTOPUP",
                     'uid': user_id
                 }
+                print("savingggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg")
                 history_web.collection(email).document(date_and_time).set(all_data)
                 print("saved")
                 history_collection.document(date_and_time).set(all_data)
                 print(f"ya{history_collection.document(date_and_time).get().to_dict()}")
                 print("saved")
                 print(f"yo{history_web.collection(email).document(date_and_time).get().to_dict()}")
-
+                print(
+                    "savedddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd")
                 # name = f"{first_name} {last_name}"
                 # amount = to_be_added
                 # file_path = 'business_api/wallet_mail.txt'
@@ -1914,7 +1920,8 @@ def webhook_send_and_save_to_history(user_id, txn_type: str, paid_at: str, ishar
                                          bundle=data_volume,
                                          email=email)
     json_response = ishare_response.json()
-    print(f"hello:{json_response}========================================================================================")
+    print(
+        f"hello:{json_response}========================================================================================")
     status_code = ishare_response.status_code
     print(status_code)
     try:
@@ -3965,7 +3972,7 @@ def admin_initiate_mtn_airtime(request):
                         print("worked well")
                         return Response(
                             {"status": response.status_code, 'message': f'Transaction Completed Successfully'},
-                            )
+                        )
                     else:
                         print("not 200 error")
                         return Response({"status": response.status_code, 'message': f'Something went wrong'},
@@ -4305,7 +4312,7 @@ def admin_initiate_voda_airtime(request):
                         print("worked well")
                         return Response(
                             {"status": response.status_code, 'message': f'Transaction Completed Successfully'},
-                            )
+                        )
                     else:
                         print("not 200 error")
                         return Response({"status": response.status_code, 'message': f'Something went wrong'},
@@ -4645,7 +4652,7 @@ def admin_initiate_glo_airtime(request):
                             print("worked well")
                             return Response(
                                 {"status": response.status_code, 'message': f'Transaction Completed Successfully'},
-                                )
+                            )
                         else:
                             print("not 200 error")
                             return Response({"status": response.status_code, 'message': f'Something went wrong'},
