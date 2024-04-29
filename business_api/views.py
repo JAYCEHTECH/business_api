@@ -298,17 +298,17 @@ def big_time_transaction(receiver, date, time, date_and_time, phone, amount, dat
     reference_t = ref
     receiver_t = receiver
 
-    tot = user_collection.document(user_id)
-    print(tot.get().to_dict())
-    try:
-        print(tot.get().to_dict()['bt_total_sales'])
-        previous_sale = tot.get().to_dict()['bt_total_sales']
-        print(f"Previous Sale: {previous_sale}")
-        new_sale = float(previous_sale) + float(amount)
-        print(new_sale)
-        user_collection.document(user_id).update({'bt_total_sales': new_sale})
-    except:
-        user_collection.document(user_id).update({'bt_total_sales': amount})
+    # tot = user_collection.document(user_id)
+    # print(tot.get().to_dict())
+    # try:
+    #     print(tot.get().to_dict()['bt_total_sales'])
+    #     previous_sale = tot.get().to_dict()['bt_total_sales']
+    #     print(f"Previous Sale: {previous_sale}")
+    #     new_sale = float(previous_sale) + float(amount)
+    #     print(new_sale)
+    #     user_collection.document(user_id).update({'bt_total_sales': new_sale})
+    # except:
+    #     user_collection.document(user_id).update({'bt_total_sales': amount})
 
     # tat = cashback_collection.document(user_id)
     # print(tat.get().to_dict())
@@ -623,17 +623,17 @@ def initiate_mtn_transaction(request):
                     mtn_other.document(date_and_time).set(second_data)
                     print("pu")
 
-                    tot = user_collection.document(user_id)
-                    print(tot.get().to_dict())
-                    try:
-                        print(tot.get().to_dict()['mtn_total_sales'])
-                        previous_sale = tot.get().to_dict()['mtn_total_sales']
-                        print(f"Previous Sale: {previous_sale}")
-                        new_sale = float(previous_sale) + float(amount_to_be_deducted)
-                        print(new_sale)
-                        user_collection.document(user_id).update({'mtn_total_sales': new_sale})
-                    except:
-                        user_collection.document(user_id).update({'mtn_total_sales': amount_to_be_deducted})
+                    # tot = user_collection.document(user_id)
+                    # print(tot.get().to_dict())
+                    # try:
+                    #     print(tot.get().to_dict()['mtn_total_sales'])
+                    #     previous_sale = tot.get().to_dict()['mtn_total_sales']
+                    #     print(f"Previous Sale: {previous_sale}")
+                    #     new_sale = float(previous_sale) + float(amount_to_be_deducted)
+                    #     print(new_sale)
+                    #     user_collection.document(user_id).update({'mtn_total_sales': new_sale})
+                    # except:
+                    #     user_collection.document(user_id).update({'mtn_total_sales': amount_to_be_deducted})
 
 
                     # tat = cashback_collection.document(user_id)
@@ -871,17 +871,17 @@ def admin_initiate_mtn_transaction(request):
                     mtn_other.document(date_and_time).set(second_data)
                     print("pu")
 
-                    tot = user_collection.document(user_id)
-                    print(tot.get().to_dict())
-                    try:
-                        print(tot.get().to_dict()['mtn_total_sales'])
-                        previous_sale = tot.get().to_dict()['mtn_total_sales']
-                        print(f"Previous Sale: {previous_sale}")
-                        new_sale = float(previous_sale) + float(amount_to_be_deducted)
-                        print(new_sale)
-                        user_collection.document(user_id).update({'mtn_total_sales': new_sale})
-                    except:
-                        user_collection.document(user_id).update({'mtn_total_sales': amount_to_be_deducted})
+                    # tot = user_collection.document(user_id)
+                    # print(tot.get().to_dict())
+                    # try:
+                    #     print(tot.get().to_dict()['mtn_total_sales'])
+                    #     previous_sale = tot.get().to_dict()['mtn_total_sales']
+                    #     print(f"Previous Sale: {previous_sale}")
+                    #     new_sale = float(previous_sale) + float(amount_to_be_deducted)
+                    #     print(new_sale)
+                    #     user_collection.document(user_id).update({'mtn_total_sales': new_sale})
+                    # except:
+                    #     user_collection.document(user_id).update({'mtn_total_sales': amount_to_be_deducted})
 
 #                     tat = cashback_collection.document(user_id)
 #                     print(tat.get().to_dict())
@@ -1100,17 +1100,17 @@ def initiate_ishare_transaction(request):
                         }
                     })
 
-                    tot = user_collection.document(user_id)
-                    print(tot.get().to_dict())
-                    try:
-                        print(tot.get().to_dict()['at_total_sales'])
-                        previous_sale = tot.get().to_dict()['at_total_sales']
-                        print(f"Previous Sale: {previous_sale}")
-                        new_sale = float(previous_sale) + float(amount)
-                        print(new_sale)
-                        user_collection.document(user_id).update({'at_total_sales': new_sale})
-                    except:
-                        user_collection.document(user_id).update({'at_total_sales': amount})
+                    # tot = user_collection.document(user_id)
+                    # print(tot.get().to_dict())
+                    # try:
+                    #     print(tot.get().to_dict()['at_total_sales'])
+                    #     previous_sale = tot.get().to_dict()['at_total_sales']
+                    #     print(f"Previous Sale: {previous_sale}")
+                    #     new_sale = float(previous_sale) + float(amount)
+                    #     print(new_sale)
+                    #     user_collection.document(user_id).update({'at_total_sales': new_sale})
+                    # except:
+                    #     user_collection.document(user_id).update({'at_total_sales': amount})
 
                     # tat = cashback_collection.document(user_id)
                     # print(tat.get().to_dict())
@@ -1302,17 +1302,17 @@ def admin_initiate_ishare_transaction(request):
                         }
                     })
 
-                    tot = user_collection.document(user_id)
-                    print(tot.get().to_dict())
-                    try:
-                        print(tot.get().to_dict()['at_total_sales'])
-                        previous_sale = tot.get().to_dict()['at_total_sales']
-                        print(f"Previous Sale: {previous_sale}")
-                        new_sale = float(previous_sale) + float(amount)
-                        print(new_sale)
-                        user_collection.document(user_id).update({'at_total_sales': new_sale})
-                    except:
-                        user_collection.document(user_id).update({'at_total_sales': amount})
+                    # tot = user_collection.document(user_id)
+                    # print(tot.get().to_dict())
+                    # try:
+                    #     print(tot.get().to_dict()['at_total_sales'])
+                    #     previous_sale = tot.get().to_dict()['at_total_sales']
+                    #     print(f"Previous Sale: {previous_sale}")
+                    #     new_sale = float(previous_sale) + float(amount)
+                    #     print(new_sale)
+                    #     user_collection.document(user_id).update({'at_total_sales': new_sale})
+                    # except:
+                    #     user_collection.document(user_id).update({'at_total_sales': amount})
 
 #                     tat = cashback_collection.document(user_id)
 #                     print(tat.get().to_dict())
