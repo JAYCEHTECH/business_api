@@ -476,7 +476,7 @@ def initiate_mtn_transaction(request):
                 print(data_volume)
                 reference = request.data.get('reference')
                 amount = request.data.get('amount')
-                # phone_number = request.data.get('phone_number')
+                phone_number = request.data.get('phone_number')
 
                 if not receiver or not data_volume or not reference or not amount:
                     return Response({'message': 'Body parameters not valid. Check and try again.'},
@@ -565,7 +565,7 @@ def initiate_mtn_transaction(request):
 
                     data = {
                         'batch_id': "unknown",
-                        'buyer': phone,
+                        'buyer': phone_number,
                         'color_code': "Green",
                         'amount': amount_to_be_deducted,
                         'data_break_down': data_volume,
@@ -610,7 +610,7 @@ def initiate_mtn_transaction(request):
                         'ishareBalance': 0,
                         'name': f"{first_name} {last_name}",
                         'number': receiver,
-                        'buyer': phone,
+                        'buyer': phone_number,
                         'paid_at': date_and_time,
                         'payment_status': "success",
                         'reference': reference,
