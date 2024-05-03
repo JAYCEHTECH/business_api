@@ -728,6 +728,7 @@ def admin_initiate_mtn_transaction(request):
         return JsonResponse({'error': 'Origin header missing'}, status=400)
 
     request_origin = request.META['HTTP_ORIGIN']
+    print(f"origiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnn issssssssssssssssssssssssssssssssssssssssss {request_origin}")
 
     if request_origin not in allowed_origins:
         return JsonResponse({'error': 'Origin not allowed'}, status=403)
@@ -1201,6 +1202,7 @@ def admin_initiate_ishare_transaction(request):
         return JsonResponse({'error': 'Origin header missing'}, status=400)
 
     request_origin = request.META['HTTP_ORIGIN']
+    print(f"origiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnn issssssssssssssssssssssssssssssssssssssssss {request_origin}")
 
     if request_origin not in allowed_origins:
         return JsonResponse({'error': 'Origin not allowed'}, status=403)
@@ -1579,6 +1581,7 @@ def admin_initiate_big_time(request):
         return JsonResponse({'error': 'Origin header missing'}, status=400)
 
     request_origin = request.META['HTTP_ORIGIN']
+    print(f"origiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnn issssssssssssssssssssssssssssssssssssssssss {request_origin}")
 
     if request_origin not in allowed_origins:
         return JsonResponse({'error': 'Origin not allowed'}, status=403)
