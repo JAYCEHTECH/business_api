@@ -468,12 +468,9 @@ def initiate_mtn_transaction(request):
                 token_obj = Token.objects.get(key=token)
                 user = token_obj.user
                 user_id = user.user_id
-                print(user_id)
 
                 receiver = request.data.get('receiver')
-                print(receiver)
                 data_volume = request.data.get('data_volume')
-                print(data_volume)
                 reference = request.data.get('reference')
                 amount = request.data.get('amount')
                 phone_number = request.data.get('phone_number')
