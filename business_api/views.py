@@ -485,6 +485,10 @@ def initiate_mtn_transaction(request):
                 amount = request.data.get('amount')
                 phone_number = request.data.get('phone_number')
 
+                if models.Blacklist.objects.filter(phone_number=str(receiver)).exists():
+                    return Response({'message': 'Invalid Recipient.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
                 if not receiver or not data_volume or not reference or not amount:
                     return Response({'message': 'Body parameters not valid. Check and try again.'},
                                     status=status.HTTP_400_BAD_REQUEST)
@@ -752,6 +756,10 @@ def admin_initiate_mtn_transaction(request):
                 amount = request.data.get('amount')
                 # phone_number = request.data.get('phone_number')
 
+                if models.Blacklist.objects.filter(phone_number=str(receiver)).exists():
+                    return Response({'message': 'Invalid Recipient.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
                 if not receiver or not data_volume or not reference or not amount or not user_id:
                     return Response({'message': 'Body parameters not valid. Check and try again.'},
                                     status=status.HTTP_400_BAD_REQUEST)
@@ -1011,6 +1019,10 @@ def initiate_ishare_transaction(request):
                 # data_break_down = request.data.get('data_break_down')
                 # image = request.data.get('image')
 
+                if models.Blacklist.objects.filter(phone_number=str(receiver)).exists():
+                    return Response({'message': 'Invalid Recipient.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
                 if not receiver or not data_volume or not reference or not amount:
                     return Response({'message': 'Body parameters not valid. Check and try again.'},
                                     status=status.HTTP_400_BAD_REQUEST)
@@ -1228,6 +1240,10 @@ def admin_initiate_ishare_transaction(request):
                 # color_code = request.data.get('color_code')
                 # data_break_down = request.data.get('data_break_down')
                 # image = request.data.get('image')
+
+                if models.Blacklist.objects.filter(phone_number=str(receiver)).exists():
+                    return Response({'message': 'Invalid Recipient.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
 
                 if not receiver or not data_volume or not reference or not amount:
                     return Response({'message': 'Body parameters not valid. Check and try again.'},
@@ -1452,6 +1468,11 @@ def initiate_big_time(request):
                 data_volume = request.data.get('data_volume')
                 reference = request.data.get('reference')
                 print(data_volume, reference)
+
+                if models.Blacklist.objects.filter(phone_number=str(receiver)).exists():
+                    return Response({'message': 'Invalid Recipient.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
                 try:
                     amount = prices_dict[data_volume]
                     print(amount)
@@ -1610,6 +1631,11 @@ def admin_initiate_big_time(request):
                 reference = request.data.get('reference')
                 user_id = request.data.get('user_id')
                 print(data_volume, reference)
+
+                if models.Blacklist.objects.filter(phone_number=str(receiver)).exists():
+                    return Response({'message': 'Invalid Recipient.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
                 try:
                     amount = prices_dict[data_volume]
                     print(amount)
