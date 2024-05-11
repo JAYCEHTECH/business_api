@@ -13,4 +13,5 @@ class CashBackAdmin(ExportActionMixin, admin.ModelAdmin):
 admin.site.register(models.CustomUser)
 admin.site.register(models.CashBack, CashBackAdmin)
 admin.site.register(models.Blacklist)
+admin.site.register(models.MTNToggle)
 
