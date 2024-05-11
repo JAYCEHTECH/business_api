@@ -460,6 +460,9 @@ def regenerate_token(request):
 @permission_classes([IsAuthenticated])
 @authentication_classes([BearerTokenAuthentication])
 def initiate_mtn_transaction(request):
+    mtn_active = models.MTNToggle.objects.filter().first().mtn_active
+    if not mtn_active:
+        return JsonResponse({'error': 'Service Unavailable'}, status=503)
     # allowed_hosts = ['cloudhubgh.com', 'reseller.cloudhubgh.com']
     # request_host = request.headers.get('Host')
     #
@@ -716,6 +719,9 @@ def initiate_mtn_transaction(request):
 @permission_classes([IsAuthenticated])
 @authentication_classes([BearerTokenAuthentication])
 def admin_initiate_mtn_transaction(request):
+    mtn_active = models.MTNToggle.objects.filter().first().mtn_active
+    if not mtn_active:
+        return JsonResponse({'error': 'Service Unavailable'}, status=503)
     # allowed_hosts = ['cloudhubgh.com', 'reseller.cloudhubgh.com', "api.cloudhubgh.com", "merchant.cloudhubgh.com"]
     # request_host = request.headers.get('Host')
     #
