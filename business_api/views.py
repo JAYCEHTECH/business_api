@@ -1154,7 +1154,6 @@ def admin_initiate_ishare_transaction(request):
         auth_type, token = authorization_header.split(' ')
         if auth_type == 'Bearer':
             try:
-
                 receiver = request.data.get('receiver')
                 print(receiver)
                 data_volume = request.data.get('data_volume')
@@ -1668,6 +1667,18 @@ def wallet_topup(request):
                 reference = request.data.get('reference')
                 receiver_id = request.data.get('receiver_id')
                 user_id = request.data.get("user_id")
+
+                allowed_ids = [
+                    "eq5bk7lBvKUiXvJhY67B2Dd96RZ2", "xxWAltejVRU9eBHS3wtvL3HTbmE2", "9VA0qyq6lXYPZ6Ut867TVcBvF2t1",
+                    "eq5bk7lBvKUiXvJhY67B2Dd96RZ2", "YvOWjIt9arboXcrOtxXEjbiVpZy1", "ajoExmDwsmQfkDlf1junWVU1SEt2",
+                    "7khtAAe7awOlRqOg3YYb1f7VTeE3", "Q0hDkakaiTMDuvbYsD65mYE9W773", "13xmcsrIiDdVu1EDEp23NBT6QYj1",
+                    "c0jyJW4MeqcEJ9LuJqhc7Rj4c9c2", "E4hsRsONxxNv27cQxNrIVC6xtL63", "7NvMDSUG4XcIzSNYs6LktMdo3X62",
+                    "viRbi1VheufDqYJe2UGpy5WB3fA3", "jkzLTRl5cSWwIRdWJYCJFOK8iln1", "PqevIUYHlBhDoz6lpahssMjtqYH2"
+                ]
+
+                if user_id not in allowed_ids:
+                    return Response({'message': 'Not permitted.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
 
                 print(
                     "==================================================================================================")
