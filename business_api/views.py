@@ -488,6 +488,14 @@ def initiate_mtn_transaction(request):
                 amount = request.data.get('amount')
                 phone_number = request.data.get('phone_number')
 
+                print(receiver)
+                print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+                for i in models.Blacklist.objects.all():
+                    print(i)
+                    if str(i) == str(receiver):
+                        return Response({'message': 'Invalid Recipient.'},
+                                        status=status.HTTP_400_BAD_REQUEST)
+
                 if models.Blacklist.objects.filter(phone_number=str(receiver)).exists():
                     return Response({'message': 'Invalid Recipient.'},
                                     status=status.HTTP_400_BAD_REQUEST)
@@ -762,6 +770,14 @@ def admin_initiate_mtn_transaction(request):
                 amount = request.data.get('amount')
                 # phone_number = request.data.get('phone_number')
 
+                print(receiver)
+                print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+                for i in models.Blacklist.objects.all():
+                    print(i)
+                    if str(i) == str(receiver):
+                        return Response({'message': 'Invalid Recipient.'},
+                                        status=status.HTTP_400_BAD_REQUEST)
+
                 if models.Blacklist.objects.filter(phone_number=str(receiver)).exists():
                     return Response({'message': 'Invalid Recipient.'},
                                     status=status.HTTP_400_BAD_REQUEST)
@@ -1025,6 +1041,14 @@ def initiate_ishare_transaction(request):
                 # data_break_down = request.data.get('data_break_down')
                 # image = request.data.get('image')
 
+                print(receiver)
+                print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+                for i in models.Blacklist.objects.all():
+                    print(i)
+                    if str(i) == str(receiver):
+                        return Response({'message': 'Invalid Recipient.'},
+                                        status=status.HTTP_400_BAD_REQUEST)
+
                 if models.Blacklist.objects.filter(phone_number=str(receiver)).exists():
                     return Response({'message': 'Invalid Recipient.'},
                                     status=status.HTTP_400_BAD_REQUEST)
@@ -1245,6 +1269,14 @@ def admin_initiate_ishare_transaction(request):
                 # color_code = request.data.get('color_code')
                 # data_break_down = request.data.get('data_break_down')
                 # image = request.data.get('image')
+
+                print(receiver)
+                print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+                for i in models.Blacklist.objects.all():
+                    print(i)
+                    if str(i) == str(receiver):
+                        return Response({'message': 'Invalid Recipient.'},
+                                        status=status.HTTP_400_BAD_REQUEST)
 
                 if models.Blacklist.objects.filter(phone_number=str(receiver)).exists():
                     return Response({'message': 'Invalid Recipient.'},
@@ -1474,6 +1506,14 @@ def initiate_big_time(request):
                 reference = request.data.get('reference')
                 print(data_volume, reference)
 
+                print(receiver)
+                print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+                for i in models.Blacklist.objects.all():
+                    print(i)
+                    if str(i) == str(receiver):
+                        return Response({'message': 'Invalid Recipient.'},
+                                        status=status.HTTP_400_BAD_REQUEST)
+
                 if models.Blacklist.objects.filter(phone_number=str(receiver)).exists():
                     return Response({'message': 'Invalid Recipient.'},
                                     status=status.HTTP_400_BAD_REQUEST)
@@ -1636,6 +1676,14 @@ def admin_initiate_big_time(request):
                 reference = request.data.get('reference')
                 user_id = request.data.get('user_id')
                 print(data_volume, reference)
+
+                print(receiver)
+                print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+                for i in models.Blacklist.objects.all():
+                    print(i)
+                    if str(i) == str(receiver):
+                        return Response({'message': 'Invalid Recipient.'},
+                                        status=status.HTTP_400_BAD_REQUEST)
 
                 if models.Blacklist.objects.filter(phone_number=str(receiver)).exists():
                     return Response({'message': 'Invalid Recipient.'},
