@@ -1019,6 +1019,29 @@ def initiate_ishare_transaction(request):
                 user = token_obj.user
                 user_id = user.user_id
 
+                prices_dict = {
+                    1000: 2.9,
+                    2000: 5.8,
+                    3000: 8.7,
+                    4000: 11.5,
+                    5000: 14.5,
+                    6000: 17.4,
+                    7000: 20.3,
+                    8000: 23.2,
+                    9000: 26.1,
+                    10000: 29,
+                    12000: 34.8,
+                    15000: 43.5,
+                    20000: 58,
+                    25000: 72.5,
+                    30000: 87,
+                    40000: 116,
+                    50000: 145,
+                    100000: 290
+                }
+
+                amount = prices_dict[data_volume]
+
                 date = datetime.datetime.now().strftime("%a, %b %d, %Y")
                 time = datetime.datetime.now().strftime("%I:%M:%S %p")
                 date_and_time = datetime.datetime.now().isoformat()
