@@ -460,19 +460,6 @@ def regenerate_token(request):
 @permission_classes([IsAuthenticated])
 @authentication_classes([BearerTokenAuthentication])
 def initiate_mtn_transaction(request):
-    mtn_active = models.MTNToggle.objects.filter().first().mtn_active
-    if not mtn_active:
-        return JsonResponse({'error': 'Service Unavailable'}, status=503)
-    # allowed_hosts = ['cloudhubgh.com', 'reseller.cloudhubgh.com']
-    # request_host = request.headers.get('Host')
-    #
-    # print(f"hosssssssssstttttttttttttttt issssssssssssss {request_host}")
-    #
-    # if request_host not in allowed_hosts:
-    #     response1 = requests.get(
-    #         f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to=0592117523&from=Bundle&sms=Invalid header host={request_host}")
-    #     print(response1.text)
-    #     return JsonResponse({'error': 'Host not allowed'}, status=403)
     authorization_header = request.headers.get('Authorization')
     if authorization_header:
         auth_type, token = authorization_header.split(' ')
@@ -481,20 +468,15 @@ def initiate_mtn_transaction(request):
                 token_obj = Token.objects.get(key=token)
                 user = token_obj.user
                 user_id = user.user_id
+                print(user_id)
 
                 receiver = request.data.get('receiver')
+                print(receiver)
                 data_volume = request.data.get('data_volume')
+                print(data_volume)
                 reference = request.data.get('reference')
                 amount = request.data.get('amount')
                 phone_number = request.data.get('phone_number')
-
-                print(receiver)
-                print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-                for i in models.Blacklist.objects.all():
-                    print(i)
-                    if str(i) == str(receiver):
-                        return Response({'message': 'Invalid Recipient.'},
-                                        status=status.HTTP_400_BAD_REQUEST)
 
                 if models.Blacklist.objects.filter(phone_number=str(receiver)).exists():
                     return Response({'message': 'Invalid Recipient.'},
@@ -505,7 +487,7 @@ def initiate_mtn_transaction(request):
                                     status=status.HTTP_400_BAD_REQUEST)
 
                 prices_dict = {
-                     1000: 3.9,
+                    1000: 3.9,
                     2000: 7.8,
                     3000: 11.0,
                     4000: 14.5,
@@ -727,9 +709,6 @@ def initiate_mtn_transaction(request):
 @permission_classes([IsAuthenticated])
 @authentication_classes([BearerTokenAuthentication])
 def admin_initiate_mtn_transaction(request):
-    mtn_active = models.MTNToggle.objects.filter().first().mtn_active
-    if not mtn_active:
-        return JsonResponse({'error': 'Service Unavailable'}, status=503)
     # allowed_hosts = ['cloudhubgh.com', 'reseller.cloudhubgh.com', "api.cloudhubgh.com", "merchant.cloudhubgh.com"]
     # request_host = request.headers.get('Host')
     #
@@ -762,7 +741,6 @@ def admin_initiate_mtn_transaction(request):
                                     status=status.HTTP_400_BAD_REQUEST)
 
                 receiver = request.data.get('receiver')
-                print(receiver)
                 data_volume = request.data.get('data_volume')
                 print(data_volume)
                 reference = request.data.get('reference')
@@ -777,7 +755,6 @@ def admin_initiate_mtn_transaction(request):
                     if str(i) == str(receiver):
                         return Response({'message': 'Invalid Recipient.'},
                                         status=status.HTTP_400_BAD_REQUEST)
-
                 if models.Blacklist.objects.filter(phone_number=str(receiver)).exists():
                     return Response({'message': 'Invalid Recipient.'},
                                     status=status.HTTP_400_BAD_REQUEST)
@@ -787,7 +764,7 @@ def admin_initiate_mtn_transaction(request):
                                     status=status.HTTP_400_BAD_REQUEST)
 
                 prices_dict = {
-                    1000: 3.9,
+                   1000: 3.9,
                     2000: 7.8,
                     3000: 11.0,
                     4000: 14.5,
@@ -804,7 +781,7 @@ def admin_initiate_mtn_transaction(request):
                     50000: 155.0,
                     100000: 290.0
                 }
-
+                print(amount)
                 amount_to_be_deducted = prices_dict[data_volume]
                 print(str(amount_to_be_deducted) + "================")
                 # channel = phone_number
@@ -1009,16 +986,6 @@ def admin_initiate_mtn_transaction(request):
 @permission_classes([IsAuthenticated])
 @authentication_classes([BearerTokenAuthentication])
 def initiate_ishare_transaction(request):
-    # allowed_hosts = ['cloudhubgh.com', 'reseller.cloudhubgh.com']
-    # request_host = request.headers.get('Host')
-    #
-    # print(f"hosssssssssstttttttttttttttt issssssssssssss {request_host}")
-    #
-    # if request_host not in allowed_hosts:
-    #     response1 = requests.get(
-    #         f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to=0592117523&from=Bundle&sms=Invalid header host={request_host}")
-    #     print(response1.text)
-    #     return JsonResponse({'error': 'Host not allowed'}, status=403)
     authorization_header = request.headers.get('Authorization')
     if authorization_header:
         auth_type, token = authorization_header.split(' ')
@@ -1040,14 +1007,6 @@ def initiate_ishare_transaction(request):
                 # color_code = request.data.get('color_code')
                 # data_break_down = request.data.get('data_break_down')
                 # image = request.data.get('image')
-
-                print(receiver)
-                print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-                for i in models.Blacklist.objects.all():
-                    print(i)
-                    if str(i) == str(receiver):
-                        return Response({'message': 'Invalid Recipient.'},
-                                        status=status.HTTP_400_BAD_REQUEST)
 
                 if models.Blacklist.objects.filter(phone_number=str(receiver)).exists():
                     return Response({'message': 'Invalid Recipient.'},
@@ -1277,12 +1236,12 @@ def admin_initiate_ishare_transaction(request):
                     if str(i) == str(receiver):
                         return Response({'message': 'Invalid Recipient.'},
                                         status=status.HTTP_400_BAD_REQUEST)
-
                 if models.Blacklist.objects.filter(phone_number=str(receiver)).exists():
                     return Response({'message': 'Invalid Recipient.'},
                                     status=status.HTTP_400_BAD_REQUEST)
 
                 if not receiver or not data_volume or not reference or not amount:
+                    print("body parameters")
                     return Response({'message': 'Body parameters not valid. Check and try again.'},
                                     status=status.HTTP_400_BAD_REQUEST)
 
@@ -1290,8 +1249,32 @@ def admin_initiate_ishare_transaction(request):
                 token_key = token_obj.key
 
                 if token_key != config("TOKEN_KEY"):
+                    print("token did not match")
                     return Response({'message': 'Authorisation Failed.'},
-                                    status=status.HTTP_400_BAD_REQUEST)
+                                    status=status.HTTP_401_UNAUTHORIZED)
+
+                prices_dict = {
+                    1000: 2.9,
+                    2000: 5.8,
+                    3000: 8.7,
+                    4000: 11.5,
+                    5000: 14.5,
+                    6000: 17.4,
+                    7000: 20.3,
+                    8000: 23.2,
+                    9000: 26.1,
+                    10000: 29,
+                    12000: 34.8,
+                    15000: 43.5,
+                    20000: 58,
+                    25000: 72.5,
+                    30000: 87,
+                    40000: 116,
+                    50000: 145,
+                    100000: 290
+                }
+
+                amount = prices_dict[data_volume]
 
                 date = datetime.datetime.now().strftime("%a, %b %d, %Y")
                 time = datetime.datetime.now().strftime("%I:%M:%S %p")
@@ -1454,6 +1437,7 @@ def admin_initiate_ishare_transaction(request):
             except Token.DoesNotExist:
                 return Response({'error': 'Token does not exist.'}, status=status.HTTP_401_UNAUTHORIZED)
         else:
+            print("hereeeeeeeeee")
             return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
@@ -1505,14 +1489,6 @@ def initiate_big_time(request):
                 data_volume = request.data.get('data_volume')
                 reference = request.data.get('reference')
                 print(data_volume, reference)
-
-                print(receiver)
-                print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-                for i in models.Blacklist.objects.all():
-                    print(i)
-                    if str(i) == str(receiver):
-                        return Response({'message': 'Invalid Recipient.'},
-                                        status=status.HTTP_400_BAD_REQUEST)
 
                 if models.Blacklist.objects.filter(phone_number=str(receiver)).exists():
                     return Response({'message': 'Invalid Recipient.'},
@@ -1668,6 +1644,8 @@ def admin_initiate_big_time(request):
                     80000: 200,
                     100000: 230,
                     200000: 450,
+                    500000: 1125,
+                    1000000: 2250
                 }
 
                 receiver = request.data.get('receiver')
@@ -1675,6 +1653,7 @@ def admin_initiate_big_time(request):
                 data_volume = request.data.get('data_volume')
                 reference = request.data.get('reference')
                 user_id = request.data.get('user_id')
+                passed_amount = request.data.get('amount')
                 print(data_volume, reference)
 
                 print(receiver)
@@ -1691,6 +1670,9 @@ def admin_initiate_big_time(request):
 
                 try:
                     amount = prices_dict[data_volume]
+                    if amount != passed_amount:
+                        return Response({'message': 'Invalid amount.'},
+                                        status=status.HTTP_400_BAD_REQUEST)
                     print(amount)
                 except KeyError:
                     print("key error")
@@ -1809,16 +1791,16 @@ def admin_initiate_big_time(request):
 @permission_classes([IsAuthenticated])
 @authentication_classes([BearerTokenAuthentication])
 def wallet_topup(request):
-    allowed_hosts = ['cloudhubgh.com', 'reseller.cloudhubgh.com']
-    request_host = request.headers.get('Host')
+    allowed_origins = ['https://reseller.cloudhubgh.com']
 
-    print(f"hosssssssssstttttttttttttttt issssssssssssss {request_host}")
+    if 'HTTP_ORIGIN' not in request.META:
+        return JsonResponse({'error': 'Origin header missing'}, status=400)
 
-    if request_host not in allowed_hosts:
-        response1 = requests.get(
-            f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to=0592117523&from=Bundle&sms=Invalid header host={request_host}")
-        print(response1.text)
-        return JsonResponse({'error': 'Host not allowed'}, status=403)
+    request_origin = request.META['HTTP_ORIGIN']
+    print(f"origiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnn issssssssssssssssssssssssssssssssssssssssss {request_origin}")
+
+    if request_origin not in allowed_origins:
+        return JsonResponse({'error': 'Origin not allowed'}, status=403)
     authorization_header = request.headers.get('Authorization')
     if authorization_header:
         auth_type, token = authorization_header.split(' ')
@@ -1838,10 +1820,10 @@ def wallet_topup(request):
                 allowed_ids = [
                     "eq5bk7lBvKUiXvJhY67B2Dd96RZ2", "xxWAltejVRU9eBHS3wtvL3HTbmE2", "9VA0qyq6lXYPZ6Ut867TVcBvF2t1",
                     "eq5bk7lBvKUiXvJhY67B2Dd96RZ2", "YvOWjIt9arboXcrOtxXEjbiVpZy1", "ajoExmDwsmQfkDlf1junWVU1SEt2",
-                    "7khtAAe7awOlRqOg3YYb1f7VTeE3", "Q0hDkakaiTMDuvbYsD65mYE9W773", "13xmcsrIiDdVu1EDEp23NBT6QYj1",
+                    "7khtAAe7awOlRqOg3YYb1f7VTeE3", "13xmcsrIiDdVu1EDEp23NBT6QYj1", "Q0hDkakaiTMDuvbYsD65mYE9W773",
                     "c0jyJW4MeqcEJ9LuJqhc7Rj4c9c2", "E4hsRsONxxNv27cQxNrIVC6xtL63", "7NvMDSUG4XcIzSNYs6LktMdo3X62",
                     "viRbi1VheufDqYJe2UGpy5WB3fA3", "jkzLTRl5cSWwIRdWJYCJFOK8iln1", "PqevIUYHlBhDoz6lpahssMjtqYH2",
-                    "utCfHk11tOcPteJKp4ASOR84On62"
+                    "lW57LDVdj9O6IV3gwfNoI3gCELN2", "utCfHk11tOcPteJKp4ASOR84On62", "zDPHNLUnGSbmUYIHRakT6xZHIqg2",
                 ]
 
                 if user_id not in allowed_ids:
@@ -2023,7 +2005,6 @@ def wallet_topup(request):
                 return Response({'error': 'Token does not exist.'}, status=status.HTTP_401_UNAUTHORIZED)
         else:
             return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
-
 
 
 def webhook_send_and_save_to_history(user_id, txn_type: str, paid_at: str, ishare_balance: float,
