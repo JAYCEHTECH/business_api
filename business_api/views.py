@@ -1809,7 +1809,7 @@ def admin_initiate_big_time(request):
 @permission_classes([IsAuthenticated])
 @authentication_classes([BearerTokenAuthentication])
 def wallet_topup(request):
-    allowed_hosts = ['cloudhubgh.com', 'reseller.cloudhubgh.com']
+    allowed_hosts = ['https://www.cloudhubgh.com', 'https://reseller.cloudhubgh.com']
     request_host = request.headers.get('Host')
 
     print(f"hosssssssssstttttttttttttttt issssssssssssss {request_host}")
