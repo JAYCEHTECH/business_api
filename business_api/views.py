@@ -477,6 +477,12 @@ def initiate_mtn_transaction(request):
                 amount = request.data.get('amount')
                 phone_number = request.data.get('phone_number')
 
+                protocol = request.data.get("protocol")
+
+                if protocol:
+                    if protocol != config("PROTOCOL"):
+                        return Response({"message": "Incorrect Protocol"}, status=status.HTTP_400_BAD_REQUEST)
+
                 if models.Blacklist.objects.filter(phone_number=str(receiver)).exists():
                     return Response({'message': 'Invalid Recipient.'},
                                     status=status.HTTP_400_BAD_REQUEST)
@@ -745,6 +751,11 @@ def admin_initiate_mtn_transaction(request):
                 reference = request.data.get('reference')
                 user_id = request.data.get('user_id')
                 amount = request.data.get('amount')
+                protocol = request.data.get("protocol")
+
+                if protocol:
+                    if protocol != config("PROTOCOL"):
+                        return Response({"message": "Incorrect Protocol"}, status=status.HTTP_400_BAD_REQUEST)
                 # phone_number = request.data.get('phone_number')
 
                 print(receiver)
@@ -997,6 +1008,12 @@ def initiate_ishare_transaction(request):
                 print(data_volume)
                 reference = request.data.get('reference')
                 amount = request.data.get('amount')
+
+                protocol = request.data.get("protocol")
+
+                if protocol:
+                    if protocol != config("PROTOCOL"):
+                        return Response({"message": "Incorrect Protocol"}, status=status.HTTP_400_BAD_REQUEST)
                 # phone_number = request.data.get('phone_number')
                 # channel = request.data.get('channel')
                 # txn_type = request.data.get('txn_type')
@@ -1241,6 +1258,12 @@ def admin_initiate_ishare_transaction(request):
                 reference = request.data.get('reference')
                 amount = request.data.get('amount')
                 user_id = request.data.get('user_id')
+
+                protocol = request.data.get("protocol")
+
+                if protocol:
+                    if protocol != config("PROTOCOL"):
+                        return Response({"message": "Incorrect Protocol"}, status=status.HTTP_400_BAD_REQUEST)
                 # phone_number = request.data.get('phone_number')
                 # channel = request.data.get('channel')
                 # txn_type = request.data.get('txn_type')
@@ -1512,6 +1535,12 @@ def initiate_big_time(request):
                 reference = request.data.get('reference')
                 print(data_volume, reference)
 
+                protocol = request.data.get("protocol")
+
+                if protocol:
+                    if protocol != config("PROTOCOL"):
+                        return Response({"message": "Incorrect Protocol"}, status=status.HTTP_400_BAD_REQUEST)
+
                 if models.Blacklist.objects.filter(phone_number=str(receiver)).exists():
                     return Response({'message': 'Invalid Recipient.'},
                                     status=status.HTTP_400_BAD_REQUEST)
@@ -1678,6 +1707,12 @@ def admin_initiate_big_time(request):
                 passed_amount = request.data.get('amount')
                 print(data_volume, reference)
 
+                protocol = request.data.get("protocol")
+
+                if protocol:
+                    if protocol != config("PROTOCOL"):
+                        return Response({"message": "Incorrect Protocol"}, status=status.HTTP_400_BAD_REQUEST)
+
                 print(receiver)
                 print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
                 for i in models.Blacklist.objects.all():
@@ -1838,6 +1873,12 @@ def wallet_topup(request):
                 reference = request.data.get('reference')
                 receiver_id = request.data.get('receiver_id')
                 user_id = request.data.get("user_id")
+
+                protocol = request.data.get("protocol")
+
+                if protocol:
+                    if protocol != config("PROTOCOL"):
+                        return Response({"message": "Incorrect Protocol"}, status=status.HTTP_400_BAD_REQUEST)
 
                 allowed_ids = [
                     "eq5bk7lBvKUiXvJhY67B2Dd96RZ2", "xxWAltejVRU9eBHS3wtvL3HTbmE2", "9VA0qyq6lXYPZ6Ut867TVcBvF2t1",
