@@ -724,16 +724,31 @@ def admin_initiate_mtn_transaction(request):
     #         f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to=0592117523&from=Bundle&sms=Invalid header host={request_host}")
     #     print(response1.text)
     #     return JsonResponse({'error': 'Host not allowed'}, status=403)
-    allowed_origins = ['https://reseller.cloudhubgh.com']
+    receiver = request.data.get('receiver')
+    data_volume = request.data.get('data_volume')
+    print(data_volume)
+    reference = request.data.get('reference')
+    user_id = request.data.get('user_id')
+    amount = request.data.get('amount')
+    protocol = request.data.get("protocol")
 
-    if 'HTTP_ORIGIN' not in request.META:
-        return JsonResponse({'error': 'Origin header missing'}, status=400)
+    if not protocol:
+        allowed_origins = ['https://reseller.cloudhubgh.com']
 
-    request_origin = request.META['HTTP_ORIGIN']
-    print(f"origiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnn issssssssssssssssssssssssssssssssssssssssss {request_origin}")
+        if 'HTTP_ORIGIN' not in request.META:
+            return JsonResponse({'error': 'Origin header missing'}, status=400)
 
-    if request_origin not in allowed_origins:
-        return JsonResponse({'error': 'Origin not allowed'}, status=403)
+        request_origin = request.META['HTTP_ORIGIN']
+        print(f"origiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnn issssssssssssssssssssssssssssssssssssssssss {request_origin}")
+
+        if request_origin not in allowed_origins:
+            return JsonResponse({'error': 'Origin not allowed'}, status=403)
+
+    if protocol:
+        if protocol != config("PROTOCOL"):
+            return Response({"message": "Incorrect Protocol"}, status=status.HTTP_400_BAD_REQUEST)
+    # phone_number = request.data.get('phone_number')
+
     authorization_header = request.headers.get('Authorization')
     if authorization_header:
         auth_type, token = authorization_header.split(' ')
@@ -744,19 +759,6 @@ def admin_initiate_mtn_transaction(request):
                 if token_key != config("TOKEN_KEY"):
                     return Response({'message': 'Authorisation Failed.'},
                                     status=status.HTTP_400_BAD_REQUEST)
-
-                receiver = request.data.get('receiver')
-                data_volume = request.data.get('data_volume')
-                print(data_volume)
-                reference = request.data.get('reference')
-                user_id = request.data.get('user_id')
-                amount = request.data.get('amount')
-                protocol = request.data.get("protocol")
-
-                if protocol:
-                    if protocol != config("PROTOCOL"):
-                        return Response({"message": "Incorrect Protocol"}, status=status.HTTP_400_BAD_REQUEST)
-                # phone_number = request.data.get('phone_number')
 
                 print(receiver)
                 print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
@@ -1236,16 +1238,23 @@ def admin_initiate_ishare_transaction(request):
     #         f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to=0592117523&from=Bundle&sms=Invalid header host={request_host}")
     #     print(response1.text)
     #     return JsonResponse({'error': 'Host not allowed'}, status=403)
-    allowed_origins = ['https://reseller.cloudhubgh.com']
+    protocol = request.data.get("protocol")
 
-    if 'HTTP_ORIGIN' not in request.META:
-        return JsonResponse({'error': 'Origin header missing'}, status=400)
+    if not protocol:
+        allowed_origins = ['https://reseller.cloudhubgh.com']
 
-    request_origin = request.META['HTTP_ORIGIN']
-    print(f"origiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnn issssssssssssssssssssssssssssssssssssssssss {request_origin}")
+        if 'HTTP_ORIGIN' not in request.META:
+            return JsonResponse({'error': 'Origin header missing'}, status=400)
 
-    if request_origin not in allowed_origins:
-        return JsonResponse({'error': 'Origin not allowed'}, status=403)
+        request_origin = request.META['HTTP_ORIGIN']
+        print(f"origiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnn issssssssssssssssssssssssssssssssssssssssss {request_origin}")
+
+        if request_origin not in allowed_origins:
+            return JsonResponse({'error': 'Origin not allowed'}, status=403)
+
+    if protocol:
+        if protocol != config("PROTOCOL"):
+            return Response({"message": "Incorrect Protocol"}, status=status.HTTP_400_BAD_REQUEST)
     authorization_header = request.headers.get('Authorization')
     if authorization_header:
         auth_type, token = authorization_header.split(' ')
@@ -1258,8 +1267,6 @@ def admin_initiate_ishare_transaction(request):
                 reference = request.data.get('reference')
                 amount = request.data.get('amount')
                 user_id = request.data.get('user_id')
-
-                protocol = request.data.get("protocol")
 
                 if protocol:
                     if protocol != config("PROTOCOL"):
@@ -1668,16 +1675,23 @@ def admin_initiate_big_time(request):
     #         f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to=0592117523&from=Bundle&sms=Invalid header host={request_host}")
     #     print(response1.text)
     #     return JsonResponse({'error': 'Host not allowed'}, status=403)
-    allowed_origins = ['https://reseller.cloudhubgh.com']
+    protocol = request.data.get("protocol")
 
-    if 'HTTP_ORIGIN' not in request.META:
-        return JsonResponse({'error': 'Origin header missing'}, status=400)
+    if not protocol:
+        allowed_origins = ['https://reseller.cloudhubgh.com']
 
-    request_origin = request.META['HTTP_ORIGIN']
-    print(f"origiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnn issssssssssssssssssssssssssssssssssssssssss {request_origin}")
+        if 'HTTP_ORIGIN' not in request.META:
+            return JsonResponse({'error': 'Origin header missing'}, status=400)
 
-    if request_origin not in allowed_origins:
-        return JsonResponse({'error': 'Origin not allowed'}, status=403)
+        request_origin = request.META['HTTP_ORIGIN']
+        print(f"origiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnn issssssssssssssssssssssssssssssssssssssssss {request_origin}")
+
+        if request_origin not in allowed_origins:
+            return JsonResponse({'error': 'Origin not allowed'}, status=403)
+
+    if protocol:
+        if protocol != config("PROTOCOL"):
+            return Response({"message": "Incorrect Protocol"}, status=status.HTTP_400_BAD_REQUEST)
     authorization_header = request.headers.get('Authorization')
     if authorization_header:
         auth_type, token = authorization_header.split(' ')
@@ -1707,7 +1721,6 @@ def admin_initiate_big_time(request):
                 passed_amount = request.data.get('amount')
                 print(data_volume, reference)
 
-                protocol = request.data.get("protocol")
 
                 if protocol:
                     if protocol != config("PROTOCOL"):
@@ -1848,16 +1861,22 @@ def admin_initiate_big_time(request):
 @permission_classes([IsAuthenticated])
 @authentication_classes([BearerTokenAuthentication])
 def wallet_topup(request):
-    allowed_origins = ['https://reseller.cloudhubgh.com']
+    protocol = request.data.get("protocol")
+    if not protocol:
+        allowed_origins = ['https://reseller.cloudhubgh.com']
 
-    if 'HTTP_ORIGIN' not in request.META:
-        return JsonResponse({'error': 'Origin header missing'}, status=400)
+        if 'HTTP_ORIGIN' not in request.META:
+            return JsonResponse({'error': 'Origin header missing'}, status=400)
 
-    request_origin = request.META['HTTP_ORIGIN']
-    print(f"origiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnn issssssssssssssssssssssssssssssssssssssssss {request_origin}")
+        request_origin = request.META['HTTP_ORIGIN']
+        print(f"origiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnn issssssssssssssssssssssssssssssssssssssssss {request_origin}")
 
-    if request_origin not in allowed_origins:
-        return JsonResponse({'error': 'Origin not allowed'}, status=403)
+        if request_origin not in allowed_origins:
+            return JsonResponse({'error': 'Origin not allowed'}, status=403)
+
+    if protocol:
+        if protocol != config("PROTOCOL"):
+            return Response({"message": "Incorrect Protocol"}, status=status.HTTP_400_BAD_REQUEST)
     authorization_header = request.headers.get('Authorization')
     if authorization_header:
         auth_type, token = authorization_header.split(' ')
@@ -1873,8 +1892,6 @@ def wallet_topup(request):
                 reference = request.data.get('reference')
                 receiver_id = request.data.get('receiver_id')
                 user_id = request.data.get("user_id")
-
-                protocol = request.data.get("protocol")
 
                 if protocol:
                     if protocol != config("PROTOCOL"):
