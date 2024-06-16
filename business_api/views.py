@@ -494,11 +494,11 @@ def initiate_mtn_transaction(request):
                 prices_dict = {
                     1000: 4.8,
                     2000: 9.5,
-                    3000: 14.0,
+                    3000: 15.0,
                     4000: 18.5,
                     5000: 23.0,
                     6000: 27.4,
-                    7000: 31.8,
+          #          7000: 31.8,
                     8000: 36.2,
                     10000: 42.0,
                     15000: 62.0,
@@ -506,8 +506,8 @@ def initiate_mtn_transaction(request):
                     25000: 103.0,
                     30000: 123.0,
                     40000: 165.0,
-                    50000: 195.0,
-                    100000: 385.0
+                    50000: 198.0,
+           #         100000: 385.0
                 }
 
                 amount_to_be_deducted = prices_dict[data_volume]
@@ -778,11 +778,11 @@ def admin_initiate_mtn_transaction(request):
                 prices_dict = {
                     1000: 4.8,
                     2000: 9.5,
-                    3000: 14.0,
+                    3000: 15.0,
                     4000: 18.5,
                     5000: 23.0,
                     6000: 27.4,
-                    7000: 31.8,
+           #         7000: 31.8,
                     8000: 36.2,
                     10000: 42.0,
                     15000: 62.0,
@@ -790,8 +790,8 @@ def admin_initiate_mtn_transaction(request):
                     25000: 103.0,
                     30000: 123.0,
                     40000: 165.0,
-                    50000: 195.0,
-                    100000: 385.0
+                    50000: 198.0,
+           #         100000: 385.0
                 }
                 print(amount)
                 amount_to_be_deducted = prices_dict[data_volume]
@@ -1904,6 +1904,7 @@ def wallet_topup(request):
                     "c0jyJW4MeqcEJ9LuJqhc7Rj4c9c2", "E4hsRsONxxNv27cQxNrIVC6xtL63", "7NvMDSUG4XcIzSNYs6LktMdo3X62",
                     "viRbi1VheufDqYJe2UGpy5WB3fA3", "jkzLTRl5cSWwIRdWJYCJFOK8iln1", "PqevIUYHlBhDoz6lpahssMjtqYH2",
                     "lW57LDVdj9O6IV3gwfNoI3gCELN2", "utCfHk11tOcPteJKp4ASOR84On62", "zDPHNLUnGSbmUYIHRakT6xZHIqg2",
+                    "CDH6FxY6sfYIAa87uoQudpbYinh2", "26mNhjpFsiWbULhSW8womcY9hu62"
                 ]
 
                 if user_id not in allowed_ids:
