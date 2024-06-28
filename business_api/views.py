@@ -79,6 +79,10 @@ def check_user_balance_against_price(user_id, price):
     details = get_user_details(user_id)
     wallet_balance = details['wallet']
     if wallet_balance is not None:
+        if float(wallet_balance) < 0:
+            return False
+        if float(wallet_balance) - float(price) < 0 or float(wallet_balance) - float(price) == 0:
+            return False
         return wallet_balance >= float(price)
     else:
         return None
