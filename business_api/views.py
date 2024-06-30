@@ -45,6 +45,7 @@ mail_collection = database.collection('mail')
 mtn_history = database.collection('MTN_Admin_History')
 mtn_tranx = mtn_history.document('mtnTransactions')
 big_time = mtn_tranx.collection('big_time')
+telecel = mtn_tranx.collection('telecel')
 mtn_other = mtn_tranx.collection('mtnOther')
 bearer_token_collection = database.collection("_KeysAndBearer")
 history_web = database.collection(u'History Web').document('all_users')
@@ -385,6 +386,140 @@ def big_time_transaction(receiver, date, time, date_and_time, phone, amount, dat
         'to': details['email'],
         'message': {
             'subject': 'Big Time Data',
+            'html': html_content,
+            'messageId': 'CloudHub GH'
+        }
+    })
+    return Response(data={'code': '0000', 'message': "Transaction Saved"}, status=status.HTTP_200_OK)
+
+
+def telecel_transaction(receiver, date, time, date_and_time, phone, amount, data_volume, details: dict, ref,
+                         channel, txn_status, user_id):
+    print("==========")
+    print(amount)
+    data = {
+        'batch_id': "unknown",
+        'buyer': phone,
+        'color_code': "Green",
+        'amount': amount,
+        'data_break_down': str(data_volume),
+        'data_volume': data_volume,
+        'date': date,
+        'date_and_time': date_and_time,
+        'done': "unknown",
+        'email': details['email'],
+        'image': details['user_id'],
+        'ishareBalance': 0,
+        'name': f"{details['first_name']} {details['last_name']}",
+        'number': receiver,
+        'paid_at': str(date_and_time),
+        'reference': ref,
+        'responseCode': 200,
+        'status': txn_status,
+        'time': time,
+        'tranxId': str(tranx_id_generator()),
+        'type': "TELECEL",
+        'uid': details['user_id']
+    }
+    history_collection.document(date_and_time).set(data)
+    history_web.collection(details['email']).document(date_and_time).set(data)
+    telecel.document(date_and_time).set(data)
+    user = history_collection.document(date_and_time)
+    doc = user.get()
+    print(doc.to_dict())
+    tranx_id = doc.to_dict()['tranxId']
+    mail_doc_ref = mail_collection.document()
+    file_path = 'business_api/mtn_maill.txt'  # Replace with your file path
+
+    name = details['first_name']
+    volume = data_volume
+    date = date_and_time
+    reference_t = ref
+    receiver_t = receiver
+
+    # tot = user_collection.document(user_id)
+    # print(tot.get().to_dict())
+    # try:
+    #     print(tot.get().to_dict()['bt_total_sales'])
+    #     previous_sale = tot.get().to_dict()['bt_total_sales']
+    #     print(f"Previous Sale: {previous_sale}")
+    #     new_sale = float(previous_sale) + float(amount)
+    #     print(new_sale)
+    #     user_collection.document(user_id).update({'bt_total_sales': new_sale})
+    # except:
+    #     user_collection.document(user_id).update({'bt_total_sales': amount})
+
+    # tat = cashback_collection.document(user_id)
+    # print(tat.get().to_dict())
+    #
+    # try:
+    #     previous_cashback = tat.get().to_dict()['cashback_wallet']
+    #     print(previous_cashback)
+    #     cashback_balance = (0.5 / 100) * float(amount)
+    #     print(cashback_balance)
+    #     new_cashback = float(previous_cashback) + float(cashback_balance)
+    #     print(new_cashback)
+    #     cashback_collection.document(user_id).update(
+    #         {'cashback_wallet': new_cashback, 'phone_number': phone})
+    # except TypeError as e:
+    #     print(e)
+    #     cashback_balance = (0.5 / 100) * float(amount)
+    #     print(cashback_balance)
+    #     cashback_collection.document(user_id).set(
+    #         {'cashback_wallet': cashback_balance, 'phone_number': phone})
+    #
+    #     print(cashback_collection.document(user_id).get().to_dict())
+    #     print("did")
+
+    # previous_big_time_totals = totals_collection.document('BIGTIME TOTALS')
+    # all_totals = totals_collection.document('ALL TOTALS')
+    # doc = previous_big_time_totals.get()
+    # doc_dict = doc.to_dict()
+    #
+    # previous_total_trans = doc_dict['total_trans']
+    # previous_total_amount = doc_dict['total_amount']
+    #
+    # all_total_doc = all_totals.get()
+    # all_total_doc_dict = all_total_doc.to_dict()
+    #
+    # previous_all_total_amount = all_total_doc_dict['total_amount']
+    #
+    # try:
+    #     new_total_amount = previous_total_amount + amount
+    # except:
+    #     new_total_amount = amount
+    #
+    # try:
+    #     new_total_trans = previous_total_trans + 1
+    # except:
+    #     new_total_trans = 1
+    #
+    # data = {
+    #     'total_trans': new_total_trans,
+    #     'total_amount': new_total_amount
+    # }
+    #
+    # totals_collection.document('BIGTIME TOTALS').update(data)
+    # totals_collection.document('ALL TOTALS').update({'total_amount': previous_all_total_amount + amount})
+
+    with open(file_path, 'r') as file:
+        html_content = file.read()
+
+    placeholders = {
+        '{name}': name,
+        '{volume}': volume,
+        '{date}': date,
+        '{reference}': reference_t,
+        '{receiver}': receiver_t
+    }
+
+    for placeholder, value in placeholders.items():
+        html_content = html_content.replace(placeholder, str(value))
+
+    mail_doc_ref.set({
+        'to': details['email'],
+        'message': {
+            'subject': 'Telecel Data',
             'html': html_content,
             'messageId': 'CloudHub GH'
         }
@@ -1814,6 +1949,203 @@ def admin_initiate_big_time(request):
                                                              channel="MoMo", phone=phone, ref=reference,
                                                              details=details, txn_status="Undelivered", user_id=user_id)
                     if big_time_response.status_code == 200 or big_time_response.data["code"] == "0000":
+                        if "wallet" == "wallet":
+                            print("updated")
+                            user = get_user_details(user_id)
+                            if user is None:
+                                return None
+                            previous_user_wallet = user['wallet']
+                            print(f"previous wallet: {previous_user_wallet}")
+                            new_balance = float(previous_user_wallet) - float(amount)
+                            print(f"new_balance:{new_balance}")
+                            doc_ref = user_collection.document(user_id)
+                            doc_ref.update({'wallet': new_balance})
+                            user = get_user_details(user_id)
+                            new_user_wallet = user['wallet']
+                            print(f"new_user_wallet: {new_user_wallet}")
+                            if new_user_wallet == previous_user_wallet:
+                                user = get_user_details(user_id)
+                                if user is None:
+                                    return None
+                                previous_user_wallet = user['wallet']
+                                print(f"previous wallet: {previous_user_wallet}")
+                                new_balance = float(previous_user_wallet) - float(amount)
+                                print(f"new_balance:{new_balance}")
+                                doc_ref = user_collection.document(user_id)
+                                doc_ref.update({'wallet': new_balance})
+                                user = get_user_details(user_id)
+                                new_user_wallet = user['wallet']
+                                print(f"new_user_wallet: {new_user_wallet}")
+                            else:
+                                print("it's fine")
+                        return Response(data={"status": "200", "message": "Transaction received successfully"},
+                                        status=status.HTTP_200_OK)
+                    else:
+                        return Response({"status": 400, "message": "Something went wrong"},
+                                        status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    return Response({"status": 400, 'message': 'Insufficient Balance'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                print(e)
+                return Response({"status": '400', 'message': f'Something went wrong: {e}'},
+                                status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+    else:
+        return Response({'error': 'Invalid Header Provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([BearerTokenAuthentication])
+def admin_initiate_telecel(request):
+    # allowed_hosts = ['cloudhubgh.com', 'reseller.cloudhubgh.com', "api.cloudhubgh.com", "merchant.cloudhubgh.com"]
+    # request_host = request.headers.get('Host')
+    #
+    # print(f"hosssssssssstttttttttttttttt issssssssssssss {request_host}")
+    #
+    # if request_host not in allowed_hosts:
+    #     response1 = requests.get(
+    #         f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to=0592117523&from=Bundle&sms=Invalid header host={request_host}")
+    #     print(response1.text)
+    #     return JsonResponse({'error': 'Host not allowed'}, status=403)
+    protocol = request.data.get("protocol")
+
+    if not protocol:
+        allowed_origins = ['https://reseller.cloudhubgh.com']
+
+        if 'HTTP_ORIGIN' not in request.META:
+            return JsonResponse({'error': 'Origin header missing'}, status=400)
+
+        request_origin = request.META['HTTP_ORIGIN']
+        print(f"origiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnn issssssssssssssssssssssssssssssssssssssssss {request_origin}")
+
+        if request_origin not in allowed_origins:
+            return JsonResponse({'error': 'Origin not allowed'}, status=403)
+
+    if protocol:
+        if protocol != config("PROTOCOL"):
+            return Response({"message": "Incorrect Protocol"}, status=status.HTTP_400_BAD_REQUEST)
+    authorization_header = request.headers.get('Authorization')
+    if authorization_header:
+        auth_type, token = authorization_header.split(' ')
+        if auth_type == 'Bearer':
+            try:
+                token_obj = Token.objects.get(key=token)
+                user = token_obj.user
+
+                print("hiiiii")
+
+                prices_dict = {
+                    30000: 80,
+                    40000: 100,
+                    50000: 120,
+                    80000: 200,
+                    100000: 230,
+                    200000: 450,
+                    500000: 1125,
+                    1000000: 2250
+                }
+
+                receiver = request.data.get('receiver')
+                print(receiver)
+                data_volume = request.data.get('data_volume')
+                reference = request.data.get('reference')
+                user_id = request.data.get('user_id')
+                passed_amount = request.data.get('amount')
+                print(data_volume, reference)
+
+                protocol = request.data.get("protocol")
+
+                if protocol:
+                    if protocol != config("PROTOCOL"):
+                        return Response({"message": "Incorrect Protocol"}, status=status.HTTP_400_BAD_REQUEST)
+
+                print(receiver)
+                print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+                for i in models.Blacklist.objects.all():
+                    print(i)
+                    if str(i) == str(receiver):
+                        return Response({'message': 'Invalid Recipient.'},
+                                        status=status.HTTP_400_BAD_REQUEST)
+
+                if models.Blacklist.objects.filter(phone_number=str(receiver)).exists():
+                    return Response({'message': 'Invalid Recipient.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
+                try:
+                    amount = prices_dict[data_volume]
+                    if amount != passed_amount:
+                        return Response({'message': 'Invalid amount.'},
+                                        status=status.HTTP_400_BAD_REQUEST)
+                    print(amount)
+                except KeyError:
+                    print("key error")
+                    return Response({'message': 'Check data volume parameter and try again.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+                print(amount)
+                # phone_number = request.data.get('phone_number')
+
+                print("yo")
+
+                if "wallet" == "wallet":
+                    print("used this")
+                    try:
+                        enough_balance = check_user_balance_against_price(user_id, amount)
+                    except:
+                        return Response(
+                            {'code': '0001', 'message': f'User ID does not exist: User ID provided: {user_id}.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    enough_balance = True
+                    print("not wallet")
+                print(enough_balance)
+                if enough_balance:
+
+                    if not receiver or not data_volume or not reference or not amount:
+                        return Response({'message': 'Body parameters not valid. Check and try again.'},
+                                        status=status.HTTP_400_BAD_REQUEST)
+
+                    token_obj = Token.objects.get(key=token)
+                    token_key = token_obj.key
+
+                    if token_key != config("TOKEN_KEY"):
+                        return Response({'message': 'Authorisation Failed.'},
+                                        status=status.HTTP_400_BAD_REQUEST)
+
+                    print("got here")
+                    user_details = get_user_details(user_id)
+                    print(user_details['first name'])
+
+                    date = datetime.datetime.now().strftime("%a, %b %d, %Y")
+                    time = datetime.datetime.now().strftime("%I:%M:%S %p")
+                    date_and_time = datetime.datetime.now().isoformat()
+
+                    if user_details is not None:
+                        print("yes")
+                        first_name = user_details['first name']
+                        print(first_name)
+                        last_name = user_details['last name']
+                        print(last_name)
+                        email = user_details['email']
+                        phone = user_details['phone']
+                    else:
+                        first_name = ""
+                        last_name = ""
+                        email = ""
+                        phone = ""
+                    details = {
+                        'first_name': first_name,
+                        'last_name': last_name,
+                        'email': email,
+                        'user_id': user_id
+                    }
+                    telecel_response = telecel_transaction(receiver=receiver, date_and_time=date_and_time, date=date,
+                                                             time=time, amount=amount, data_volume=data_volume,
+                                                             channel="MoMo", phone=phone, ref=reference,
+                                                             details=details, txn_status="Undelivered", user_id=user_id)
+                    if telecel.status_code == 200 or telecel.data["code"] == "0000":
                         if "wallet" == "wallet":
                             print("updated")
                             user = get_user_details(user_id)

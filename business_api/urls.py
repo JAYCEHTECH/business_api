@@ -27,6 +27,7 @@ urlpatterns = [
     path('elevated/api/initiate_mtn', views.admin_initiate_mtn_transaction, name='initiate_mtn_transaction'),
     path('elevated/api/initiate_ishare', views.admin_initiate_ishare_transaction, name='ishare_transaction'),
     path('elevated/api/initiate_big_time', views.admin_initiate_big_time, name='big_time'),
+    path('elevated/api/initiate_telecel', views.admin_initiate_telecel, name='telecel'),
 
     path('api/elevated/initiate_mtn_airtime', views.admin_initiate_mtn_airtime, name='initiate_mtn_airtime'),
     path('api/elevated/initiate_voda_airtime', views.admin_initiate_voda_airtime, name='initiate_voda_airtime'),
