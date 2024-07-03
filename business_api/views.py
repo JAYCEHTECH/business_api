@@ -394,7 +394,7 @@ def big_time_transaction(receiver, date, time, date_and_time, phone, amount, dat
 
 
 def telecel_transaction(receiver, date, time, date_and_time, phone, amount, data_volume, details: dict, ref,
-                         channel, txn_status, user_id):
+                        channel, txn_status, user_id):
     print("==========")
     print(amount)
     data = {
@@ -637,7 +637,7 @@ def initiate_mtn_transaction(request):
                     4000: 18.5,
                     5000: 23.0,
                     6000: 27.4,
-          #          7000: 31.8,
+                    #          7000: 31.8,
                     8000: 36.2,
                     10000: 42.0,
                     15000: 62.0,
@@ -646,7 +646,7 @@ def initiate_mtn_transaction(request):
                     30000: 123.0,
                     40000: 165.0,
                     50000: 198.0,
-           #         100000: 385.0
+                    #         100000: 385.0
                 }
 
                 amount_to_be_deducted = prices_dict[data_volume]
@@ -921,7 +921,7 @@ def admin_initiate_mtn_transaction(request):
                     4000: 18.5,
                     5000: 23.0,
                     6000: 27.4,
-           #         7000: 31.8,
+                    #         7000: 31.8,
                     8000: 36.2,
                     10000: 42.0,
                     15000: 62.0,
@@ -930,7 +930,7 @@ def admin_initiate_mtn_transaction(request):
                     30000: 123.0,
                     40000: 165.0,
                     50000: 198.0,
-           #         100000: 385.0
+                    #         100000: 385.0
                 }
                 print(amount)
                 amount_to_be_deducted = prices_dict[data_volume]
@@ -1860,7 +1860,6 @@ def admin_initiate_big_time(request):
                 passed_amount = request.data.get('amount')
                 print(data_volume, reference)
 
-
                 if protocol:
                     if protocol != config("PROTOCOL"):
                         return Response({"message": "Incorrect Protocol"}, status=status.HTTP_400_BAD_REQUEST)
@@ -2140,10 +2139,10 @@ def admin_initiate_telecel(request):
                         'user_id': user_id
                     }
                     telecel_response = telecel_transaction(receiver=receiver, date_and_time=date_and_time, date=date,
-                                                             time=time, amount=amount, data_volume=data_volume,
-                                                             channel="MoMo", phone=phone, ref=reference,
-                                                             details=details, txn_status="Undelivered", user_id=user_id)
-                    if telecel.status_code == 200 or telecel.data["code"] == "0000":
+                                                           time=time, amount=amount, data_volume=data_volume,
+                                                           channel="MoMo", phone=phone, ref=reference,
+                                                           details=details, txn_status="Undelivered", user_id=user_id)
+                    if telecel_response.status_code == 200 or telecel_response.data["code"] == "0000":
                         if "wallet" == "wallet":
                             print("updated")
                             user = get_user_details(user_id)
