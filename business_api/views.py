@@ -1788,6 +1788,7 @@ def initiate_big_time(request):
                         return Response({"status": 400, "message": "Insufficient balance"},
                                         status=status.HTTP_400_BAD_REQUEST)
                 else:
+                    print("not enough balance")
                     return Response({"status": '400', 'message': 'Something went wrong'},
                                     status=status.HTTP_400_BAD_REQUEST)
             except Exception as e:
