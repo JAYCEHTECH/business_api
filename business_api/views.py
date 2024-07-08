@@ -913,8 +913,7 @@ def admin_initiate_mtn_transaction(request):
                 if not receiver or not data_volume or not reference or not amount or not user_id:
                     return Response({'message': 'Body parameters not valid. Check and try again.'},
                                     status=status.HTTP_400_BAD_REQUEST)
-
-              prices_dict = {
+                prices_dict = {
                     1000: 4.5,
                     2000: 9.0,
                     3000: 13.0,
