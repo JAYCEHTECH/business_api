@@ -2012,12 +2012,12 @@ def initiate_telecel(request):
                 print("hiiiii")
 
                 prices_dict = {
-                    30000: 80,
-                    40000: 100,
-                    50000: 120,
-                    80000: 200,
-                    100000: 230,
-                    200000: 450,
+                    5000: 21,
+                    10000: 39,
+                    20000: 77,
+                    30000: 113,
+                    40000: 150,
+                    50000: 185,
                 }
 
                 receiver = request.data.get('receiver')
