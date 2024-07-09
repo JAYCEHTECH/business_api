@@ -13,6 +13,7 @@ urlpatterns = [
     path('api/initiate_mtn', views.initiate_mtn_transaction, name='initiate_mtn_transaction'),
     path('api/initiate_ishare', views.initiate_ishare_transaction, name='ishare_transaction'),
     path('api/initiate_big_time', views.initiate_big_time, name='big_time'),
+    path('api/initiate_telecel', views.initiate_telecel, name='telecel'),
     path('api/initiate_wallet_topup', views.wallet_topup, name='wallet_topup'),
 
     path('hubtel_webhook', views.hubtel_webhook, name='hubtel_webhook'),
