@@ -1611,7 +1611,7 @@ def admin_initiate_ishare_transaction(request):
                         "emailTo": [email],
                         "emailFrom": "support@cloudhubgh.com",
                         "emailBody": mail_content,
-                        "senderName": "Cloudhub GH",
+                        "senderName": "CloudHub GH",
                         "subject": "Payment Received",
                         "callBackUrl": "",
                         "html": mail_content,  # Use the content of mail.txt with replaced placeholders
@@ -2532,7 +2532,7 @@ def wallet_topup(request):
                     "c0jyJW4MeqcEJ9LuJqhc7Rj4c9c2", "E4hsRsONxxNv27cQxNrIVC6xtL63", "7NvMDSUG4XcIzSNYs6LktMdo3X62",
                     "viRbi1VheufDqYJe2UGpy5WB3fA3", "jkzLTRl5cSWwIRdWJYCJFOK8iln1", "PqevIUYHlBhDoz6lpahssMjtqYH2",
                     "lW57LDVdj9O6IV3gwfNoI3gCELN2", "utCfHk11tOcPteJKp4ASOR84On62", "zDPHNLUnGSbmUYIHRakT6xZHIqg2",
-                    "CDH6FxY6sfYIAa87uoQudpbYinh2", "26mNhjpFsiWbULhSW8womcY9hu62"
+                    "CDH6FxY6sfYIAa87uoQudpbYinh2", "26mNhjpFsiWbULhSW8womcY9hu62", "3nGpzLdhQQZx7ZAo5uBsBPcHXF93"
                 ]
 
                 if user_id not in allowed_ids:
