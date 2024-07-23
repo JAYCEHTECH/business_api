@@ -1101,32 +1101,32 @@ def admin_initiate_mtn_transaction(request):
                     channel = "MTN MASTER BUNDLE"
 
                     # Read the email template from mail.txt and replace placeholders
-                    with open(file_path, 'r') as file:
-                        mail_content = file.read()
-                        mail_content = mail_content.replace("{{bundle_amount}}", bundle_amount)
-                        mail_content = mail_content.replace("{{amount}}", amount)
-                        mail_content = mail_content.replace("{{name}}", name)
-                        mail_content = mail_content.replace("{{channel}}", channel)
-                        mail_content = mail_content.replace("{{date}}", date)
-                        mail_content = mail_content.replace("{{reference}}", reference_t)
+                    # with open(file_path, 'r') as file:
+                    #     mail_content = file.read()
+                    #     mail_content = mail_content.replace("{{bundle_amount}}", bundle_amount)
+                    #     mail_content = mail_content.replace("{{amount}}", amount)
+                    #     mail_content = mail_content.replace("{{name}}", name)
+                    #     mail_content = mail_content.replace("{{channel}}", channel)
+                    #     mail_content = mail_content.replace("{{date}}", date)
+                    #     mail_content = mail_content.replace("{{reference}}", reference_t)
 
-                    url = "https://email.nalosolutions.com/smsbackend/clientapi/Nal_resl/send-email/"
+                    # url = "https://email.nalosolutions.com/smsbackend/clientapi/Nal_resl/send-email/"
 
-                    payload = {
-                        "key": "n)p3@tf0hrdxljmcz8gq51drmmcz2wpj@nr9#3m3123(@5sam_1jrh58n08t(rge",
-                        "emailTo": [email],
-                        "emailFrom": "support@cloudhubgh.com",
-                        "emailBody": mail_content,
-                        "senderName": "Cloudhub GH",
-                        "subject": "Payment Received",
-                        "callBackUrl": "",
-                        "html": mail_content,  # Use the content of mail.txt with replaced placeholders
-                    }
-                    headers = {}
+                    # payload = {
+                    #     "key": "n)p3@tf0hrdxljmcz8gq51drmmcz2wpj@nr9#3m3123(@5sam_1jrh58n08t(rge",
+                    #     "emailTo": [email],
+                    #     "emailFrom": "support@cloudhubgh.com",
+                    #     "emailBody": mail_content,
+                    #     "senderName": "Cloudhub GH",
+                    #     "subject": "Payment Received",
+                    #     "callBackUrl": "",
+                    #     "html": mail_content,  # Use the content of mail.txt with replaced placeholders
+                    # }
+                    # headers = {}
 
-                    response = requests.request("POST", url, headers=headers, data=payload)
+                    # response = requests.request("POST", url, headers=headers, data=payload)
 
-                    print(response.text)
+                    # print(response.text)
 
                     # with open(file_path, 'r') as file:
                     #     html_content = file.read()
@@ -1595,32 +1595,32 @@ def admin_initiate_ishare_transaction(request):
                     channel = "AT PREMIUM BUNDLE"
 
                     # Read the email template from mail.txt and replace placeholders
-                    with open(file_path, 'r') as file:
-                        mail_content = file.read()
-                        mail_content = mail_content.replace("{{bundle_amount}}", bundle_amount)
-                        mail_content = mail_content.replace("{{amount}}", amount)
-                        mail_content = mail_content.replace("{{name}}", name)
-                        mail_content = mail_content.replace("{{channel}}", channel)
-                        mail_content = mail_content.replace("{{date}}", date)
-                        mail_content = mail_content.replace("{{reference}}", reference_t)
+                    # with open(file_path, 'r') as file:
+                    #     mail_content = file.read()
+                    #     mail_content = mail_content.replace("{{bundle_amount}}", bundle_amount)
+                    #     mail_content = mail_content.replace("{{amount}}", amount)
+                    #     mail_content = mail_content.replace("{{name}}", name)
+                    #     mail_content = mail_content.replace("{{channel}}", channel)
+                    #     mail_content = mail_content.replace("{{date}}", date)
+                    #     mail_content = mail_content.replace("{{reference}}", reference_t)
 
-                    url = "https://email.nalosolutions.com/smsbackend/clientapi/Nal_resl/send-email/"
+                    # url = "https://email.nalosolutions.com/smsbackend/clientapi/Nal_resl/send-email/"
 
-                    payload = {
-                        "key": "n)p3@tf0hrdxljmcz8gq51drmmcz2wpj@nr9#3m3123(@5sam_1jrh58n08t(rge",
-                        "emailTo": [email],
-                        "emailFrom": "support@cloudhubgh.com",
-                        "emailBody": mail_content,
-                        "senderName": "CloudHub GH",
-                        "subject": "Payment Received",
-                        "callBackUrl": "",
-                        "html": mail_content,  # Use the content of mail.txt with replaced placeholders
-                    }
-                    headers = {}
+                    # payload = {
+                    #     "key": "n)p3@tf0hrdxljmcz8gq51drmmcz2wpj@nr9#3m3123(@5sam_1jrh58n08t(rge",
+                    #     "emailTo": [email],
+                    #     "emailFrom": "support@cloudhubgh.com",
+                    #     "emailBody": mail_content,
+                    #     "senderName": "CloudHub GH",
+                    #     "subject": "Payment Received",
+                    #     "callBackUrl": "",
+                    #     "html": mail_content,  # Use the content of mail.txt with replaced placeholders
+                    # }
+                    # headers = {}
 
-                    response = requests.request("POST", url, headers=headers, data=payload)
+                    # response = requests.request("POST", url, headers=headers, data=payload)
 
-                    print(response.text)
+                    # print(response.text)
                     # file_path = 'business_api/mail.txt'  # Replace with your file path
                     #
                     # name = user_details["first name"]
@@ -2057,32 +2057,32 @@ def admin_initiate_big_time(request):
                             channel = "AT Big Time"
 
                             # Read the email template from mail.txt and replace placeholders
-                            with open(file_path, 'r') as file:
-                                mail_content = file.read()
-                                mail_content = mail_content.replace("{{bundle_amount}}", bundle_amount)
-                                mail_content = mail_content.replace("{{amount}}", str(amount))
-                                mail_content = mail_content.replace("{{name}}", name)
-                                mail_content = mail_content.replace("{{channel}}", channel)
-                                mail_content = mail_content.replace("{{date}}", date)
-                                mail_content = mail_content.replace("{{reference}}", reference_t)
+                            # with open(file_path, 'r') as file:
+                            #     mail_content = file.read()
+                            #     mail_content = mail_content.replace("{{bundle_amount}}", bundle_amount)
+                            #     mail_content = mail_content.replace("{{amount}}", str(amount))
+                            #     mail_content = mail_content.replace("{{name}}", name)
+                            #     mail_content = mail_content.replace("{{channel}}", channel)
+                            #     mail_content = mail_content.replace("{{date}}", date)
+                            #     mail_content = mail_content.replace("{{reference}}", reference_t)
 
-                            url = "https://email.nalosolutions.com/smsbackend/clientapi/Nal_resl/send-email/"
+                            # url = "https://email.nalosolutions.com/smsbackend/clientapi/Nal_resl/send-email/"
 
-                            payload = {
-                                "key": "n)p3@tf0hrdxljmcz8gq51drmmcz2wpj@nr9#3m3123(@5sam_1jrh58n08t(rge",
-                                "emailTo": [email],
-                                "emailFrom": "support@cloudhubgh.com",
-                                "emailBody": mail_content,
-                                "senderName": "Cloudhub GH",
-                                "subject": "Payment Received",
-                                "callBackUrl": "",
-                                "html": mail_content,  # Use the content of mail.txt with replaced placeholders
-                            }
-                            headers = {}
+                            # payload = {
+                            #     "key": "n)p3@tf0hrdxljmcz8gq51drmmcz2wpj@nr9#3m3123(@5sam_1jrh58n08t(rge",
+                            #     "emailTo": [email],
+                            #     "emailFrom": "support@cloudhubgh.com",
+                            #     "emailBody": mail_content,
+                            #     "senderName": "Cloudhub GH",
+                            #     "subject": "Payment Received",
+                            #     "callBackUrl": "",
+                            #     "html": mail_content,  # Use the content of mail.txt with replaced placeholders
+                            # }
+                            # headers = {}
 
-                            response = requests.request("POST", url, headers=headers, data=payload)
+                            # response = requests.request("POST", url, headers=headers, data=payload)
 
-                            print(response.text)
+                            # print(response.text)
                         return Response(data={"status": "200", "message": "Transaction received successfully"},
                                         status=status.HTTP_200_OK)
                     else:
@@ -2441,32 +2441,32 @@ def admin_initiate_telecel(request):
                             channel = "TELECEL"
 
                             # Read the email template from mail.txt and replace placeholders
-                            with open(file_path, 'r') as file:
-                                mail_content = file.read()
-                                mail_content = mail_content.replace("{{bundle_amount}}", bundle_amount)
-                                mail_content = mail_content.replace("{{amount}}", str(amount))
-                                mail_content = mail_content.replace("{{name}}", name)
-                                mail_content = mail_content.replace("{{channel}}", channel)
-                                mail_content = mail_content.replace("{{date}}", date)
-                                mail_content = mail_content.replace("{{reference}}", reference_t)
+                            # with open(file_path, 'r') as file:
+                            #     mail_content = file.read()
+                            #     mail_content = mail_content.replace("{{bundle_amount}}", bundle_amount)
+                            #     mail_content = mail_content.replace("{{amount}}", str(amount))
+                            #     mail_content = mail_content.replace("{{name}}", name)
+                            #     mail_content = mail_content.replace("{{channel}}", channel)
+                            #     mail_content = mail_content.replace("{{date}}", date)
+                            #     mail_content = mail_content.replace("{{reference}}", reference_t)
 
-                            url = "https://email.nalosolutions.com/smsbackend/clientapi/Nal_resl/send-email/"
+                            # url = "https://email.nalosolutions.com/smsbackend/clientapi/Nal_resl/send-email/"
 
-                            payload = {
-                                "key": "n)p3@tf0hrdxljmcz8gq51drmmcz2wpj@nr9#3m3123(@5sam_1jrh58n08t(rge",
-                                "emailTo": [email],
-                                "emailFrom": "support@cloudhubgh.com",
-                                "emailBody": mail_content,
-                                "senderName": "Cloudhub GH",
-                                "subject": "Payment Received",
-                                "callBackUrl": "",
-                                "html": mail_content,  # Use the content of mail.txt with replaced placeholders
-                            }
-                            headers = {}
+                            # payload = {
+                            #     "key": "n)p3@tf0hrdxljmcz8gq51drmmcz2wpj@nr9#3m3123(@5sam_1jrh58n08t(rge",
+                            #     "emailTo": [email],
+                            #     "emailFrom": "support@cloudhubgh.com",
+                            #     "emailBody": mail_content,
+                            #     "senderName": "Cloudhub GH",
+                            #     "subject": "Payment Received",
+                            #     "callBackUrl": "",
+                            #     "html": mail_content,  # Use the content of mail.txt with replaced placeholders
+                            # }
+                            # headers = {}
 
-                            response = requests.request("POST", url, headers=headers, data=payload)
+                            # response = requests.request("POST", url, headers=headers, data=payload)
 
-                            print(response.text)
+                            # print(response.text)
                         return Response(data={"status": "200", "message": "Transaction received successfully"},
                                         status=status.HTTP_200_OK)
                     else:
