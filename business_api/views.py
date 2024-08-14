@@ -52,7 +52,8 @@ history_web = database.collection(u'History Web').document('all_users')
 
 totals_collection = database.collection('Totals')
 admin_collection = database.collection('Admin')
-
+allowed_users_collection_name = 'customer_database'
+allowed_users_doc_ref = database.collection(allowed_users_collection_name)
 
 class BearerTokenAuthentication(TokenAuthentication):
     keyword = 'Bearer'
@@ -630,6 +631,18 @@ def initiate_mtn_transaction(request):
                     return Response({'message': 'Body parameters not valid. Check and try again.'},
                                     status=status.HTTP_400_BAD_REQUEST)
 
+                if models.MTNToggle.objects.filter().first().allowed_active:
+                    doc_0 = allowed_users_doc_ref.document(str(receiver))
+                    doc = doc_0.get()
+                    if doc.exists():
+                        doc_to_dict = doc.to_dict()
+                        print(doc_to_dict)
+                        pass
+                    else:
+                        return Response({"message": "Incorrect receiver"}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    print("not active")
+
                 prices_dict = {
                     1000: 4.5,
                     2000: 9.0,
@@ -871,6 +884,7 @@ def admin_initiate_mtn_transaction(request):
     amount = request.data.get('amount')
     protocol = request.data.get("protocol")
 
+
     if not protocol:
         allowed_origins = ['https://reseller.cloudhubgh.com']
 
@@ -887,6 +901,18 @@ def admin_initiate_mtn_transaction(request):
         if protocol != config("PROTOCOL"):
             return Response({"message": "Incorrect Protocol"}, status=status.HTTP_400_BAD_REQUEST)
     # phone_number = request.data.get('phone_number')
+
+    if models.MTNToggle.objects.filter().first().allowed_active:
+        doc_0 = allowed_users_doc_ref.document(str(receiver))
+        doc = doc_0.get()
+        if doc.exists():
+            doc_to_dict = doc.to_dict()
+            print(doc_to_dict)
+            pass
+        else:
+            return Response({"message": "Incorrect receiver"}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        print("not active")
 
     authorization_header = request.headers.get('Authorization')
     if authorization_header:
