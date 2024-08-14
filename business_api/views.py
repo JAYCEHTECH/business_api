@@ -631,17 +631,17 @@ def initiate_mtn_transaction(request):
                     return Response({'message': 'Body parameters not valid. Check and try again.'},
                                     status=status.HTTP_400_BAD_REQUEST)
 
-                if models.MTNToggle.objects.filter().first().allowed_active:
-                    doc_0 = allowed_users_doc_ref.document(str(receiver))
-                    doc = doc_0.get()
-                    if doc.exists():
-                        doc_to_dict = doc.to_dict()
-                        print(doc_to_dict)
-                        pass
-                    else:
-                        return Response({"message": "Incorrect receiver"}, status=status.HTTP_400_BAD_REQUEST)
-                else:
-                    print("not active")
+                # if models.MTNToggle.objects.filter().first().allowed_active:
+                #     doc_0 = allowed_users_doc_ref.document(str(receiver))
+                #     doc = doc_0.get()
+                #     if doc.exists():
+                #         doc_to_dict = doc.to_dict()
+                #         print(doc_to_dict)
+                #         pass
+                #     else:
+                #         return Response({"message": "Incorrect receiver"}, status=status.HTTP_400_BAD_REQUEST)
+                # else:
+                #     print("not active")
 
                 prices_dict = {
                     1000: 4.5,
@@ -902,17 +902,17 @@ def admin_initiate_mtn_transaction(request):
             return Response({"message": "Incorrect Protocol"}, status=status.HTTP_400_BAD_REQUEST)
     # phone_number = request.data.get('phone_number')
 
-    if models.MTNToggle.objects.filter().first().allowed_active:
-        doc_0 = allowed_users_doc_ref.document(str(receiver))
-        doc = doc_0.get()
-        if doc.exists():
-            doc_to_dict = doc.to_dict()
-            print(doc_to_dict)
-            pass
-        else:
-            return Response({"message": "Incorrect receiver"}, status=status.HTTP_400_BAD_REQUEST)
-    else:
-        print("not active")
+    # if models.MTNToggle.objects.filter().first().allowed_active:
+    #     doc_0 = allowed_users_doc_ref.document(str(receiver))
+    #     doc = doc_0.get()
+    #     if doc.exists():
+    #         doc_to_dict = doc.to_dict()
+    #         print(doc_to_dict)
+    #         pass
+    #     else:
+    #         return Response({"message": "Incorrect receiver"}, status=status.HTTP_400_BAD_REQUEST)
+    # else:
+    #     print("not active")
 
     authorization_header = request.headers.get('Authorization')
     if authorization_header:
