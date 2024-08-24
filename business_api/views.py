@@ -633,13 +633,22 @@ def initiate_mtn_transaction(request):
                                     status=status.HTTP_400_BAD_REQUEST)
 
                 if models.MTNToggle.objects.filter().first().allowed_active:
+                    print(
+                        "activvvvvvvvvvvvvvvvvvvvvveeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
                     doc_0 = allowed_users_doc_ref.document(str(receiver))
                     doc = doc_0.get()
                     if doc.exists:
                         doc_to_dict = doc.to_dict()
                         print(doc_to_dict)
+                        if str(doc_to_dict['number'] == str(receiver)):
+                            print("matches number in customner db")
+                        else:
+                            print("did not match")
+                            return Response({"message": "Incorrect receiver"}, status=status.HTTP_400_BAD_REQUEST)
+                        print("number was available in the search")
                         pass
                     else:
+                        print("number was not available in db")
                         return Response({"message": "Incorrect receiver"}, status=status.HTTP_400_BAD_REQUEST)
                 else:
                     print("not active")
