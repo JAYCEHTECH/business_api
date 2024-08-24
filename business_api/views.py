@@ -55,6 +55,7 @@ admin_collection = database.collection('Admin')
 allowed_users_collection_name = 'customer_database'
 allowed_users_doc_ref = database.collection(allowed_users_collection_name)
 
+
 class BearerTokenAuthentication(TokenAuthentication):
     keyword = 'Bearer'
 
@@ -884,7 +885,6 @@ def admin_initiate_mtn_transaction(request):
     amount = request.data.get('amount')
     protocol = request.data.get("protocol")
 
-
     if not protocol:
         allowed_origins = ['https://reseller.cloudhubgh.com']
 
@@ -903,13 +903,22 @@ def admin_initiate_mtn_transaction(request):
     # phone_number = request.data.get('phone_number')
 
     if models.MTNToggle.objects.filter().first().allowed_active:
+        print(
+            "activvvvvvvvvvvvvvvvvvvvvveeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
         doc_0 = allowed_users_doc_ref.document(str(receiver))
         doc = doc_0.get()
         if doc.exists:
             doc_to_dict = doc.to_dict()
             print(doc_to_dict)
+            if str(doc_to_dict['number'] == str(receiver)):
+                print("matches number in customner db")
+            else:
+                print("did not match")
+                return Response({"message": "Incorrect receiver"}, status=status.HTTP_400_BAD_REQUEST)
+            print("number was available in the search")
             pass
         else:
+            print("number was not available in db")
             return Response({"message": "Incorrect receiver"}, status=status.HTTP_400_BAD_REQUEST)
     else:
         print("not active")
@@ -2226,9 +2235,9 @@ def initiate_telecel(request):
                         'user_id': user_id
                     }
                     telecel_response = telecel_transaction(receiver=receiver, date_and_time=date_and_time, date=date,
-                                                             time=time, amount=amount, data_volume=data_volume,
-                                                             channel="MoMo", phone=phone, ref=reference,
-                                                             details=details, txn_status="Undelivered", user_id=user_id)
+                                                           time=time, amount=amount, data_volume=data_volume,
+                                                           channel="MoMo", phone=phone, ref=reference,
+                                                           details=details, txn_status="Undelivered", user_id=user_id)
                     if telecel_response.status_code == 200 or telecel_response.data["code"] == "0000":
                         if "wallet" == "wallet":
                             print("updated")
