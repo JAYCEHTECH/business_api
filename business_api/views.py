@@ -634,7 +634,7 @@ def initiate_mtn_transaction(request):
                 if models.MTNToggle.objects.filter().first().allowed_active:
                     doc_0 = allowed_users_doc_ref.document(str(receiver))
                     doc = doc_0.get()
-                    if doc.exists():
+                    if doc.exists:
                         doc_to_dict = doc.to_dict()
                         print(doc_to_dict)
                         pass
@@ -905,7 +905,7 @@ def admin_initiate_mtn_transaction(request):
     if models.MTNToggle.objects.filter().first().allowed_active:
         doc_0 = allowed_users_doc_ref.document(str(receiver))
         doc = doc_0.get()
-        if doc.exists():
+        if doc.exists:
             doc_to_dict = doc.to_dict()
             print(doc_to_dict)
             pass
