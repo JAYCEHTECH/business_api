@@ -643,6 +643,7 @@ def initiate_mtn_transaction(request):
                         if str(doc_to_dict['number'] == str(receiver)):
                             print("matches number in customner db")
                         else:
+
                             print("did not match")
                             return Response({"message": "Incorrect receiver"}, status=status.HTTP_400_BAD_REQUEST)
                         print("number was available in the search")
