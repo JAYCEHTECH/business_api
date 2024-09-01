@@ -32,7 +32,8 @@ ALLOWED_HOSTS = [
     'merchant-nz2nc.ondigitalocean.app',
     'merchant.cloudhubgh.com',
     'localhost',
-    '127.0.0.1'
+    '127.0.0.1',
+    'bestpay-flutter.web.app'
 ]
 
 
@@ -77,7 +78,8 @@ CORS_ALLOWED_ORIGINS = [  # Replace with your allowed domain(s)
     'https://cloudhubgh-refreshed.web.app',
     'https://www.cloudhubgh.com',
     'https://reseller.cloudhubgh.com',
-    'https://merchant-wvwod.ondigitalocean.app'
+    'https://merchant-wvwod.ondigitalocean.app',
+    'https://bestpay-flutter.web.app'
 ]
 
 CORS_ALLOW_METHODS = [
