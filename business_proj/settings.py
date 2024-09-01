@@ -32,7 +32,8 @@ ALLOWED_HOSTS = [
     'merchant-nz2nc.ondigitalocean.app',
     'merchant.cloudhubgh.com',
     'localhost',
-    '127.0.0.1'
+    '127.0.0.1',
+    'bestpay-flutter.web.app'
 ]
 
 
