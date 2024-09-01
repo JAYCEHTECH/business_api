@@ -1437,8 +1437,8 @@ def initiate_ishare_transaction(request):
                         #
                         #     print(cashback_collection.document(user_id).get().to_dict())
                         #     print("did")
-                        return Response(data={'status_code': response_code, "message": "Transaction Failed"},
-                                        status=status.HTTP_400_BAD_REQUEST)
+                        return Response(data={'status_code': response_code, "message": "Transaction Successful"},
+                                        status=status.HTTP_200_OK)
 
                     else:
                         return Response(data={'status_code': response_code, "message": "Transaction Failed"},
