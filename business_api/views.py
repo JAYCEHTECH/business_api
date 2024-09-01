@@ -118,34 +118,63 @@ def get_user_details(user_id):
 
 def send_ishare_bundle(first_name: str, last_name: str, buyer, receiver: str, email: str, bundle: float
                        ):
-    url = "https://backend.boldassure.net:445/live/api/context/business/transaction/new-transaction"
+    import uuid
+    transaction_reference = f"TXN-{uuid.uuid4().hex[:8].upper()}"
 
-    payload = json.dumps({
-        "accountNo": buyer,
-        "accountFirstName": first_name,
-        "accountLastName": last_name,
-        "accountMsisdn": receiver,
-        "accountEmail": email,
-        "accountVoiceBalance": 0,
-        "accountDataBalance": bundle,
-        "accountCashBalance": 0,
-        "active": True
-    })
+    url = "https://api.hubnet.app/send"
 
-    token = bearer_token_collection.document("Active_API_BoldAssure")
-    token_doc = token.get()
-    token_doc_dict = token_doc.to_dict()
-    tokennn = token_doc_dict['ishare_bearer']
-
+    # Header with the API key
     headers = {
-        'Authorization': tokennn,
-        'Content-Type': 'application/json'
+        "X-HUBNET-KEY": config("HUBNET_KEY"),
     }
 
-    response = requests.request("POST", url, headers=headers, data=payload)
-    print(
-        f"{response.json()} from first method +++++++++++++++++++++++++++++++++++++==========================================")
+    # Payload with transaction details
+    payload = {
+        "transaction_id": transaction_reference,
+        "volume": str(int(bundle)),
+        "recipient": str(receiver)
+    }
+
+    # Make the POST request
+    response = requests.post(url, headers=headers, json=payload)
+    data = response.json()
+    print(data)
+
+    if response.status_code == 200:
+        print("Request successful:", response.json())
+    else:
+        print("Request failed with status code:", response.status_code)
+        print("Response:", response.text)
+
     return response
+    # url = "https://backend.boldassure.net:445/live/api/context/business/transaction/new-transaction"
+    #
+    # payload = json.dumps({
+    #     "accountNo": buyer,
+    #     "accountFirstName": first_name,
+    #     "accountLastName": last_name,
+    #     "accountMsisdn": receiver,
+    #     "accountEmail": email,
+    #     "accountVoiceBalance": 0,
+    #     "accountDataBalance": bundle,
+    #     "accountCashBalance": 0,
+    #     "active": True
+    # })
+    #
+    # token = bearer_token_collection.document("Active_API_BoldAssure")
+    # token_doc = token.get()
+    # token_doc_dict = token_doc.to_dict()
+    # tokennn = token_doc_dict['ishare_bearer']
+    #
+    # headers = {
+    #     'Authorization': tokennn,
+    #     'Content-Type': 'application/json'
+    # }
+    #
+    # response = requests.request("POST", url, headers=headers, data=payload)
+    # print(
+    #     f"{response.json()} from first method +++++++++++++++++++++++++++++++++++++==========================================")
+    # return response
 
 
 def ishare_verification(batch_id):
@@ -220,16 +249,12 @@ def send_and_save_to_history(user_id,
     json_response = ishare_response.json()
     print(f"hello:{json_response}")
     print(ishare_response.status_code)
-    try:
-        batch_id = json_response["batchId"]
-    except KeyError:
-        batch_id = None
-    print(batch_id)
+    response_code = json_response["data"]["response_code"]
 
     doc_ref = history_collection.document(date_and_time)
-    doc_ref.update({'batch_id': batch_id, 'responseCode': ishare_response.status_code})
+    doc_ref.update({'batch_id': "Null", 'responseCode': response_code})
     history_web.collection(email).document(date_and_time).update(
-        {'batch_id': batch_id, 'responseCode': ishare_response.status_code})
+        {'batch_id': "Null", 'responseCode': response_code})
     # data = {
     #     'batch_id': batch_id,
     #     'buyer': phone,
@@ -1337,20 +1362,10 @@ def initiate_ishare_transaction(request):
                             data={'status_code': ishare_response.status_code, "message": "Authorization Failed"},
                             status=status.HTTP_400_BAD_REQUEST)
                     data = ishare_response.json()
-                    try:
-                        print("entered the try")
-                        batch_id = data["batchId"]
-                        print("batch id")
-                    except KeyError:
-                        print("key error")
-                        return Response(
-                            data={'status_code': ishare_response.status_code, "message": "Transaction Failed"},
-                            status=status.HTTP_400_BAD_REQUEST)
-                    print(data["batchId"])
-                    status_code = ishare_response.status_code
-                    if batch_id is None:
-                        print("batch id was none")
-                        return Response(data={'status_code': status_code, "message": "Transaction Failed"},
+
+                    response_code = data["data"]["response_code"]
+                    if response_code is not "200":
+                        return Response(data={'status_code': response_code, "message": "Transaction Failed"},
                                         status=status.HTTP_400_BAD_REQUEST)
 
                     sms = f"Your account has been credited with {data_volume}MB."
@@ -1359,7 +1374,7 @@ def initiate_ishare_transaction(request):
                     print(response.text)
                     doc_ref = history_collection.document(date_and_time)
                     doc_ref.update({'done': 'Successful'})
-                    mail_doc_ref = mail_collection.document(f"{batch_id}-Mail")
+                    mail_doc_ref = mail_collection.document(f"{reference}-Mail")
                     file_path = 'business_api/mail.txt'  # Replace with your file path
 
                     name = user["first name"]
@@ -1426,7 +1441,7 @@ def initiate_ishare_transaction(request):
                     #     print(cashback_collection.document(user_id).get().to_dict())
                     #     print("did")
 
-                    return Response(data={'status_code': status_code, 'batch_id': batch_id},
+                    return Response(data={'status_code': response_code, 'reference': reference},
                                     status=status.HTTP_200_OK)
                 else:
                     return Response(data={'status_code': 400, "message": "Not enough balance"},
@@ -1604,21 +1619,10 @@ def admin_initiate_ishare_transaction(request):
                             data={'status_code': ishare_response.status_code, "message": "Authorization Failed"},
                             status=status.HTTP_400_BAD_REQUEST)
                     data = ishare_response.json()
-                    try:
-                        print("entered the try")
-                        batch_id = data["batchId"]
-                        print("batch id")
-                    except KeyError:
-                        print("key error")
-                        return Response(
-                            data={'status_code': ishare_response.status_code, "message": "Transaction Failed"},
-                            status=status.HTTP_400_BAD_REQUEST)
-                    print(data["batchId"])
-                    status_code = ishare_response.status_code
-                    print(f"status codeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee: {status_code}")
-                    if batch_id is None:
-                        print("batch id was none")
-                        return Response(data={'status_code': status_code, "message": "Transaction Failed"},
+
+                    response_code = data["data"]["response_code"]
+                    if response_code is not "200":
+                        return Response(data={'status_code': response_code, "message": "Transaction Failed"},
                                         status=status.HTTP_400_BAD_REQUEST)
 
                     sms = f"Your account has been credited with {data_volume}MB."
@@ -1627,7 +1631,7 @@ def admin_initiate_ishare_transaction(request):
                     print(response.text)
                     doc_ref = history_collection.document(date_and_time)
                     doc_ref.update({'done': 'Successful'})
-                    mail_doc_ref = mail_collection.document(f"{batch_id}-Mail")
+                    mail_doc_ref = mail_collection.document(f"{reference}-Mail")
 
                     file_path = 'business_api/main_mail.txt'  # Replace with your file path
 
@@ -1732,7 +1736,7 @@ def admin_initiate_ishare_transaction(request):
                     #                         print(cashback_collection.document(user_id).get().to_dict())
                     #                         print("did")
 
-                    return Response(data={'status_code': status_code, 'batch_id': batch_id},
+                    return Response(data={'status_code': response_code, 'reference': reference},
                                     status=status.HTTP_200_OK)
                 else:
                     return Response(data={'status_code': 400, "message": "Not enough balance"},
