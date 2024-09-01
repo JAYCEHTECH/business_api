@@ -1364,85 +1364,85 @@ def initiate_ishare_transaction(request):
                     data = ishare_response.json()
 
                     response_code = data["data"]["response_code"]
-                    if response_code is not "200":
+                    if response_code == "200":
+                        sms = f"Your account has been credited with {data_volume}MB."
+                        r_sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to={receiver}&from=CloudHub GH&sms={sms}"
+                        response = requests.request("GET", url=r_sms_url)
+                        print(response.text)
+                        doc_ref = history_collection.document(date_and_time)
+                        doc_ref.update({'done': 'Successful'})
+                        mail_doc_ref = mail_collection.document(f"{reference}-Mail")
+                        file_path = 'business_api/mail.txt'  # Replace with your file path
+
+                        name = user["first name"]
+                        volume = data_volume
+                        date = date_and_time
+                        reference_t = reference
+                        receiver_t = receiver
+
+                        with open(file_path, 'r') as file:
+                            html_content = file.read()
+
+                        placeholders = {
+                            '{name}': name,
+                            '{volume}': volume,
+                            '{date}': date,
+                            '{reference}': reference_t,
+                            '{receiver}': receiver_t
+                        }
+
+                        for placeholder, value in placeholders.items():
+                            html_content = html_content.replace(placeholder, str(value))
+
+                        mail_doc_ref.set({
+                            'to': email,
+                            'message': {
+                                'subject': 'AT Flexi Bundle',
+                                'html': html_content,
+                                'messageId': 'CloudHub GH'
+                            }
+                        })
+
+                        # tot = user_collection.document(user_id)
+                        # print(tot.get().to_dict())
+                        # try:
+                        #     print(tot.get().to_dict()['at_total_sales'])
+                        #     previous_sale = tot.get().to_dict()['at_total_sales']
+                        #     print(f"Previous Sale: {previous_sale}")
+                        #     new_sale = float(previous_sale) + float(amount)
+                        #     print(new_sale)
+                        #     user_collection.document(user_id).update({'at_total_sales': new_sale})
+                        # except:
+                        #     user_collection.document(user_id).update({'at_total_sales': amount})
+
+                        # tat = cashback_collection.document(user_id)
+                        # print(tat.get().to_dict())
+                        #
+                        # try:
+                        #     previous_cashback = tat.get().to_dict()['cashback_wallet']
+                        #     print(previous_cashback)
+                        #     cashback_balance = (0.5 / 100) * float(amount)
+                        #     print(cashback_balance)
+                        #     new_cashback = float(previous_cashback) + float(cashback_balance)
+                        #     print(new_cashback)
+                        #     cashback_collection.document(user_id).update(
+                        #         {'cashback_wallet': new_cashback, 'phone_number': user_details['phone']})
+                        #
+                        # except TypeError as e:
+                        #     print(e)
+                        #     cashback_balance = (0.5 / 100) * float(amount)
+                        #     print(cashback_balance)
+                        #     cashback_collection.document(user_id).set(
+                        #         {'cashback_wallet': cashback_balance, 'phone_number': user_details['phone']})
+                        #
+                        #     print(cashback_collection.document(user_id).get().to_dict())
+                        #     print("did")
                         return Response(data={'status_code': response_code, "message": "Transaction Failed"},
                                         status=status.HTTP_400_BAD_REQUEST)
 
-                    sms = f"Your account has been credited with {data_volume}MB."
-                    r_sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to={receiver}&from=CloudHub GH&sms={sms}"
-                    response = requests.request("GET", url=r_sms_url)
-                    print(response.text)
-                    doc_ref = history_collection.document(date_and_time)
-                    doc_ref.update({'done': 'Successful'})
-                    mail_doc_ref = mail_collection.document(f"{reference}-Mail")
-                    file_path = 'business_api/mail.txt'  # Replace with your file path
-
-                    name = user["first name"]
-                    volume = data_volume
-                    date = date_and_time
-                    reference_t = reference
-                    receiver_t = receiver
-
-                    with open(file_path, 'r') as file:
-                        html_content = file.read()
-
-                    placeholders = {
-                        '{name}': name,
-                        '{volume}': volume,
-                        '{date}': date,
-                        '{reference}': reference_t,
-                        '{receiver}': receiver_t
-                    }
-
-                    for placeholder, value in placeholders.items():
-                        html_content = html_content.replace(placeholder, str(value))
-
-                    mail_doc_ref.set({
-                        'to': email,
-                        'message': {
-                            'subject': 'AT Flexi Bundle',
-                            'html': html_content,
-                            'messageId': 'CloudHub GH'
-                        }
-                    })
-
-                    # tot = user_collection.document(user_id)
-                    # print(tot.get().to_dict())
-                    # try:
-                    #     print(tot.get().to_dict()['at_total_sales'])
-                    #     previous_sale = tot.get().to_dict()['at_total_sales']
-                    #     print(f"Previous Sale: {previous_sale}")
-                    #     new_sale = float(previous_sale) + float(amount)
-                    #     print(new_sale)
-                    #     user_collection.document(user_id).update({'at_total_sales': new_sale})
-                    # except:
-                    #     user_collection.document(user_id).update({'at_total_sales': amount})
-
-                    # tat = cashback_collection.document(user_id)
-                    # print(tat.get().to_dict())
-                    #
-                    # try:
-                    #     previous_cashback = tat.get().to_dict()['cashback_wallet']
-                    #     print(previous_cashback)
-                    #     cashback_balance = (0.5 / 100) * float(amount)
-                    #     print(cashback_balance)
-                    #     new_cashback = float(previous_cashback) + float(cashback_balance)
-                    #     print(new_cashback)
-                    #     cashback_collection.document(user_id).update(
-                    #         {'cashback_wallet': new_cashback, 'phone_number': user_details['phone']})
-                    #
-                    # except TypeError as e:
-                    #     print(e)
-                    #     cashback_balance = (0.5 / 100) * float(amount)
-                    #     print(cashback_balance)
-                    #     cashback_collection.document(user_id).set(
-                    #         {'cashback_wallet': cashback_balance, 'phone_number': user_details['phone']})
-                    #
-                    #     print(cashback_collection.document(user_id).get().to_dict())
-                    #     print("did")
-
-                    return Response(data={'status_code': response_code, 'reference': reference},
-                                    status=status.HTTP_200_OK)
+                    else:
+                        return Response(data={'status_code': response_code, "message": "Transaction Failed"},
+                                        status=status.HTTP_200_OK)
                 else:
                     return Response(data={'status_code': 400, "message": "Not enough balance"},
                                     status=status.HTTP_400_BAD_REQUEST)
@@ -1621,123 +1621,123 @@ def admin_initiate_ishare_transaction(request):
                     data = ishare_response.json()
 
                     response_code = data["data"]["response_code"]
-                    if response_code is not "200":
+                    print(response_code)
+                    if response_code == "200":
+                        sms = f"Your account has been credited with {data_volume}MB."
+                        r_sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to={receiver}&from=Bundle&sms={sms}"
+                        response = requests.request("GET", url=r_sms_url)
+                        print(response.text)
+                        doc_ref = history_collection.document(date_and_time)
+                        doc_ref.update({'done': 'Successful'})
+                        mail_doc_ref = mail_collection.document(f"{reference}-Mail")
+
+                        file_path = 'business_api/main_mail.txt'  # Replace with your file path
+
+                        volume = data_volume
+                        bundle_amount = f"{volume}MB"
+                        amount = amount
+                        name = user_details["first name"]
+                        date = date_and_time
+                        reference_t = reference
+                        channel = "AT PREMIUM BUNDLE"
+
+                        # Read the email template from mail.txt and replace placeholders
+                        # with open(file_path, 'r') as file:
+                        #     mail_content = file.read()
+                        #     mail_content = mail_content.replace("{{bundle_amount}}", bundle_amount)
+                        #     mail_content = mail_content.replace("{{amount}}", amount)
+                        #     mail_content = mail_content.replace("{{name}}", name)
+                        #     mail_content = mail_content.replace("{{channel}}", channel)
+                        #     mail_content = mail_content.replace("{{date}}", date)
+                        #     mail_content = mail_content.replace("{{reference}}", reference_t)
+
+                        # url = "https://email.nalosolutions.com/smsbackend/clientapi/Nal_resl/send-email/"
+
+                        # payload = {
+                        #     "key": "n)p3@tf0hrdxljmcz8gq51drmmcz2wpj@nr9#3m3123(@5sam_1jrh58n08t(rge",
+                        #     "emailTo": [email],
+                        #     "emailFrom": "support@cloudhubgh.com",
+                        #     "emailBody": mail_content,
+                        #     "senderName": "CloudHub GH",
+                        #     "subject": "Payment Received",
+                        #     "callBackUrl": "",
+                        #     "html": mail_content,  # Use the content of mail.txt with replaced placeholders
+                        # }
+                        # headers = {}
+
+                        # response = requests.request("POST", url, headers=headers, data=payload)
+
+                        # print(response.text)
+                        # file_path = 'business_api/mail.txt'  # Replace with your file path
+                        #
+                        # name = user_details["first name"]
+                        # volume = data_volume
+                        # date = date_and_time
+                        # reference_t = reference
+                        # receiver_t = receiver
+                        #
+                        # with open(file_path, 'r') as file:
+                        #     html_content = file.read()
+                        #
+                        # placeholders = {
+                        #     '{name}': name,
+                        #     '{volume}': volume,
+                        #     '{date}': date,
+                        #     '{reference}': reference_t,
+                        #     '{receiver}': receiver_t
+                        # }
+                        #
+                        # for placeholder, value in placeholders.items():
+                        #     html_content = html_content.replace(placeholder, str(value))
+                        #
+                        # mail_doc_ref.set({
+                        #     'to': email,
+                        #     'message': {
+                        #         'subject': 'AT Flexi Bundle',
+                        #         'html': html_content,
+                        #         'messageId': 'CloudHub GH'
+                        #     }
+                        # })
+
+                        # tot = user_collection.document(user_id)
+                        # print(tot.get().to_dict())
+                        # try:
+                        #     print(tot.get().to_dict()['at_total_sales'])
+                        #     previous_sale = tot.get().to_dict()['at_total_sales']
+                        #     print(f"Previous Sale: {previous_sale}")
+                        #     new_sale = float(previous_sale) + float(amount)
+                        #     print(new_sale)
+                        #     user_collection.document(user_id).update({'at_total_sales': new_sale})
+                        # except:
+                        #     user_collection.document(user_id).update({'at_total_sales': amount})
+
+                        #                     tat = cashback_collection.document(user_id)
+                        #                     print(tat.get().to_dict())
+                        #
+                        #                     try:
+                        #                         previous_cashback = tat.get().to_dict()['cashback_wallet']
+                        #                         print(previous_cashback)
+                        #                         cashback_balance = (0.5 / 100) * float(amount)
+                        #                         print(cashback_balance)
+                        #                         new_cashback = float(previous_cashback) + float(cashback_balance)
+                        #                         print(new_cashback)
+                        #                         cashback_collection.document(user_id).update(
+                        #                             {'cashback_wallet': new_cashback, 'phone_number': user_details['phone']})
+                        #
+                        #                     except TypeError as e:
+                        #                         print(e)
+                        #                         cashback_balance = (0.5 / 100) * float(amount)
+                        #                         print(cashback_balance)
+                        #                         cashback_collection.document(user_id).set(
+                        #                             {'cashback_wallet': cashback_balance, 'phone_number': user_details['phone']})
+                        #
+                        #                         print(cashback_collection.document(user_id).get().to_dict())
+                        #                         print("did")
+                        return Response(data={'status_code': response_code, "message": "Transaction Successful"},
+                                        status=status.HTTP_200_OK)
+                    else:
                         return Response(data={'status_code': response_code, "message": "Transaction Failed"},
-                                        status=status.HTTP_400_BAD_REQUEST)
-
-                    sms = f"Your account has been credited with {data_volume}MB."
-                    r_sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to={receiver}&from=Bundle&sms={sms}"
-                    response = requests.request("GET", url=r_sms_url)
-                    print(response.text)
-                    doc_ref = history_collection.document(date_and_time)
-                    doc_ref.update({'done': 'Successful'})
-                    mail_doc_ref = mail_collection.document(f"{reference}-Mail")
-
-                    file_path = 'business_api/main_mail.txt'  # Replace with your file path
-
-                    volume = data_volume
-                    bundle_amount = f"{volume}MB"
-                    amount = amount
-                    name = user_details["first name"]
-                    date = date_and_time
-                    reference_t = reference
-                    channel = "AT PREMIUM BUNDLE"
-
-                    # Read the email template from mail.txt and replace placeholders
-                    # with open(file_path, 'r') as file:
-                    #     mail_content = file.read()
-                    #     mail_content = mail_content.replace("{{bundle_amount}}", bundle_amount)
-                    #     mail_content = mail_content.replace("{{amount}}", amount)
-                    #     mail_content = mail_content.replace("{{name}}", name)
-                    #     mail_content = mail_content.replace("{{channel}}", channel)
-                    #     mail_content = mail_content.replace("{{date}}", date)
-                    #     mail_content = mail_content.replace("{{reference}}", reference_t)
-
-                    # url = "https://email.nalosolutions.com/smsbackend/clientapi/Nal_resl/send-email/"
-
-                    # payload = {
-                    #     "key": "n)p3@tf0hrdxljmcz8gq51drmmcz2wpj@nr9#3m3123(@5sam_1jrh58n08t(rge",
-                    #     "emailTo": [email],
-                    #     "emailFrom": "support@cloudhubgh.com",
-                    #     "emailBody": mail_content,
-                    #     "senderName": "CloudHub GH",
-                    #     "subject": "Payment Received",
-                    #     "callBackUrl": "",
-                    #     "html": mail_content,  # Use the content of mail.txt with replaced placeholders
-                    # }
-                    # headers = {}
-
-                    # response = requests.request("POST", url, headers=headers, data=payload)
-
-                    # print(response.text)
-                    # file_path = 'business_api/mail.txt'  # Replace with your file path
-                    #
-                    # name = user_details["first name"]
-                    # volume = data_volume
-                    # date = date_and_time
-                    # reference_t = reference
-                    # receiver_t = receiver
-                    #
-                    # with open(file_path, 'r') as file:
-                    #     html_content = file.read()
-                    #
-                    # placeholders = {
-                    #     '{name}': name,
-                    #     '{volume}': volume,
-                    #     '{date}': date,
-                    #     '{reference}': reference_t,
-                    #     '{receiver}': receiver_t
-                    # }
-                    #
-                    # for placeholder, value in placeholders.items():
-                    #     html_content = html_content.replace(placeholder, str(value))
-                    #
-                    # mail_doc_ref.set({
-                    #     'to': email,
-                    #     'message': {
-                    #         'subject': 'AT Flexi Bundle',
-                    #         'html': html_content,
-                    #         'messageId': 'CloudHub GH'
-                    #     }
-                    # })
-
-                    # tot = user_collection.document(user_id)
-                    # print(tot.get().to_dict())
-                    # try:
-                    #     print(tot.get().to_dict()['at_total_sales'])
-                    #     previous_sale = tot.get().to_dict()['at_total_sales']
-                    #     print(f"Previous Sale: {previous_sale}")
-                    #     new_sale = float(previous_sale) + float(amount)
-                    #     print(new_sale)
-                    #     user_collection.document(user_id).update({'at_total_sales': new_sale})
-                    # except:
-                    #     user_collection.document(user_id).update({'at_total_sales': amount})
-
-                    #                     tat = cashback_collection.document(user_id)
-                    #                     print(tat.get().to_dict())
-                    #
-                    #                     try:
-                    #                         previous_cashback = tat.get().to_dict()['cashback_wallet']
-                    #                         print(previous_cashback)
-                    #                         cashback_balance = (0.5 / 100) * float(amount)
-                    #                         print(cashback_balance)
-                    #                         new_cashback = float(previous_cashback) + float(cashback_balance)
-                    #                         print(new_cashback)
-                    #                         cashback_collection.document(user_id).update(
-                    #                             {'cashback_wallet': new_cashback, 'phone_number': user_details['phone']})
-                    #
-                    #                     except TypeError as e:
-                    #                         print(e)
-                    #                         cashback_balance = (0.5 / 100) * float(amount)
-                    #                         print(cashback_balance)
-                    #                         cashback_collection.document(user_id).set(
-                    #                             {'cashback_wallet': cashback_balance, 'phone_number': user_details['phone']})
-                    #
-                    #                         print(cashback_collection.document(user_id).get().to_dict())
-                    #                         print("did")
-
-                    return Response(data={'status_code': response_code, 'reference': reference},
-                                    status=status.HTTP_200_OK)
+                                        status=status.HTTP_200_OK)
                 else:
                     return Response(data={'status_code': 400, "message": "Not enough balance"},
                                     status=status.HTTP_400_BAD_REQUEST)
