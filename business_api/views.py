@@ -1441,8 +1441,12 @@ def initiate_ishare_transaction(request):
                                         status=status.HTTP_200_OK)
 
                     else:
+                        doc_ref = history_collection.document(date_and_time)
+                        doc_ref.update({'done': 'Failed', 'status': 'Failed'})
+                        history_web.collection(email).document(date_and_time).update(
+                            {'batch_id': reference, 'responseCode': response_code, 'status': 'Failed'})
                         return Response(data={'status_code': response_code, "message": "Transaction Failed"},
-                                        status=status.HTTP_200_OK)
+                                        status=status.HTTP_400_BAD_REQUEST)
                 else:
                     return Response(data={'status_code': 400, "message": "Not enough balance"},
                                     status=status.HTTP_400_BAD_REQUEST)
@@ -1736,8 +1740,12 @@ def admin_initiate_ishare_transaction(request):
                         return Response(data={'status_code': response_code, "message": "Transaction Successful"},
                                         status=status.HTTP_200_OK)
                     else:
+                        doc_ref = history_collection.document(date_and_time)
+                        doc_ref.update({'done': 'Failed', 'status': 'Failed'})
+                        history_web.collection(email).document(date_and_time).update(
+                            {'batch_id': reference, 'responseCode': response_code, 'status': 'Failed'})
                         return Response(data={'status_code': response_code, "message": "Transaction Failed"},
-                                        status=status.HTTP_200_OK)
+                                        status=status.HTTP_400_BAD_REQUEST)
                 else:
                     return Response(data={'status_code': 400, "message": "Not enough balance"},
                                     status=status.HTTP_400_BAD_REQUEST)
