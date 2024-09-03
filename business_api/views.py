@@ -1366,7 +1366,7 @@ def initiate_ishare_transaction(request):
                     response_code = data["data"]["response_code"]
                     if response_code == "200":
                         sms = f"Your account has been credited with {data_volume}MB."
-                        r_sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to={receiver}&from=CloudHub GH&sms={sms}"
+                        r_sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to={receiver}&from=Bundle&sms={sms}"
                         response = requests.request("GET", url=r_sms_url)
                         print(response.text)
                         doc_ref = history_collection.document(date_and_time)
