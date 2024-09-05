@@ -116,7 +116,7 @@ def get_user_details(user_id):
         return None
 
 
-def send_ishare_bundle(first_name: str, last_name: str, buyer, receiver: str, email: str, bundle: float
+def send_ishare_bundle(first_name: str, last_name: str, buyer, receiver: str, email: str, bundle: float, reference:str
                        ):
     import uuid
     transaction_reference = f"TXN-{uuid.uuid4().hex[:8].upper()}"
@@ -130,7 +130,7 @@ def send_ishare_bundle(first_name: str, last_name: str, buyer, receiver: str, em
 
     # Payload with transaction details
     payload = {
-        "transaction_id": transaction_reference,
+        "transaction_id": reference,
         "volume": str(int(bundle)),
         "recipient": str(receiver)
     }
@@ -245,7 +245,7 @@ def send_and_save_to_history(user_id,
     ishare_response = send_ishare_bundle(first_name=first_name, last_name=last_name, receiver=receiver,
                                          buyer=phone,
                                          bundle=data_volume,
-                                         email=email)
+                                         email=email, reference=reference)
     json_response = ishare_response.json()
     print(f"hello:{json_response}")
     print(ishare_response.status_code)
