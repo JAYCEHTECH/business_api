@@ -44,6 +44,7 @@ history_collection = database.collection(u'History Web')
 mail_collection = database.collection('mail')
 mtn_history = database.collection('MTN_Admin_History')
 mtn_tranx = mtn_history.document('mtnTransactions')
+ishare_tranx = mtn_tranx.document('ishare')
 big_time = mtn_tranx.collection('big_time')
 telecel = mtn_tranx.collection('telecel')
 mtn_other = mtn_tranx.collection('mtnOther')
@@ -230,7 +231,7 @@ def send_and_save_to_history(user_id,
         'paid_at': date_and_time,
         'reference': reference,
         'responseCode': "0",
-        'status': "Delivered",
+        'status': "Pending",
         'time': time,
         'tranxId': str(tranx_id_generator()),
         'type': "AT PREMIUM BUNDLE",
@@ -239,6 +240,7 @@ def send_and_save_to_history(user_id,
     }
     history_collection.document(date_and_time).set(data)
     history_web.collection(email).document(date_and_time).set(data)
+    ishare_tranx.set(data)
 
     print("first save")
 
@@ -255,6 +257,7 @@ def send_and_save_to_history(user_id,
     doc_ref.update({'batch_id': reference, 'responseCode': response_code})
     history_web.collection(email).document(date_and_time).update(
         {'batch_id': reference, 'responseCode': response_code})
+    ishare_tranx.document(date_and_time).update({'responseCode': response_code, 'batch_id': reference})
     # data = {
     #     'batch_id': batch_id,
     #     'buyer': phone,
@@ -1362,15 +1365,21 @@ def initiate_ishare_transaction(request):
                             data={'status_code': ishare_response.status_code, "message": "Authorization Failed"},
                             status=status.HTTP_400_BAD_REQUEST)
                     data = ishare_response.json()
-
-                    response_code = data["data"]["response_code"]
+                    try:
+                        response_code = data["data"]["response_code"]
+                    except Exception as e:
+                        print(e)
+                        return Response(
+                            data={'status_code': ishare_response.status_code, "message": "Bad Response from API"},
+                            status=status.HTTP_400_BAD_REQUEST)
                     if response_code == "200":
                         sms = f"Your account has been credited with {data_volume}MB."
                         r_sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to={receiver}&from=Bundle&sms={sms}"
                         response = requests.request("GET", url=r_sms_url)
                         print(response.text)
                         doc_ref = history_collection.document(date_and_time)
-                        doc_ref.update({'done': 'Successful'})
+                        doc_ref.update({'done': 'Successful', 'status': 'Delivered'})
+                        ishare_tranx.document(date_and_time).update({'responseCode': response_code, 'batch_id': reference, 'status': 'Delivered'})
                         mail_doc_ref = mail_collection.document(f"{reference}-Mail")
                         file_path = 'business_api/mail.txt'  # Replace with your file path
 
@@ -1624,7 +1633,13 @@ def admin_initiate_ishare_transaction(request):
                             status=status.HTTP_400_BAD_REQUEST)
                     data = ishare_response.json()
 
-                    response_code = data["data"]["response_code"]
+                    try:
+                        response_code = data["data"]["response_code"]
+                    except Exception as e:
+                        print(e)
+                        return Response(
+                            data={'status_code': ishare_response.status_code, "message": "Bad Response from API"},
+                            status=status.HTTP_400_BAD_REQUEST)
                     print(response_code)
                     if response_code == "200":
                         sms = f"Your account has been credited with {data_volume}MB."
@@ -1632,7 +1647,9 @@ def admin_initiate_ishare_transaction(request):
                         response = requests.request("GET", url=r_sms_url)
                         print(response.text)
                         doc_ref = history_collection.document(date_and_time)
-                        doc_ref.update({'done': 'Successful'})
+                        doc_ref.update({'done': 'Successful', 'status': 'Delivered'})
+                        ishare_tranx.document(date_and_time).update(
+                            {'responseCode': response_code, 'batch_id': reference, 'status': 'Delivered'})
                         mail_doc_ref = mail_collection.document(f"{reference}-Mail")
 
                         file_path = 'business_api/main_mail.txt'  # Replace with your file path
