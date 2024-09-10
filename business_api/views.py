@@ -44,7 +44,7 @@ history_collection = database.collection(u'History Web')
 mail_collection = database.collection('mail')
 mtn_history = database.collection('MTN_Admin_History')
 mtn_tranx = mtn_history.document('mtnTransactions')
-ishare_tranx = mtn_tranx.document('ishare')
+ishare_tranx = mtn_tranx.collection('ishare')
 big_time = mtn_tranx.collection('big_time')
 telecel = mtn_tranx.collection('telecel')
 mtn_other = mtn_tranx.collection('mtnOther')
@@ -1454,6 +1454,8 @@ def initiate_ishare_transaction(request):
                         doc_ref.update({'done': 'Failed', 'status': 'Failed'})
                         history_web.collection(email).document(date_and_time).update(
                             {'batch_id': reference, 'responseCode': response_code, 'status': 'Failed'})
+                        ishare_tranx.document(date_and_time).update(
+                            {'responseCode': response_code, 'batch_id': reference, 'status': 'Failed'})
                         return Response(data={'status_code': response_code, "message": "Transaction Failed"},
                                         status=status.HTTP_400_BAD_REQUEST)
                 else:
