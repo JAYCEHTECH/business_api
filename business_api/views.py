@@ -231,7 +231,7 @@ def send_and_save_to_history(user_id,
         'paid_at': date_and_time,
         'reference': reference,
         'responseCode': "0",
-        'status': "Pending",
+        'status': "Delivered",
         'time': time,
         'tranxId': str(tranx_id_generator()),
         'type': "AT PREMIUM BUNDLE",
@@ -251,7 +251,13 @@ def send_and_save_to_history(user_id,
     json_response = ishare_response.json()
     print(f"hello:{json_response}")
     print(ishare_response.status_code)
-    response_code = json_response["data"]["response_code"]
+    try:
+        response_code = json_response["data"]["response_code"]
+    except Exception as e:
+        print(e)
+        return Response(
+            data={'status_code': ishare_response.status_code, "message": "Bad Response from API"},
+            status=status.HTTP_400_BAD_REQUEST)
 
     doc_ref = history_collection.document(date_and_time)
     doc_ref.update({'batch_id': reference, 'responseCode': response_code})
