@@ -240,7 +240,7 @@ def send_and_save_to_history(user_id,
     }
     history_collection.document(date_and_time).set(data)
     history_web.collection(email).document(date_and_time).set(data)
-    ishare_tranx.set(data)
+    ishare_tranx.document(date_and_time).set(data)
 
     print("first save")
 
