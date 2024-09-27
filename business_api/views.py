@@ -1489,17 +1489,17 @@ def admin_initiate_ishare_transaction(request):
     #     return JsonResponse({'error': 'Host not allowed'}, status=403)
     protocol = request.data.get("protocol")
 
-    if not protocol:
-        allowed_origins = ['https://reseller.cloudhubgh.com']
-
-        if 'HTTP_ORIGIN' not in request.META:
-            return JsonResponse({'error': 'Origin header missing'}, status=400)
-
-        request_origin = request.META['HTTP_ORIGIN']
-        print(f"origiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnn issssssssssssssssssssssssssssssssssssssssss {request_origin}")
-
-        if request_origin not in allowed_origins:
-            return JsonResponse({'error': 'Origin not allowed'}, status=403)
+    # if not protocol:
+    #     allowed_origins = ['https://reseller.cloudhubgh.com']
+    #
+    #     if 'HTTP_ORIGIN' not in request.META:
+    #         return JsonResponse({'error': 'Origin header missing'}, status=400)
+    #
+    #     request_origin = request.META['HTTP_ORIGIN']
+    #     print(f"origiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnn issssssssssssssssssssssssssssssssssssssssss {request_origin}")
+    #
+    #     if request_origin not in allowed_origins:
+    #         return JsonResponse({'error': 'Origin not allowed'}, status=403)
 
     if protocol:
         if protocol != config("PROTOCOL"):
